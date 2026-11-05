@@ -1,25 +1,23 @@
 # Doc
 
-A browser-style workspace with a focus on thoughtful interface design, smooth interactions, and a calm waterfront-inspired look.
+doc brings browsing, apps, and games together in one place. its ui is built around a compact toolbar, tabs, and a nice ui polish.
 
-Doc brings browsing, apps, and quick-play experiences together in one place. Its interface is built around a compact glass toolbar, flexible tabs, and custom controls that keep the experience consistent.
+## Stuff
 
-## What’s inside
-
-- **Browser workspace** — navigation controls, tabs, bookmarks, and history.
-- **Apps** — a curated collection of useful web destinations.
-- **Play** — a selection of games organized for easy browsing.
-- **Custom interface** — responsive layouts, floating panels, and in-app menus.
-- **Proxy engine** — experimental Scramjet integration for supported browsing.
+- **Browser workspace** - navigation controls, tabs, bookmarks, and history.
+- **Apps** - a curated collection of useful web destinations.
+- **Play** - a selection of games organized for easy browsing.
+- **Custom interface** - responsive layouts, floating panels, and in-app menus.
+- **Proxy engine** - Scramjet for browsing.
 
 ## Project status
 
-Doc is a personal UI development project and is still evolving. Some features and websites may behave differently depending on browser support and the limits of the proxy engine.
+Doc is a personal development project and is still evolving. Some features and websites may behave differently depending on browser support and the limits of the proxy engine.
 
 ## Try it
 
 [Open Doc](https://theexpie.github.io/fuckin-doc-idk/)
-
+or [Open Doc](https://cdn.jsdelivr.net/gh/theexpie/fuckin-doc-idk/index.svg) - might be a bit outdated if it caches too much, ctrl+shift+r every load so its new.
 ---
 
-Designed and developed as an ongoing experiment in web interfaces.
+not final build, still being worked on.
