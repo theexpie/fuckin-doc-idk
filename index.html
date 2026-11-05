@@ -518,12 +518,16 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 #browser-tabs{position:relative;z-index:1;width:100%;height:39px;min-height:39px;display:flex;align-items:center;gap:8px;padding:0 2px 6px;border-bottom:1px solid rgba(157,226,224,.14)}
 #tab-strip{display:flex;align-items:center;gap:6px;min-width:0;flex:1;height:100%;overflow-x:auto;scrollbar-width:none}
 #tab-strip::-webkit-scrollbar{display:none}
-.browser-tab{position:relative;display:flex;align-items:center;gap:9px;min-width:125px;max-width:225px;height:38px;padding:0 11px;border:1px solid transparent;border-radius:11px;background:rgba(255,255,255,.045);color:var(--text-muted);font-size:12px;cursor:grab;user-select:none;transition:background .2s,border-color .2s,transform .2s;flex:0 1 190px}
+.browser-tab{position:relative;display:flex;align-items:center;gap:9px;min-width:125px;max-width:225px;height:38px;padding:0 11px;border:1px solid transparent;border-radius:11px;background:rgba(255,255,255,.045);color:var(--text-muted);font-size:12px;cursor:default;user-select:none;flex:0 1 190px;touch-action:pan-y;transition:background .18s,border-color .18s,opacity .16s}
 .browser-tab.active{background:rgba(67,198,189,.16);border-color:rgba(110,221,210,.3);color:var(--text-main)}
-.browser-tab.dragging{opacity:.4;transform:scale(.96)}
+.browser-tab.tab-drag-source{display:none}
+.tab-drop-placeholder{height:34px;min-width:38px;max-width:225px;flex:0 1 190px;border:1px dashed rgba(120,220,211,.55);border-radius:10px;background:rgba(67,198,189,.09);pointer-events:none}
+.tab-drag-ghost{position:fixed!important;z-index:2147483647!important;pointer-events:none!important;opacity:.96!important;transform:scale(1.035) rotate(.6deg);background:rgba(8,53,62,.97)!important;border-color:rgba(120,220,211,.65)!important;box-shadow:0 18px 44px rgba(0,0,0,.48),0 0 0 1px rgba(120,220,211,.16)!important;transition:none!important;cursor:grabbing!important}
 .browser-tab .tab-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;text-align:left}
 .browser-tab .tab-close{border:0;background:none;color:inherit;opacity:.6;font-size:16px;line-height:1;cursor:pointer;padding:2px 3px}
 .browser-tab .tab-close:hover{opacity:1;color:#ff9a9a}
+#tab-strip.is-reordering{overflow-x:auto;scroll-behavior:auto}
+#tab-strip.is-reordering .browser-tab{transition:width .16s ease,flex-basis .16s ease}
 .chrome-icon-btn{width:37px;height:37px;flex:0 0 37px;border:1px solid transparent;border-radius:11px;background:transparent;color:#d9efec;display:grid;place-items:center;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
 .chrome-icon-btn svg{width:19px;height:19px}
 .chrome-icon-btn:hover{background:rgba(255,255,255,.09);border-color:rgba(157,226,224,.18)}
@@ -1170,48 +1174,63 @@ function persistHistory(){try{localStorage.setItem("doc-history",JSON.stringify(
 let tabPointerDrag=null;
 function renderBrowserTabs(){
  tabStrip.innerHTML="";
- browserTabs.forEach((tab,index)=>{
+ browserTabs.forEach(tab=>{
   const el=document.createElement("div");el.className="browser-tab"+(tab.id===activeBrowserTab?" active":"");el.dataset.tabId=tab.id;
   const title=document.createElement("span");title.className="tab-title";title.textContent=tab.title||"New tab";
   const close=document.createElement("button");close.className="tab-close";close.type="button";close.setAttribute("aria-label","Close tab");close.textContent="×";
   close.addEventListener("click",e=>{e.stopPropagation();closeBrowserTab(tab.id)});
   el.append(title,close);
   el.addEventListener("pointerdown",e=>{
-   if(e.target.closest(".tab-close")||e.button!==0)return;
-   tabPointerDrag={id:tab.id,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,lastX:e.clientX,dragging:false,el};
-   el.setPointerCapture?.(e.pointerId);
+   if(e.target.closest(".tab-close")||e.button!==0||tabPointerDrag)return;
+   e.preventDefault();
+   tabPointerDrag={id:tab.id,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,x:e.clientX,y:e.clientY,started:false,el,ghost:null,placeholder:null};
   });
-  el.addEventListener("pointermove",e=>{
-   const drag=tabPointerDrag;if(!drag||drag.id!==tab.id||drag.pointerId!==e.pointerId)return;
-   const dx=e.clientX-drag.startX,dy=e.clientY-drag.startY;
-   if(!drag.dragging&&Math.hypot(dx,dy)>7){drag.dragging=true;el.classList.add("pointer-dragging");el.classList.remove("active");}
-   if(!drag.dragging)return;
-   drag.lastX=e.clientX;
-   const target=document.elementFromPoint(e.clientX,e.clientY)?.closest(".browser-tab");
-   if(!target||target===el)return;
-   const from=browserTabs.findIndex(t=>t.id===drag.id),to=browserTabs.findIndex(t=>t.id===target.dataset.tabId);
-   if(from<0||to<0||from===to)return;
-   const targetRect=target.getBoundingClientRect();
-   const insertAfter=e.clientX>targetRect.left+targetRect.width/2;
-   const moved=browserTabs.splice(from,1)[0];
-   let nextIndex=browserTabs.findIndex(t=>t.id===target.dataset.tabId);
-   if(insertAfter)nextIndex++;
-   browserTabs.splice(Math.max(0,Math.min(browserTabs.length,nextIndex)),0,moved);
-   if(insertAfter)tabStrip.insertBefore(el,target.nextSibling);
-   else tabStrip.insertBefore(el,target);
-  });
-  const finishPointer=e=>{
-   const drag=tabPointerDrag;if(!drag||drag.id!==tab.id||drag.pointerId!==e.pointerId)return;
-   tabPointerDrag=null;
-   el.classList.remove("pointer-dragging");
-   if(drag.dragging){renderBrowserTabs();tabStrip.querySelector('[data-tab-id="'+tab.id+'"]')?.scrollIntoView({block:"nearest",inline:"nearest",behavior:"smooth"});}
-   else switchBrowserTab(tab.id);
-  };
-  el.addEventListener("pointerup",finishPointer);
-  el.addEventListener("pointercancel",finishPointer);
   tabStrip.appendChild(el);
  });
 }
+function beginTabReorder(drag){
+ const rect=drag.el.getBoundingClientRect();
+ const ghost=drag.el.cloneNode(true);
+ ghost.classList.add("tab-drag-ghost");ghost.style.left=rect.left+"px";ghost.style.top=rect.top+"px";ghost.style.width=rect.width+"px";ghost.style.height=rect.height+"px";
+ document.body.appendChild(ghost);
+ const placeholder=document.createElement("div");placeholder.className="tab-drop-placeholder";placeholder.style.width=rect.width+"px";
+ tabStrip.insertBefore(placeholder,drag.el);drag.el.classList.add("tab-drag-source");tabStrip.classList.add("is-reordering");
+ drag.ghost=ghost;drag.placeholder=placeholder;drag.started=true;
+}
+function moveTabReorder(e){
+ const drag=tabPointerDrag;if(!drag||drag.pointerId!==e.pointerId)return;
+ drag.x=e.clientX;drag.y=e.clientY;
+ if(!drag.started&&Math.hypot(e.clientX-drag.startX,e.clientY-drag.startY)>5)beginTabReorder(drag);
+ if(!drag.started)return;
+ e.preventDefault();
+ drag.ghost.style.left=(e.clientX-drag.ghost.offsetWidth/2)+"px";
+ drag.ghost.style.top=(e.clientY-drag.ghost.offsetHeight/2)+"px";
+ const target=document.elementFromPoint(e.clientX,e.clientY)?.closest(".browser-tab:not(.tab-drag-source)");
+ if(target&&target.parentElement===tabStrip){
+  const r=target.getBoundingClientRect();
+  const after=e.clientX>r.left+r.width/2;
+  const reference=after?target.nextSibling:target;
+  if(reference!==drag.placeholder&&reference!==drag.placeholder.nextSibling)tabStrip.insertBefore(drag.placeholder,reference);
+ }
+ const stripRect=tabStrip.getBoundingClientRect(),edge=34;
+ if(e.clientX<stripRect.left+edge)tabStrip.scrollLeft-=Math.ceil((stripRect.left+edge-e.clientX)*.22);
+ else if(e.clientX>stripRect.right-edge)tabStrip.scrollLeft+=Math.ceil((e.clientX-(stripRect.right-edge))*.22);
+}
+function finishTabReorder(e){
+ const drag=tabPointerDrag;if(!drag||drag.pointerId!==e.pointerId)return;
+ tabPointerDrag=null;
+ if(!drag.started){switchBrowserTab(drag.id);return}
+ drag.placeholder.replaceWith(drag.el);drag.el.classList.remove("tab-drag-source");
+ drag.ghost.remove();tabStrip.classList.remove("is-reordering");
+ const order=[...tabStrip.querySelectorAll(".browser-tab")].map(node=>node.dataset.tabId);
+ browserTabs.sort((x,y)=>order.indexOf(x.id)-order.indexOf(y.id));
+ renderBrowserTabs();
+ const active=tabStrip.querySelector('[data-tab-id="'+drag.id+'"]');
+ active?.scrollIntoView({block:"nearest",inline:"nearest",behavior:"smooth"});
+}
+window.addEventListener("pointermove",moveTabReorder,{passive:false});
+window.addEventListener("pointerup",finishTabReorder);
+window.addEventListener("pointercancel",finishTabReorder);
 function createBrowserTab(url=""){
  const tab={id:"tab-"+(++tabSequence),url,title:url?tabTitle(url):"New tab"};browserTabs.push(tab);activeBrowserTab=tab.id;renderBrowserTabs();if(url)navigateBrowserTab(tab,url);return tab;
 }
