@@ -452,6 +452,23 @@ header {
   .dock-item span { display: none; }
   .dock-item { padding: 10px 14px; }
 }
+
+.catalog-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(160px,260px) 145px;gap:9px;align-items:center;margin-bottom:16px}
+.catalog-heading{min-width:0}.catalog-heading .section-title{margin:0 0 5px}.catalog-subtitle{font-size:12px;color:var(--text-muted)}
+.catalog-search,.catalog-category{width:100%;min-width:0;background:rgba(0,0,0,.34);border:1px solid var(--panel-border);color:var(--text-main);border-radius:11px;padding:11px 12px;outline:0;font:inherit;font-size:13px}
+.catalog-search:focus,.catalog-category:focus{border-color:rgba(0,190,220,.65);box-shadow:0 0 0 3px rgba(0,160,190,.12)}
+.catalog-grid{grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:11px}
+.catalog-card{min-height:100px;display:grid;grid-template-columns:44px minmax(0,1fr) 18px;align-items:center;gap:11px;text-align:left;padding:14px;border:1px solid rgba(255,255,255,.085);background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.025));border-radius:16px;transition:transform .18s,border-color .18s,background .18s;overflow:hidden}
+.catalog-card:hover{transform:translateY(-2px);border-color:rgba(0,190,220,.42);background:linear-gradient(145deg,rgba(0,136,168,.16),rgba(255,255,255,.035))}
+.catalog-card:active{transform:scale(.985)}.catalog-icon{position:relative;width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.09);overflow:hidden}
+.catalog-icon img{position:absolute;width:27px;height:27px;object-fit:contain}.catalog-icon b{font-size:17px;color:#fff}
+.catalog-copy{min-width:0;display:flex;flex-direction:column;gap:5px}.catalog-name{font-size:13px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.catalog-desc{font-size:11px;color:var(--text-muted);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.catalog-tag{font-size:9px;letter-spacing:.35px;text-transform:uppercase;color:#8bd9e7;background:rgba(0,136,168,.14);border:1px solid rgba(0,136,168,.2);border-radius:99px;padding:3px 6px}
+.catalog-arrow{color:var(--text-muted);font-size:17px}.catalog-empty{grid-column:1/-1;padding:30px 12px;text-align:center;color:var(--text-muted);font-size:13px;border:1px dashed var(--panel-border);border-radius:14px}
+@media(max-width:680px){.catalog-head{grid-template-columns:1fr 1fr}.catalog-heading{grid-column:1/-1}.catalog-grid{grid-template-columns:repeat(auto-fill,minmax(145px,1fr))}.catalog-card{grid-template-columns:38px minmax(0,1fr);padding:11px;gap:9px;min-height:92px}.catalog-icon{width:38px;height:38px}.catalog-icon img{width:23px;height:23px}.catalog-arrow{display:none}}
+@media(max-width:390px){.catalog-head{grid-template-columns:1fr}.catalog-heading{grid-column:auto}.catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.catalog-card{grid-template-columns:32px minmax(0,1fr);gap:7px;padding:9px}.catalog-icon{width:32px;height:32px;border-radius:10px}.catalog-icon img{width:20px;height:20px}.catalog-name{font-size:12px}.catalog-desc{font-size:10px}}
+
 </style>
 </head>
 <body>
@@ -493,14 +510,12 @@ header {
 
   <!-- Apps View -->
   <div class="view-panel" id="view-apps">
-    <div class="section-title">Web Apps</div>
-    <div class="grid" id="apps-grid"></div>
+    <div class="catalog-head"><div class="catalog-heading"><div class="section-title">Web Apps</div><div class="catalog-subtitle">Your everyday tabs, one tap away.</div></div><input class="catalog-search" id="apps-filter" type="search" placeholder="Find an app..." autocomplete="off"><select class="catalog-category" id="apps-category" aria-label="Filter apps"><option value="all">All apps</option></select></div><div class="grid catalog-grid" id="apps-grid"></div>
   </div>
 
   <!-- Games View -->
   <div class="view-panel" id="view-games">
-    <div class="section-title">Games</div>
-    <div class="grid" id="games-grid"></div>
+    <div class="catalog-head"><div class="catalog-heading"><div class="section-title">Games</div><div class="catalog-subtitle">Quick launches. No digging around.</div></div><input class="catalog-search" id="games-filter" type="search" placeholder="Find a game..." autocomplete="off"><select class="catalog-category" id="games-category" aria-label="Filter games"><option value="all">All games</option></select></div><div class="grid catalog-grid" id="games-grid"></div>
   </div>
 
   <!-- Settings View -->
@@ -550,8 +565,8 @@ header {
   <div class="floating-panel" id="panel-devtools">
     <div class="panel-header"><span>DevTools Suite</span><button class="panel-close" data-close="devtools">&times;</button></div>
     <div class="panel-body">
-      <div style="font-family:monospace; color:#34d399; margin-bottom:8px;">[Doc Engine v3.2 - Scramjet Active]</div>
-      <div style="color:var(--text-muted); margin-bottom:12px;">WebSocket: wss://wisp.mercurywork.shop</div>
+      <div style="font-family:monospace; color:#34d399; margin-bottom:8px;">[Doc Engine — Scramjet 2.0.67-alpha.2]</div>
+      <div style="color:var(--text-muted); margin-bottom:12px;">Wisp transport: wss://wisp.mercurywork.shop/</div>
       <div style="font-weight:600; margin-bottom:4px;">Console Logs</div>
       <div style="background:rgba(0,0,0,0.5); padding:8px; border-radius:6px; font-family:monospace; font-size:11px; height:150px; overflow-y:auto; color:#a5b4fc;" id="console-logs">
         > Scramjet proxy tunnel initialized.<br>> Wisp endpoint connected.<br>
@@ -596,38 +611,78 @@ header {
   </button>
 </nav>
 
-<script src="/scramjet/scramjet.config.js"></script>
-<script src="/scramjet/scramjet.wasm.js"></script>
-<script src="/scramjet/scramjet.codecs.js"></script>
-<script src="/scramjet/scramjet.client.js"></script>
 <script>
-const MIST = {
-  wisp: "wss://wisp.mercurywork.shop",
-  encode(url) {
-    try {
-      if (typeof __scramjet !== 'undefined' && __scramjet.encodeUrl) return __scramjet.encodeUrl(url);
-      if (window.$scramjet && window.$scramjet.encodeUrl) return window.$scramjet.encodeUrl(url);
-    } catch(e) {}
-    return '/service/' + btoa(url);
-  }
-};
+const DOC_ENGINE=(()=>{
+ const base=new URL("./",window.location.href),wisp="wss://wisp.mercurywork.shop/";
+ const paths={sw:new URL("sw.js",base).href,runtime:new URL("scramjet.js",base).href,wasm:new URL("scramjet.wasm",base).href,utils:new URL("scramjet-utils.js",base).href,api:new URL("controller.api.js",base).href,inject:new URL("controller.inject.js",base).href,transport:"https://cdn.jsdelivr.net/gh/theexpie/Splooshi@343bcb5c839963d01ed3addb1487410876943756/libcurl-client.js"};
+ let controller=null,utils=null,frame=null,starting=null;
+ const log=m=>{const box=document.getElementById("console-logs");if(box){const line=document.createElement("div");line.textContent="> "+m;box.appendChild(line);box.scrollTop=box.scrollHeight;}console.info("[Doc]",m)};
+ const load=src=>new Promise((resolve,reject)=>{const s=document.createElement("script");s.src=src;s.async=false;s.onload=resolve;s.onerror=()=>reject(new Error("Failed to load "+src));document.head.appendChild(s)});
+ async function init(){
+  if(controller)return controller;if(starting)return starting;
+  starting=(async()=>{
+   if(!("serviceWorker"in navigator)||!window.isSecureContext)throw new Error("Scramjet needs HTTPS and service-worker support. Open Doc from GitHub Pages.");
+   log("Registering Scramjet service worker…");
+   await navigator.serviceWorker.register(paths.sw,{scope:base.pathname,updateViaCache:"none"});
+   const registration=await navigator.serviceWorker.ready;
+   if(!navigator.serviceWorker.controller){
+    log("Waiting for service worker control…");
+    await Promise.race([new Promise(resolve=>navigator.serviceWorker.addEventListener("controllerchange",resolve,{once:true})),new Promise((_,reject)=>setTimeout(()=>reject(new Error("Service worker is active but does not control this tab yet. Reload Doc once and retry.")),12000))]);
+   }
+   const sw=navigator.serviceWorker.controller;if(!sw||!registration.active)throw new Error("Scramjet service worker is not controlling this tab.");
+   log("Loading Scramjet runtime and Wisp transport…");
+   await load(paths.runtime);await load(paths.api);await load(paths.utils);await load(paths.transport);
+   const api=window.$scramjetController;utils=window.$scramjetUtils;
+   if(!api?.Controller)throw new Error("Scramjet controller API did not load.");
+   if(!utils?.HttpCachePlugin||!utils?.UrlWatcherPlugin||!utils?.CatchEscapedLinksPlugin)throw new Error("Scramjet utility plugins did not load.");
+   if(!window.LibcurlTransport?.LibcurlClient)throw new Error("Wisp transport client did not load.");
+   api.config.injectPath=paths.inject;api.config.wasmPath=paths.wasm;api.config.scramjetPath=paths.runtime;api.config.prefix=new URL("./~/sj/",base).pathname;
+   const transport=new window.LibcurlTransport.LibcurlClient({wisp,websocket:wisp});
+   controller=new api.Controller({serviceworker:sw,transport});
+   await Promise.race([controller.wait(),new Promise((_,reject)=>setTimeout(()=>reject(new Error("Scramjet handshake timed out. Check the Wisp endpoint and service worker.")),18000))]);
+   log("Scramjet is ready.");return controller;
+  })().catch(e=>{starting=null;log("ENGINE ERROR: "+(e?.message||e));throw e});
+  return starting;
+ }
+ function attach(iframe){
+  if(frame)return frame;if(!controller)throw new Error("Scramjet is not ready.");
+  const plugins=[new utils.HttpCachePlugin(),new utils.UrlWatcherPlugin(url=>{if(/^https?:\\/\\//i.test(String(url||""))){urlDisplay.textContent=url;document.getElementById("active-tab-title").textContent=(new URL(url)).hostname.replace(/^www\\./,"")}}),new utils.CatchEscapedLinksPlugin(url=>{const target=new URL(window.location.href);target.search="";target.searchParams.set("url",url.href);return target})];
+  frame=controller.createFrame(iframe,{plugins});return frame;
+ }
+ async function go(iframe,url){await init();return attach(iframe).go(url)}
+ function back(iframe){if(frame?.back)return frame.back();try{iframe.contentWindow.history.back()}catch{}}
+ function forward(iframe){if(frame?.forward)return frame.forward();try{iframe.contentWindow.history.forward()}catch{}}
+ function reload(iframe){if(frame?.reload)return frame.reload();try{iframe.contentWindow.location.reload()}catch{}}
+ return {init,go,back,forward,reload,get ready(){return !!controller}};
+})();
 
 const APPS = [
-  ["YouTube", "https://youtube.com"],
-  ["Discord", "https://discord.com/app"],
-  ["Spotify", "https://open.spotify.com"],
-  ["Twitch", "https://twitch.tv"],
-  ["Reddit", "https://reddit.com"],
-  ["GitHub", "https://github.com"]
+{name:"YouTube",url:"https://www.youtube.com",category:"Video",desc:"Videos, streams and creators",icon:"youtube.com"},
+{name:"Discord",url:"https://discord.com/app",category:"Social",desc:"Servers, calls and communities",icon:"discord.com"},
+{name:"Spotify",url:"https://open.spotify.com",category:"Music",desc:"Music, playlists and podcasts",icon:"spotify.com"},
+{name:"Twitch",url:"https://www.twitch.tv",category:"Video",desc:"Live streams and gaming",icon:"twitch.tv"},
+{name:"Reddit",url:"https://www.reddit.com",category:"Social",desc:"Communities for everything",icon:"reddit.com"},
+{name:"GitHub",url:"https://github.com",category:"Tools",desc:"Code, projects and repositories",icon:"github.com"},
+{name:"Google Drive",url:"https://drive.google.com",category:"Work",desc:"Files and cloud storage",icon:"drive.google.com"},
+{name:"Google Classroom",url:"https://classroom.google.com",category:"School",desc:"Classes, assignments and updates",icon:"classroom.google.com"},
+{name:"Canva",url:"https://www.canva.com",category:"Creative",desc:"Designs, slides and graphics",icon:"canva.com"},
+{name:"ChatGPT",url:"https://chatgpt.com",category:"Tools",desc:"Chat, research and create",icon:"chatgpt.com"},
+{name:"Gmail",url:"https://mail.google.com",category:"Work",desc:"Your inbox and messages",icon:"mail.google.com"},
+{name:"Wikipedia",url:"https://www.wikipedia.org",category:"Learning",desc:"The free encyclopedia",icon:"wikipedia.org"}
 ];
-
 const GAMES = [
-  ["Krunker", "https://krunker.io"],
-  ["1v1.LOL", "https://1v1.lol"],
-  ["Shell Shockers", "https://shellshock.io"],
-  ["TETR.IO", "https://tetr.io"],
-  ["Chess.com", "https://chess.com"],
-  ["Poki", "https://poki.com"]
+{name:"Roblox",url:"https://www.roblox.com",category:"Multiplayer",desc:"Millions of player-made worlds",icon:"roblox.com"},
+{name:"Krunker",url:"https://krunker.io",category:"FPS",desc:"Fast browser-based arena FPS",icon:"krunker.io"},
+{name:"1v1.LOL",url:"https://1v1.lol",category:"FPS",desc:"Build, aim and outplay",icon:"1v1.lol"},
+{name:"Shell Shockers",url:"https://shellshock.io",category:"FPS",desc:"Eggs with serious firepower",icon:"shellshock.io"},
+{name:"TETR.IO",url:"https://tetr.io",category:"Puzzle",desc:"Competitive modern Tetris",icon:"tetr.io"},
+{name:"Chess.com",url:"https://www.chess.com",category:"Strategy",desc:"Play chess and solve puzzles",icon:"chess.com"},
+{name:"Poki",url:"https://poki.com",category:"Arcade",desc:"A huge collection of quick games",icon:"poki.com"},
+{name:"CrazyGames",url:"https://www.crazygames.com",category:"Arcade",desc:"Discover browser games",icon:"crazygames.com"},
+{name:"itch.io",url:"https://itch.io/games",category:"Indie",desc:"Indie games from small creators",icon:"itch.io"},
+{name:"Agar.io",url:"https://agar.io",category:"Multiplayer",desc:"Grow bigger. Don't get eaten.",icon:"agar.io"},
+{name:"GeoGuessr",url:"https://www.geoguessr.com",category:"Puzzle",desc:"Guess where in the world you are",icon:"geoguessr.com"},
+{name:"2048",url:"https://play2048.co",category:"Puzzle",desc:"Merge tiles and chase 2048",icon:"play2048.co"}
 ];
 
 const SPLASHES = [
@@ -665,16 +720,20 @@ setInterval(() => {
 }, 8000);
 
 /* Grids */
-function populateGrid(containerId, list) {
-  document.getElementById(containerId).innerHTML = list.map(([name, url]) => `
-    <div class="card" onclick="launchBrowser('${url}')">
-      <div class="card-icon">${name[0]}</div>
-      <div class="card-name">${name}</div>
-    </div>
-  `).join('');
+function populateGrid(containerId,list,filterId,categoryId){
+ const grid=document.getElementById(containerId),search=document.getElementById(filterId),category=document.getElementById(categoryId);
+ [...new Set(list.map(x=>x.category))].sort().forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;category.appendChild(o)});
+ function render(){
+  const q=search.value.trim().toLowerCase(),cat=category.value;
+  const filtered=list.filter(x=>(cat==="all"||x.category===cat)&&[x.name,x.desc,x.category].join(" ").toLowerCase().includes(q));
+  grid.innerHTML=filtered.length?filtered.map(x=>`<button class="card catalog-card" type="button" data-url="${x.url}" aria-label="Open ${x.name}"><span class="catalog-icon"><b>${x.name[0]}</b><img src="https://www.google.com/s2/favicons?domain=${x.icon}&sz=64" alt="" loading="lazy" onerror="this.style.display='none'"></span><span class="catalog-copy"><span class="catalog-name">${x.name}</span><span class="catalog-desc">${x.desc}</span><span class="catalog-tag">${x.category}</span></span><span class="catalog-arrow" aria-hidden="true">↗</span></button>`).join(""):'<div class="catalog-empty">Nothing here. Try another search or category.</div>';
+ }
+ search.addEventListener("input",render);category.addEventListener("change",render);
+ grid.addEventListener("click",e=>{const card=e.target.closest("[data-url]");if(card)launchBrowser(card.dataset.url)});
+ render();
 }
-populateGrid('apps-grid', APPS);
-populateGrid('games-grid', GAMES);
+populateGrid("apps-grid",APPS,"apps-filter","apps-category");
+populateGrid("games-grid",GAMES,"games-filter","games-category");
 
 /* Navigation Views */
 const dockItems = document.querySelectorAll('.dock-item');
@@ -743,12 +802,13 @@ const mainView = document.getElementById('main-view');
 const browserFrame = document.getElementById('browser-frame');
 const urlDisplay = document.getElementById('current-url-display');
 
-function launchBrowser(url) {
+async function launchBrowser(url) {
   mainView.classList.add('active');
-  let target = /^https?:\/\//i.test(url) ? url : 'https://' + url;
-  browserFrame.src = MIST.encode(target);
-  urlDisplay.textContent = target;
-  document.getElementById('active-tab-title').textContent = target;
+  let target=/^https?:\/\//i.test(url)?url:'https://'+url;
+  urlDisplay.textContent=target;
+  document.getElementById('active-tab-title').textContent=new URL(target).hostname.replace(/^www\./,"");
+  try{await DOC_ENGINE.go(browserFrame,target)}
+  catch(e){const box=document.getElementById("console-logs");if(box){const line=document.createElement("div");line.style.color="#fb7185";line.textContent="> "+(e?.message||e);box.appendChild(line)}}
 }
 
 document.getElementById('search-bar').addEventListener('keydown', (e) => {
@@ -760,11 +820,12 @@ document.getElementById('search-bar').addEventListener('keydown', (e) => {
   }
 });
 
-document.getElementById('btn-return').addEventListener('click', () => {
-  mainView.classList.remove('active');
-  browserFrame.src = 'about:blank';
-});
+document.getElementById('btn-return').addEventListener('click', () => { mainView.classList.remove('active'); });
 
+document.getElementById('tb-back').addEventListener('click',()=>DOC_ENGINE.back(browserFrame));
+document.getElementById('tb-forward').addEventListener('click',()=>DOC_ENGINE.forward(browserFrame));
+document.getElementById('tb-refresh').addEventListener('click',()=>DOC_ENGINE.reload(browserFrame));
+DOC_ENGINE.init().catch(()=>{});
 /* Sidebar Panels */
 const panels = {
   devtools: document.getElementById('panel-devtools'),
