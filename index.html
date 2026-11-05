@@ -646,7 +646,7 @@ const DOC_ENGINE=(()=>{
  }
  function attach(iframe){
   if(frame)return frame;if(!controller)throw new Error("Scramjet is not ready.");
-  const plugins=[new utils.HttpCachePlugin(),new utils.UrlWatcherPlugin(url=>{if(/^https?:\\/\\//i.test(String(url||""))){urlDisplay.textContent=url;document.getElementById("active-tab-title").textContent=(new URL(url)).hostname.replace(/^www\\./,"")}}),new utils.CatchEscapedLinksPlugin(url=>{const target=new URL(window.location.href);target.search="";target.searchParams.set("url",url.href);return target})];
+  const plugins=[new utils.HttpCachePlugin(),new utils.UrlWatcherPlugin(url=>{if(/^https?:\/\//i.test(String(url||""))){urlDisplay.textContent=url;document.getElementById("active-tab-title").textContent=(new URL(url)).hostname.replace(/^www\./,"")}}),new utils.CatchEscapedLinksPlugin(url=>{const target=new URL(window.location.href);target.search="";target.searchParams.set("url",url.href);return target})];
   frame=controller.createFrame(iframe,{plugins});return frame;
  }
  async function go(iframe,url){await init();return attach(iframe).go(url)}
