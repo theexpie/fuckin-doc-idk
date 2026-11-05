@@ -1076,6 +1076,8 @@ function applyTabCloak(value) {
   if (cloak.icon) cloakIcon.href = cloak.icon;
   else cloakIcon.href = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230088a8'/%3E%3Ctext x='32' y='44' font-size='42' text-anchor='middle' fill='white' font-family='Arial'%3ED%3C/text%3E%3C/svg%3E";
   try { localStorage.setItem("doc-tab-cloak", value); } catch (e) {}
+  /* The JSDelivr SVG runs this page inside an iframe, so mirror the cloak to its real browser tab. */
+  try { window.parent.postMessage({type:"doc-tab-cloak",title:cloak.title,icon:cloak.icon||""},"*"); } catch (e) {}
 }
 try {
   const savedCloak = localStorage.getItem("doc-tab-cloak");
