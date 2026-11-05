@@ -426,8 +426,9 @@ header {
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 #dock.autohide { transform: translateX(-50%) translateY(90px); opacity: 0; pointer-events: none; }
-/* The desktop dock is a home-screen taskbar, not a browsing control. */
-#main-view.active ~ #dock { display: none !important; }
+/* Keep the home dock/taskbar visible while browsing; only the URL toolbar collapses. */
+#dock { display: flex; }
+#main-view.active ~ #dock { display: flex !important; }
 
 .dock-item {
   background: none;
