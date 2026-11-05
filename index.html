@@ -614,9 +614,34 @@ body.browsing .view-panel{visibility:hidden}
 .catalog-dropdown-option[aria-selected="true"]:after,.custom-select-option[aria-selected="true"]:after{content:"✓";color:#9ce5d8}
 @media(max-width:390px){.catalog-dropdown-trigger{height:42px}}
 
+
+/* Purpose-built loading surfaces: startup and proxied navigation are independent. */
+.doc-loader{position:fixed;inset:0;z-index:2147483600;display:grid;place-items:center;padding:24px;background:rgba(4,25,33,.94);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);opacity:1;visibility:visible;transition:opacity .28s ease,visibility .28s ease}
+.doc-loader[hidden]{display:none}
+.doc-loader-card{width:min(330px,calc(100vw - 48px));padding:25px 23px 22px;border:1px solid rgba(157,226,224,.2);border-radius:20px;background:rgba(7,48,58,.78);box-shadow:0 24px 70px rgba(0,0,0,.36);text-align:center}
+.doc-loader-mark{font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:-1px;color:var(--text-main);margin-bottom:7px}
+.doc-loader-mark span{color:var(--accent)}
+.doc-loader-label{font-size:12px;color:var(--text-muted);letter-spacing:.15px}
+.doc-loader-track{height:3px;margin-top:21px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.1)}
+.doc-loader-progress{height:100%;width:38%;border-radius:99px;background:linear-gradient(90deg,#43c6bd,#9de9df);animation:doc-loader-travel 1.15s cubic-bezier(.45,0,.55,1) infinite}
+@keyframes doc-loader-travel{0%{transform:translateX(-115%)}100%{transform:translateX(285%)}}
+#startup-loader{z-index:2147483601}
+#page-loader{position:absolute;inset:0;z-index:15;background:rgba(4,25,33,.68)}
+#page-loader .doc-loader-card{width:min(270px,calc(100vw - 48px));padding:18px 20px}
+#page-loader .doc-loader-mark{font-size:19px;margin-bottom:4px}
+#page-loader .doc-loader-track{margin-top:14px}
+.browser-tab{touch-action:pan-y;cursor:grab;will-change:transform}
+.browser-tab.pointer-dragging{z-index:8;cursor:grabbing;opacity:.92;transition:transform .08s ease,opacity .12s ease;box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.browser-tab.tab-shift{transition:transform .16s cubic-bezier(.2,.75,.25,1)}
+@media(prefers-reduced-motion:reduce){.doc-loader-progress{animation-duration:2.5s}.browser-tab,.browser-tab.tab-shift{transition:none}}
+
 </style>
 </head>
 <body>
+
+<div class="doc-loader" id="startup-loader" role="status" aria-live="polite">
+  <div class="doc-loader-card"><div class="doc-loader-mark">Doc<span>.</span></div><div class="doc-loader-label">Preparing your workspace</div><div class="doc-loader-track"><div class="doc-loader-progress"></div></div></div>
+</div>
 
 <!-- Your Uploaded Waterfront Photos Background Slideshow -->
 <div id="bg-container">
@@ -694,6 +719,10 @@ body.browsing .view-panel{visibility:hidden}
 
 <!-- Browser workspace -->
 <div id="main-view">
+  
+<div class="doc-loader" id="page-loader" role="status" aria-live="polite" hidden>
+  <div class="doc-loader-card"><div class="doc-loader-mark">Loading page</div><div class="doc-loader-label" id="page-loader-label">Connecting securely</div><div class="doc-loader-track"><div class="doc-loader-progress"></div></div></div>
+</div>
   <iframe id="browser-frame" src="about:blank" title="Web content"></iframe>\n  <span id="active-tab-title" hidden>New tab</span>
   <div id="browser-chrome">
     <section id="browser-tabs" aria-label="Browser tabs">
@@ -981,6 +1010,22 @@ const mainView = document.getElementById('main-view');
 const browserFrame = document.getElementById('browser-frame');
 const urlDisplay = document.getElementById('current-url-display');
 
+const startupLoader=document.getElementById("startup-loader");
+const pageLoader=document.getElementById("page-loader");
+let pageLoadToken=0;
+function showPageLoader(label="Connecting securely"){
+  if(!pageLoader)return;
+  pageLoader.querySelector("#page-loader-label").textContent=label;
+  pageLoader.hidden=false;
+  pageLoader.setAttribute("aria-busy","true");
+  return ++pageLoadToken;
+}
+function hidePageLoader(token){
+  if(token!==undefined&&token!==pageLoadToken)return;
+  if(pageLoader){pageLoader.hidden=true;pageLoader.removeAttribute("aria-busy")}
+}
+
+
 const homeDock = document.getElementById('dock');
 const dockEdgeTrigger = document.getElementById('dock-edge-trigger');
 function syncBrowsingChrome() {
@@ -1002,8 +1047,10 @@ async function launchBrowser(url) {
   const tab=browserTabs.find(t=>t.id===activeBrowserTab);if(tab){tab.url=target;tab.title=title;renderBrowserTabs()}
   document.getElementById('active-tab-title').textContent=title;
   addHistory(target,title);
+  const loadToken=showPageLoader("Opening "+title);
   try{await DOC_ENGINE.go(browserFrame,target)}
   catch(e){const box=document.getElementById("console-logs");if(box){const line=document.createElement("div");line.style.color="#fb7185";line.textContent="> "+(e?.message||e);box.appendChild(line)}urlDisplay.value="Proxy error — open DevTools for details";}
+  finally{hidePageLoader(loadToken)}
 }
 
 document.getElementById('search-bar').addEventListener('keydown', (e) => {
@@ -1020,7 +1067,7 @@ document.getElementById('btn-return').addEventListener('click', () => { mainView
 document.getElementById('tb-back').addEventListener('click',()=>DOC_ENGINE.back(browserFrame));
 document.getElementById('tb-forward').addEventListener('click',()=>DOC_ENGINE.forward(browserFrame));
 document.getElementById('tb-refresh').addEventListener('click',()=>DOC_ENGINE.reload(browserFrame));
-DOC_ENGINE.init().catch(()=>{});
+DOC_ENGINE.init().catch(error=>{const box=document.getElementById("console-logs");if(box){const line=document.createElement("div");line.style.color="#fb7185";line.textContent="Engine initialization: "+(error?.message||error);box.appendChild(line)}}).finally(()=>{if(startupLoader){startupLoader.style.opacity="0";startupLoader.style.visibility="hidden";setTimeout(()=>startupLoader.remove(),320)}});
 /* Sidebar Panels */
 const panels = {
   devtools: document.getElementById('panel-devtools'),
@@ -1048,18 +1095,48 @@ const browserChrome=document.getElementById("browser-chrome");
 const chromeReveal=document.getElementById("chrome-reveal");
 function tabTitle(url){try{return new URL(url).hostname.replace(/^www\./,"")}catch{return "New tab"}}
 function persistHistory(){try{localStorage.setItem("doc-history",JSON.stringify(historyStore.slice(0,100)))}catch{}}
+let tabPointerDrag=null;
 function renderBrowserTabs(){
  tabStrip.innerHTML="";
  browserTabs.forEach((tab,index)=>{
-  const el=document.createElement("div");el.className="browser-tab"+(tab.id===activeBrowserTab?" active":"");el.draggable=true;el.dataset.tabId=tab.id;
+  const el=document.createElement("div");el.className="browser-tab"+(tab.id===activeBrowserTab?" active":"");el.dataset.tabId=tab.id;
   const title=document.createElement("span");title.className="tab-title";title.textContent=tab.title||"New tab";
   const close=document.createElement("button");close.className="tab-close";close.type="button";close.setAttribute("aria-label","Close tab");close.textContent="×";
   close.addEventListener("click",e=>{e.stopPropagation();closeBrowserTab(tab.id)});
-  el.append(title,close);el.addEventListener("click",()=>switchBrowserTab(tab.id));
-  el.addEventListener("dragstart",e=>{el.classList.add("dragging");e.dataTransfer.setData("text/plain",tab.id);e.dataTransfer.effectAllowed="move"});
-  el.addEventListener("dragend",()=>el.classList.remove("dragging"));
-  el.addEventListener("dragover",e=>e.preventDefault());
-  el.addEventListener("drop",e=>{e.preventDefault();const from=e.dataTransfer.getData("text/plain"),to=tab.id;if(from&&from!==to){const a=browserTabs.findIndex(t=>t.id===from),b=browserTabs.findIndex(t=>t.id===to);const moved=browserTabs.splice(a,1)[0];browserTabs.splice(b,0,moved);renderBrowserTabs()}});
+  el.append(title,close);
+  el.addEventListener("pointerdown",e=>{
+   if(e.target.closest(".tab-close")||e.button!==0)return;
+   tabPointerDrag={id:tab.id,pointerId:e.pointerId,startX:e.clientX,startY:e.clientY,lastX:e.clientX,dragging:false,el};
+   el.setPointerCapture?.(e.pointerId);
+  });
+  el.addEventListener("pointermove",e=>{
+   const drag=tabPointerDrag;if(!drag||drag.id!==tab.id||drag.pointerId!==e.pointerId)return;
+   const dx=e.clientX-drag.startX,dy=e.clientY-drag.startY;
+   if(!drag.dragging&&Math.hypot(dx,dy)>7){drag.dragging=true;el.classList.add("pointer-dragging");el.classList.remove("active");}
+   if(!drag.dragging)return;
+   drag.lastX=e.clientX;
+   const target=document.elementFromPoint(e.clientX,e.clientY)?.closest(".browser-tab");
+   if(!target||target===el)return;
+   const from=browserTabs.findIndex(t=>t.id===drag.id),to=browserTabs.findIndex(t=>t.id===target.dataset.tabId);
+   if(from<0||to<0||from===to)return;
+   const targetRect=target.getBoundingClientRect();
+   const insertAfter=e.clientX>targetRect.left+targetRect.width/2;
+   const moved=browserTabs.splice(from,1)[0];
+   let nextIndex=browserTabs.findIndex(t=>t.id===target.dataset.tabId);
+   if(insertAfter)nextIndex++;
+   browserTabs.splice(Math.max(0,Math.min(browserTabs.length,nextIndex)),0,moved);
+   if(insertAfter)tabStrip.insertBefore(el,target.nextSibling);
+   else tabStrip.insertBefore(el,target);
+  });
+  const finishPointer=e=>{
+   const drag=tabPointerDrag;if(!drag||drag.id!==tab.id||drag.pointerId!==e.pointerId)return;
+   tabPointerDrag=null;
+   el.classList.remove("pointer-dragging");
+   if(drag.dragging){renderBrowserTabs();tabStrip.querySelector('[data-tab-id="'+tab.id+'"]')?.scrollIntoView({block:"nearest",inline:"nearest",behavior:"smooth"});}
+   else switchBrowserTab(tab.id);
+  };
+  el.addEventListener("pointerup",finishPointer);
+  el.addEventListener("pointercancel",finishPointer);
   tabStrip.appendChild(el);
  });
 }
@@ -1068,8 +1145,11 @@ function createBrowserTab(url=""){
 }
 function switchBrowserTab(id){
  const tab=browserTabs.find(t=>t.id===id);if(!tab)return;activeBrowserTab=id;
- if(tab.url){urlDisplay.textContent=tab.url;document.getElementById("active-tab-title").textContent=tab.title;try{DOC_ENGINE.go(browserFrame,tab.url).catch(e=>console.warn(e))}catch(e){}}
- else{browserFrame.src="about:blank";urlDisplay.value=""}
+ if(tab.url){
+  urlDisplay.value=tab.url;document.getElementById("active-tab-title").textContent=tab.title;
+  const loadToken=showPageLoader("Returning to "+tab.title);
+  try{Promise.resolve(DOC_ENGINE.go(browserFrame,tab.url)).catch(e=>console.warn(e)).finally(()=>hidePageLoader(loadToken))}catch(e){hidePageLoader(loadToken)}
+ }else{browserFrame.src="about:blank";urlDisplay.value="";hidePageLoader()}
  renderBrowserTabs();
 }
 function closeBrowserTab(id){
