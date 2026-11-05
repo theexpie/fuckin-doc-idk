@@ -95,16 +95,6 @@ header {
 
 .brand span { color: var(--accent); }
 
-.splash-tag {
-  font-size: 12px;
-  color: var(--text-muted);
-  font-weight: 400;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 4px 10px;
-  border-radius: 99px;
-  border: 1px solid var(--panel-border);
-}
-
 /* Views Container */
 .view-panel {
   position: absolute;
@@ -475,6 +465,10 @@ body.browsing #dock-edge-trigger {
 
 
 /* Waterfront motion system */
+#bg-container{position:fixed;inset:0;z-index:0;display:block!important;visibility:visible!important;opacity:1!important}
+#bg-container .bg-slide{display:block!important;visibility:visible!important}
+#app{background:transparent}
+
 :root{--ease-water:cubic-bezier(.2,.75,.25,1)}
 body{background:radial-gradient(ellipse at 15% 15%,rgba(24,126,133,.28),transparent 42%),linear-gradient(145deg,#061d25,#092f3b 58%,#071f2a)}
 #bg-overlay{background:linear-gradient(145deg,rgba(3,30,39,.16),rgba(3,27,37,.08))}
@@ -577,7 +571,6 @@ body.browsing .view-panel{visibility:hidden}
 <div id="app">
   <header>
     <div class="brand">Doc<span>.</span></div>
-    <div class="splash-tag" id="splash-text" aria-hidden="true"></div>
   </header>
 
   <!-- Home View -->
@@ -790,28 +783,29 @@ function rotateSplash(){
   setTimeout(()=>{splashNode.textContent=SPLASHES[splashIndex++ % SPLASHES.length];splashNode.classList.remove("splash-out");},260);
 }
 rotateSplash();setInterval(rotateSplash,4200);
-document.getElementById("splash-text").textContent = "";
 
-/* Your Uploaded Photos as Local Canvas-Rendered Blobs / Direct References */
+
+/* Waterfront photo slideshow — use encoded, same-origin paths for GitHub Pages. */
 const PHOTOS = [
-  "doc image.jpg",   /*[cite: 7] */
-  "doc image2.jpg",  /*[cite: 6] */
-  "doc image3.jpg",  /*[cite: 5] */
-  "doc image4.jpg",  /*[cite: 4] */
-  "doc image5.jpg",  /*[cite: 3] */
-  "doc image6.jpg",  /*[cite: 2] */
-  "doc image7.jpg"   /*[cite: 1] */
+  "doc image.jpg",
+  "doc image2.jpg",
+  "doc image3.jpg",
+  "doc image4.jpg",
+  "doc image5.jpg",
+  "doc image6.jpg",
+  "doc image7.jpg"
 ];
 
 let pIdx = 0;
 const s1 = document.getElementById('slide1'), s2 = document.getElementById('slide2');
-s1.style.backgroundImage = `url('${PHOTOS[0]}')`;
-s2.style.backgroundImage = `url('${PHOTOS[1]}')`;
+const photoURL = name => new URL(encodeURIComponent(name), document.baseURI).href;
+s1.style.backgroundImage = `url("${photoURL(PHOTOS[0])}")`;
+s2.style.backgroundImage = `url("${photoURL(PHOTOS[1])}")`;
 setInterval(() => {
   pIdx = (pIdx + 1) % PHOTOS.length;
   const active = s1.classList.contains('active') ? s1 : s2;
   const next = active === s1 ? s2 : s1;
-  next.style.backgroundImage = `url('${PHOTOS[pIdx]}')`;
+  next.style.backgroundImage = `url("${photoURL(PHOTOS[pIdx])}")`;
   active.classList.remove('active');
   next.classList.add('active');
 }, 8000);
