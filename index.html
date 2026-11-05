@@ -565,7 +565,7 @@ body.browsing .view-panel{visibility:hidden}
 .catalog-hero:after{content:"";position:absolute;width:260px;height:260px;right:-70px;top:-150px;border-radius:50%;background:radial-gradient(circle,rgba(82,220,204,.2),transparent 68%);pointer-events:none}
 .play-hero{background:linear-gradient(115deg,rgba(8,62,69,.88),rgba(13,47,64,.76) 55%,rgba(17,37,56,.78))}
 .catalog-kicker{display:flex;align-items:center;gap:8px;font-size:9px;letter-spacing:1.45px;font-weight:750;color:#a7d8d2;margin-bottom:13px}
-.catalog-kicker-dot{width:6px;height:6px;border-radius:50%;background:#68d9c9;box-shadow:0 0 12px rgba(104,217,201,.8)}
+
 .catalog-title-row{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px}
 .catalog-title{font-size:clamp(27px,5vw,38px);line-height:1;font-weight:720;letter-spacing:-1.2px;color:#f3fffc}
 .catalog-subtitle{font-size:12px;color:#b0ceca;margin-top:8px}
@@ -598,6 +598,21 @@ body.browsing .view-panel{visibility:hidden}
 @keyframes library-card-in{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:680px){.catalog-hero{padding:18px;margin-bottom:16px;border-radius:18px}.catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.catalog-card{grid-template-columns:38px minmax(0,1fr);gap:9px;padding:10px;min-height:88px}.catalog-icon{width:38px;height:38px;border-radius:12px}.catalog-icon img{width:23px;height:23px}.catalog-arrow{display:none}.catalog-title-row{margin-bottom:16px}}
 @media(max-width:390px){.catalog-controls{grid-template-columns:1fr}.catalog-category{width:100%}.catalog-count{font-size:9px;padding:6px 8px}.catalog-card{padding:9px;gap:7px;min-height:84px}.catalog-name{font-size:11px}.catalog-desc{font-size:9px}}
+
+
+/* Native select menus are replaced with in-page Doc menus */
+.catalog-dropdown,.custom-select{position:relative;width:100%;min-width:0}
+.catalog-dropdown-trigger,.custom-select-trigger{width:100%;height:44px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 13px;border:1px solid rgba(157,226,224,.2);border-radius:12px;background:rgba(1,19,27,.42);color:#d9efeb;font:inherit;font-size:11px;text-align:left;cursor:pointer;transition:border-color .18s,background .18s}
+.catalog-dropdown-trigger:hover,.custom-select-trigger:hover,.catalog-dropdown.open .catalog-dropdown-trigger,.custom-select.open .custom-select-trigger{border-color:rgba(104,217,201,.55);background:rgba(1,24,32,.72)}
+.catalog-dropdown-trigger svg,.custom-select-trigger svg{width:14px;height:14px;flex:0 0 auto;fill:none;stroke:#9bc9c2;stroke-width:1.8;transition:transform .18s}
+.catalog-dropdown.open .catalog-dropdown-trigger svg,.custom-select.open .custom-select-trigger svg{transform:rotate(180deg)}
+.catalog-dropdown-menu,.custom-select-menu{position:absolute;z-index:80;top:calc(100% + 7px);right:0;left:0;max-height:240px;overflow:auto;padding:5px;border:1px solid rgba(157,226,224,.22);border-radius:13px;background:rgba(5,28,37,.97);box-shadow:0 16px 38px rgba(0,0,0,.36);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);opacity:0;transform:translateY(-5px);pointer-events:none;transition:opacity .15s,transform .15s}
+.catalog-dropdown.open .catalog-dropdown-menu,.custom-select.open .custom-select-menu{opacity:1;transform:translateY(0);pointer-events:auto}
+.catalog-dropdown-option,.custom-select-option{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 10px;border:0;border-radius:8px;background:transparent;color:#c5dfda;font:inherit;font-size:11px;text-align:left;cursor:pointer}
+.catalog-dropdown-option:hover,.custom-select-option:hover{background:rgba(93,190,178,.13);color:#f2fffc}
+.catalog-dropdown-option[aria-selected="true"],.custom-select-option[aria-selected="true"]{background:rgba(93,190,178,.17);color:#a8eee0}
+.catalog-dropdown-option[aria-selected="true"]:after,.custom-select-option[aria-selected="true"]:after{content:"✓";color:#9ce5d8}
+@media(max-width:390px){.catalog-dropdown-trigger{height:42px}}
 
 </style>
 </head>
@@ -640,9 +655,9 @@ body.browsing .view-panel{visibility:hidden}
   <!-- App Library -->
   <div class="view-panel catalog-view" id="view-apps">
     <div class="catalog-hero app-hero">
-      <div class="catalog-kicker"><span class="catalog-kicker-dot"></span> THE WATERFRONT / LIBRARY</div>
+      <div class="catalog-kicker">THE WATERFRONT / LIBRARY</div>
       <div class="catalog-title-row"><div><h2 class="catalog-title">Apps</h2><p class="catalog-subtitle">Your everyday stops, collected in one place.</p></div><span class="catalog-count" id="apps-count">12 destinations</span></div>
-      <div class="catalog-controls"><label class="catalog-search-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input class="catalog-search" id="apps-filter" type="search" placeholder="Search your apps" autocomplete="off"></label><select class="catalog-category" id="apps-category" aria-label="Filter apps"><option value="all">Every category</option></select></div>
+      <div class="catalog-controls"><label class="catalog-search-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input class="catalog-search" id="apps-filter" type="search" placeholder="Search your apps" autocomplete="off"></label><div class="catalog-dropdown" id="apps-category" aria-label="Filter apps"></div></div>
     </div>
     <div class="catalog-section-label"><span>YOUR COLLECTION</span><span>OPEN IN DOC <i>↗</i></span></div>
     <div class="grid catalog-grid app-grid" id="apps-grid"></div>
@@ -653,7 +668,7 @@ body.browsing .view-panel{visibility:hidden}
     <div class="catalog-hero play-hero">
       <div class="catalog-kicker"><span class="catalog-kicker-dot"></span> THE WATERFRONT / PLAY</div>
       <div class="catalog-title-row"><div><h2 class="catalog-title">Play</h2><p class="catalog-subtitle">Pick a world. Jump straight in.</p></div><span class="catalog-count" id="games-count">12 experiences</span></div>
-      <div class="catalog-controls"><label class="catalog-search-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input class="catalog-search" id="games-filter" type="search" placeholder="Find something to play" autocomplete="off"></label><select class="catalog-category" id="games-category" aria-label="Filter play library"><option value="all">Every category</option></select></div>
+      <div class="catalog-controls"><label class="catalog-search-wrap"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input class="catalog-search" id="games-filter" type="search" placeholder="Find something to play" autocomplete="off"></label><div class="catalog-dropdown" id="games-category" aria-label="Filter play library"></div></div>
     </div>
     <div class="catalog-section-label"><span>READY WHEN YOU ARE</span><span>OPEN IN DOC <i>↗</i></span></div>
     <div class="grid catalog-grid play-grid" id="games-grid"></div>
@@ -664,14 +679,7 @@ body.browsing .view-panel{visibility:hidden}
     <div class="section-title">Preferences</div>
     <div class="setting-row">
       <label>Tab Cloak</label>
-      <select id="setting-cloak">
-        <option value="none">None</option>
-        <option value="clever">Clever Portal</option>
-        <option value="canvas">Dashboard</option>
-        <option value="classroom">Home - Classroom</option>
-        <option value="youtube">YouTube</option>
-        <option value="drive">Home - Google Drive</option>
-      </select>
+      <div class="custom-select" id="setting-cloak" aria-label="Tab appearance"></div>
     </div>
     <div class="setting-row">
       <label>Panic Key</label>
@@ -868,16 +876,36 @@ setInterval(() => {
 
 const ICON_SLUGS={"youtube.com":"youtube","discord.com":"discord","spotify.com":"spotify","twitch.tv":"twitch","reddit.com":"reddit","github.com":"github","drive.google.com":"googledrive","classroom.google.com":"googleclassroom","canva.com":"canva","chatgpt.com":"openai","mail.google.com":"gmail","wikipedia.org":"wikipedia","roblox.com":"roblox","krunker.io":"krunker","1v1.lol":"1v1dotlol","shellshock.io":"egghead","tetr.io":"tetris","chess.com":"chessdotcom","poki.com":"poki","crazygames.com":"crazygames","itch.io":"itchdotio","agar.io":"agar","geoguessr.com":"geoguessr","play2048.co":"2048"};
 /* Grids */
+function makeDocDropdown(root,options,initial,onChange,kind="catalog"){
+ let value=initial;
+ const triggerClass=kind==="catalog"?"catalog-dropdown-trigger":"custom-select-trigger";
+ const menuClass=kind==="catalog"?"catalog-dropdown-menu":"custom-select-menu";
+ const optionClass=kind==="catalog"?"catalog-dropdown-option":"custom-select-option";
+ root.innerHTML=`<button type="button" class="${triggerClass}" aria-haspopup="listbox" aria-expanded="false"><span></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><div class="${menuClass}" role="listbox" hidden></div>`;
+ const trigger=root.querySelector("button"),label=trigger.querySelector("span"),menu=root.querySelector('[role="listbox"]');
+ function draw(){
+  const selected=options.find(o=>o.value===value)||options[0];label.textContent=selected.label;
+  menu.innerHTML=options.map(o=>`<button type="button" class="${optionClass}" role="option" data-value="${o.value}" aria-selected="${o.value===value}">${o.label}</button>`).join("");
+ }
+ function close(){root.classList.remove("open");trigger.setAttribute("aria-expanded","false");menu.hidden=true}
+ trigger.addEventListener("click",()=>{const opening=!root.classList.contains("open");document.querySelectorAll(".catalog-dropdown.open,.custom-select.open").forEach(el=>{el.classList.remove("open");el.querySelector("button")?.setAttribute("aria-expanded","false");const m=el.querySelector('[role="listbox"]');if(m)m.hidden=true});if(opening){root.classList.add("open");trigger.setAttribute("aria-expanded","true");menu.hidden=false}});
+ menu.addEventListener("click",e=>{const option=e.target.closest("[data-value]");if(!option)return;value=option.dataset.value;draw();close();onChange(value)});
+ root._docSelect={get value(){return value},set value(v){if(options.some(o=>o.value===v)){value=v;draw();onChange(value)}}};
+ draw();return root._docSelect;
+}
+document.addEventListener("click",e=>{if(!e.target.closest(".catalog-dropdown,.custom-select"))document.querySelectorAll(".catalog-dropdown.open,.custom-select.open").forEach(el=>{el.classList.remove("open");el.querySelector("button")?.setAttribute("aria-expanded","false");const m=el.querySelector('[role="listbox"]');if(m)m.hidden=true})});
 function populateGrid(containerId,list,filterId,categoryId,countId,kind){
- const grid=document.getElementById(containerId),search=document.getElementById(filterId),category=document.getElementById(categoryId),count=document.getElementById(countId);
- [...new Set(list.map(x=>x.category))].sort().forEach(c=>{const o=document.createElement("option");o.value=c;o.textContent=c;category.appendChild(o)});
+ const grid=document.getElementById(containerId),search=document.getElementById(filterId),categoryRoot=document.getElementById(categoryId),count=document.getElementById(countId);
+ let categoryValue="all";
+ const options=[{value:"all",label:"Every category"},...([...new Set(list.map(x=>x.category))].sort().map(c=>({value:c,label:c})))];
+ const category=makeDocDropdown(categoryRoot,options,"all",v=>{categoryValue=v;render()});
  function render(){
-  const q=search.value.trim().toLowerCase(),cat=category.value;
+  const q=search.value.trim().toLowerCase(),cat=categoryValue;
   const filtered=list.filter(x=>(cat==="all"||x.category===cat)&&[x.name,x.desc,x.category].join(" ").toLowerCase().includes(q));
   count.textContent=filtered.length+" "+(kind==="play"?"experiences":"destinations");
   grid.innerHTML=filtered.length?filtered.map((x,i)=>{const slug=ICON_SLUGS[x.icon]||"",src=slug?"https://cdn.simpleicons.org/"+slug:"https://icons.duckduckgo.com/ip3/"+x.icon+".ico";return `<button class="card catalog-card ${kind}-card" type="button" data-url="${x.url}" style="--card-order:${i}" aria-label="Open ${x.name}"><span class="catalog-icon"><img src="${src}" alt="" loading="lazy" onerror="this.onerror=null;this.src='https://icons.duckduckgo.com/ip3/${x.icon}.ico'"></span><span class="catalog-copy"><span class="catalog-name">${x.name}</span><span class="catalog-desc">${x.desc}</span><span class="catalog-tag">${x.category}</span></span><span class="catalog-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 17 17 7M7 7h10v10"/></svg></span></button>`}).join(""):'<div class="catalog-empty">No matches. Try a different search or category.</div>';
  }
- search.addEventListener("input",render);category.addEventListener("change",render);
+ search.addEventListener("input",render);
  grid.addEventListener("click",e=>{const card=e.target.closest("[data-url]");if(card)launchBrowser(card.dataset.url)});
  render();
 }
@@ -930,7 +958,10 @@ const TAB_CLOAKS = {
   youtube: { title: "YouTube", icon: "https://www.google.com/s2/favicons?domain=youtube.com&sz=64" },
   drive: { title: "Home - Google Drive", icon: "./google-drive-cloak.svg" }
 };
-const cloakSelect = document.getElementById("setting-cloak");
+const cloakRoot = document.getElementById("setting-cloak");
+const cloakOptions=[{value:"none",label:"None"},{value:"clever",label:"Clever Portal"},{value:"canvas",label:"Dashboard"},{value:"classroom",label:"Home - Classroom"},{value:"youtube",label:"YouTube"},{value:"drive",label:"Home - Google Drive"}];
+let cloakValue="none";
+const cloakSelect=makeDocDropdown(cloakRoot,cloakOptions,"none",v=>applyTabCloak(v),"settings");
 const cloakIcon = document.getElementById("tab-cloak-icon");
 function applyTabCloak(value) {
   const cloak = TAB_CLOAKS[value] || TAB_CLOAKS.none;
@@ -944,7 +975,6 @@ try {
   if (savedCloak && TAB_CLOAKS[savedCloak]) cloakSelect.value = savedCloak;
 } catch (e) {}
 applyTabCloak(cloakSelect.value);
-cloakSelect.addEventListener("change", () => applyTabCloak(cloakSelect.value));
 
 /* Pro Browsing Session via Scramjet */
 const mainView = document.getElementById('main-view');
