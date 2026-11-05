@@ -425,10 +425,10 @@ header {
   box-shadow: 0 12px 35px rgba(0,0,0,0.6);
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
-#dock.autohide { transform: translateX(-50%) translateY(90px); opacity: 0; pointer-events: none; }
+
 /* Keep the home dock/taskbar visible while browsing; only the URL toolbar collapses. */
-#dock { display: flex; }
-#main-view.active ~ #dock { display: flex !important; }
+#dock { display:flex !important; position:fixed !important; z-index:99999 !important; bottom:calc(12px + env(safe-area-inset-bottom, 0px)); visibility:visible !important; opacity:1 !important; pointer-events:auto !important; transform:translateX(-50%) !important; }
+#main-view.active ~ #dock { display:flex !important; }
 
 .dock-item {
   background: none;
@@ -629,7 +629,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 </div>
 
 <!-- Auto-Hiding Bottom Dock -->
-<nav id="dock" class="autohide">
+<nav id="dock" aria-label="Home taskbar">
   <button class="dock-item active" data-view="home">
     <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
     <span>Home</span>
@@ -893,23 +893,7 @@ document.getElementById('tb-collapse').addEventListener('click', () => {
   document.getElementById('tb-collapse').disabled = true;
 });
 
-/* Touch / Mouse Auto-Hiding Dock */
-let mouseTimer;
-function showDock() {
-  const dock = document.getElementById('dock');
-  dock.classList.remove('autohide');
-  clearTimeout(mouseTimer);
-  mouseTimer = setTimeout(() => {
-    if (!mainView.classList.contains('active')) dock.classList.add('autohide');
-  }, 3000);
-}
-
-document.addEventListener('mousemove', (e) => {
-  if (window.innerHeight - e.clientY < 90) showDock();
-});
-document.addEventListener('touchstart', () => {
-  showDock();
-}, { passive: true });
+/* Dock stays visible; only the URL toolbar has a collapse control. */
 </script>
 </body>
 </html>
