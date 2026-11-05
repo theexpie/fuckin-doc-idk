@@ -427,7 +427,8 @@ header {
 }
 
 /* Keep the home dock/taskbar visible while browsing; only the URL toolbar collapses. */
-#dock { display:flex !important; position:fixed !important; z-index:99999 !important; bottom:calc(12px + env(safe-area-inset-bottom, 0px)); visibility:visible !important; opacity:1 !important; pointer-events:auto !important; transform:translateX(-50%) !important; }
+#dock { display:flex !important; position:fixed !important; z-index:99999 !important; bottom:calc(12px + env(safe-area-inset-bottom, 0px)); }
+#dock.autohide { transform:translateX(-50%) translateY(115%); opacity:0; pointer-events:none; }
 #main-view.active ~ #dock { display:flex !important; }
 
 .dock-item {
@@ -629,7 +630,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 </div>
 
 <!-- Auto-Hiding Bottom Dock -->
-<nav id="dock" aria-label="Home taskbar">
+<nav id="dock" class="autohide" aria-label="Home taskbar">
   <button class="dock-item active" data-view="home">
     <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
     <span>Home</span>
@@ -893,7 +894,19 @@ document.getElementById('tb-collapse').addEventListener('click', () => {
   document.getElementById('tb-collapse').disabled = true;
 });
 
-/* Dock stays visible; only the URL toolbar has a collapse control. */
+/* Auto-hide dock: reveal at the bottom edge, then tuck away after 3 seconds. */
+let dockHideTimer;
+const dock = document.getElementById("dock");
+function revealDock(){
+  dock.classList.remove("autohide");
+  clearTimeout(dockHideTimer);
+  dockHideTimer=setTimeout(()=>dock.classList.add("autohide"),3000);
+}
+document.addEventListener("mousemove",e=>{if(window.innerHeight-e.clientY<90)revealDock();});
+dock.addEventListener("mouseenter",()=>clearTimeout(dockHideTimer));
+dock.addEventListener("mouseleave",()=>{dockHideTimer=setTimeout(()=>dock.classList.add("autohide"),1800);});
+document.addEventListener("touchstart",revealDock,{passive:true});
+
 </script>
 </body>
 </html>
