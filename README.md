@@ -15,7 +15,7 @@ doc brings browsing, apps, and games together in one place. its ui is built arou
 Doc is a personal development project and is still evolving. Some features and websites may behave differently depending on browser support and the limits of the proxy engine.
 
 ## Try it
-[Github](https://theexpie.github.io/fuckin-doc-idk/)
+[Github Version](https://theexpie.github.io/fuckin-doc-idk/)
 
 [SVG Version](https://cdn.jsdelivr.net/gh/theexpie/fuckin-doc-idk/index.svg) - might be a bit outdated if it caches too much, ctrl+shift+r every load so its new.
 ---
