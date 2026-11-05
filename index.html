@@ -673,6 +673,25 @@ body.browsing .view-panel{visibility:hidden}
 <div class="doc-loader" id="startup-loader" role="status" aria-live="polite">
   <div class="doc-loader-card"><div class="doc-loader-mark">Doc</div><div class="doc-loader-spinner" aria-hidden="true"></div></div>
 </div>
+<script>
+/* Independent failsafe: the workspace splash must never trap the app if a later script fails. */
+(function(){
+  var loader=document.getElementById("startup-loader");
+  if(!loader)return;
+  var dismissed=false;
+  function dismiss(){
+    if(dismissed||!loader.isConnected)return;
+    dismissed=true;
+    loader.style.transition="opacity .28s ease,visibility 0s linear .28s";
+    loader.style.opacity="0";
+    loader.style.visibility="hidden";
+    setTimeout(function(){if(loader.isConnected)loader.remove()},320);
+  }
+  window.addEventListener("error",dismiss,{once:true});
+  window.addEventListener("unhandledrejection",dismiss,{once:true});
+  setTimeout(dismiss,3200);
+})();
+</script>
 
 <!-- Your Uploaded Waterfront Photos Background Slideshow -->
 <div id="bg-container">
