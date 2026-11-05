@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Doc</title>
+<style>
+:root {
+  --bg-dark: #07090E;
+  --panel-bg: rgba(14, 18, 26, 0.85);
+  --panel-border: rgba(255, 255, 255, 0.12);
+  --text-main: #F4F6F9;
+  --text-muted: #828C9D;
+  --accent: #0088A8;
+  --accent-glow: rgba(0, 136, 168, 0.35);
+  --radius-lg: 20px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body {
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--bg-dark);
+  color: var(--text-main);
+  font-family: var(--font-body);
+}
+
+/* Background Slideshow with 10% Blur */
+#bg-container {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bg-slide {
+  position: absolute;
+  inset: -30px;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  filter: blur(5px);
+  -webkit-filter: blur(5px);
+  transition: opacity 2.2s cubic-bezier(0.4, 0, 0.2, 1), transform 12s cubic-bezier(0.25, 1, 0.5, 1);
+  transform: scale(1);
+}
+
+.bg-slide.active {
+  opacity: 1;
+  transform: scale(1.06);
+}
+
+#bg-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(circle at 50% 35%, rgba(7, 9, 14, 0.3) 0%, rgba(7, 9, 14, 0.85) 100%),
+              linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.55));
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* App Shell */
+#app {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 12px calc(70px + env(safe-area-inset-bottom, 0px));
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 4px;
+  margin-bottom: auto;
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.brand span { color: var(--accent); }
+
+.splash-tag {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 400;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 10px;
+  border-radius: 99px;
+  border: 1px solid var(--panel-border);
+}
+
+/* Views Container */
+.view-panel {
+  position: absolute;
+  inset: 65px 12px 75px 12px;
+  display: none;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+}
+.view-panel.active { display: flex; }
+
+#view-home {
+  background: none;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 600px;
+  width: 100%;
+  margin-bottom: 60px;
+  padding: 0 10px;
+}
+
+.home-title {
+  font-family: var(--font-display);
+  font-size: 38px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  letter-spacing: -1px;
+}
+
+.home-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+/* Search Bar & Small Dropdown */
+.search-container {
+  display: flex;
+  gap: 6px;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  padding: 6px;
+  width: 100%;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+  position: relative;
+  backdrop-filter: blur(12px);
+}
+
+.engine-select { position: relative; }
+
+.engine-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 0;
+  color: var(--text-main);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  min-height: 40px;
+}
+
+.engine-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 160px;
+  background: #10141D;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 100;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+}
+
+.engine-dropdown.open { display: flex; }
+
+.engine-opt {
+  background: none;
+  border: 0;
+  color: var(--text-main);
+  padding: 10px;
+  border-radius: 6px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.engine-opt:hover { background: rgba(255, 255, 255, 0.08); }
+
+.search-input {
+  flex: 1;
+  background: none;
+  border: 0;
+  outline: 0;
+  color: var(--text-main);
+  font-size: 16px;
+  padding: 0 8px;
+  font-family: var(--font-body);
+  min-height: 40px;
+}
+
+.search-input::placeholder { color: var(--text-muted); }
+
+/* Grid & Cards for Apps/Games */
+.section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.card:active { background: rgba(255, 255, 255, 0.1); }
+
+.card-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 136, 168, 0.15);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.card-name {
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Settings Rows */
+.setting-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.setting-row label { font-size: 13px; font-weight: 500; }
+.setting-row select, .setting-row input[type="text"] {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--panel-border);
+  color: var(--text-main);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  outline: 0;
+  font-size: 13px;
+}
+
+/* Pro Browsing View */
+#main-view {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  background: var(--bg-dark);
+  display: none;
+  flex-direction: column;
+}
+#main-view.active { display: flex; }
+
+#browser-frame {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #fff;
+}
+
+/* Collapsible Right-Hand Control Bar */
+#right-sidebar {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  padding: 6px;
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#right-sidebar.collapsed { transform: translateX(calc(100% + 20px)); }
+
+.sidebar-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 0;
+  color: var(--text-main);
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  touch-action: manipulation;
+}
+.sidebar-btn:active { background: var(--accent); color: #fff; }
+.sidebar-btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+/* Floating URL Toolbar with Pull-Out Arrow */
+#url-toolbar {
+  position: absolute;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  padding: 6px 10px;
+  border-radius: 99px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  max-width: 92vw;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#url-toolbar.collapsed { transform: translateX(-50%) translateY(80px); }
+
+.toolbar-btn { background: none; border: 0; color: var(--text-main); padding: 8px; cursor: pointer; display: grid; place-items: center; touch-action: manipulation; }
+.toolbar-btn svg { width: 16px; height: 16px; fill: currentColor; }
+.url-display { font-size: 12px; color: var(--text-muted); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 4px; }
+
+@media (min-width: 600px) {
+  .url-display { max-width: 320px; }
+}
+
+/* Floating Panels */
+.floating-panel {
+  position: absolute;
+  top: 50px;
+  right: 12px;
+  left: 12px;
+  max-width: 420px;
+  margin-left: auto;
+  height: 450px;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(16px);
+  z-index: 30;
+  display: none;
+  flex-direction: column;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+  overflow: hidden;
+}
+.floating-panel.open { display: flex; }
+.panel-header { padding: 12px 16px; border-bottom: 1px solid var(--panel-border); display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 13px; }
+.panel-close { background: none; border: 0; color: var(--text-muted); cursor: pointer; font-size: 18px; padding: 4px; }
+.panel-body { flex: 1; padding: 14px; overflow-y: auto; -webkit-overflow-scrolling: touch; font-size: 12px; }
+
+/* Auto-Hiding Bottom Dock */
+#dock {
+  position: absolute;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: rgba(14, 18, 26, 0.88);
+  border: 1px solid var(--panel-border);
+  backdrop-filter: blur(14px);
+  padding: 5px;
+  border-radius: 99px;
+  display: flex;
+  gap: 3px;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.6);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+#dock.autohide { transform: translateX(-50%) translateY(90px); opacity: 0; pointer-events: none; }
+
+.dock-item {
+  background: none;
+  border: 0;
+  color: var(--text-muted);
+  padding: 8px 14px;
+  border-radius: 99px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  touch-action: manipulation;
+  transition: color 0.2s, background 0.2s;
+}
+.dock-item:active, .dock-item.active { color: var(--text-main); background: rgba(255,255,255,0.08); }
+.dock-item svg { width: 16px; height: 16px; fill: currentColor; }
+
+@media (max-width: 480px) {
+  .dock-item span { display: none; }
+  .dock-item { padding: 10px 14px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Your Uploaded Waterfront Photos Background Slideshow -->
+<div id="bg-container">
+  <div class="bg-slide active" id="slide1"></div>
+  <div class="bg-slide" id="slide2"></div>
+  <div id="bg-overlay"></div>
+</div>
+
+<div id="app">
+  <header>
+    <div class="brand">Doc<span>.</span></div>
+    <div class="splash-tag" id="splash-text">locking in...</div>
+  </header>
+
+  <!-- Home View -->
+  <div class="view-panel active" id="view-home">
+    <div class="home-hero">
+      <h1 class="home-title">Doc.</h1>
+      <div class="home-subtitle">Your waterfront workspace.</div>
+      <div class="search-container">
+        <div class="engine-select">
+          <button class="engine-btn" id="engine-toggle">
+            <span id="engine-name">DuckDuckGo</span>
+          </button>
+          <div class="engine-dropdown" id="engine-menu">
+            <button class="engine-opt" data-engine="ddg">DuckDuckGo</button>
+            <button class="engine-opt" data-engine="google">Google</button>
+            <button class="engine-opt" data-engine="brave">Brave</button>
+            <button class="engine-opt" data-engine="bing">Bing</button>
+          </div>
+        </div>
+        <input type="text" class="search-input" id="search-bar" placeholder="Search or URL..." autocomplete="off">
+      </div>
+    </div>
+  </div>
+
+  <!-- Apps View -->
+  <div class="view-panel" id="view-apps">
+    <div class="section-title">Web Apps</div>
+    <div class="grid" id="apps-grid"></div>
+  </div>
+
+  <!-- Games View -->
+  <div class="view-panel" id="view-games">
+    <div class="section-title">Games</div>
+    <div class="grid" id="games-grid"></div>
+  </div>
+
+  <!-- Settings View -->
+  <div class="view-panel" id="view-settings">
+    <div class="section-title">Preferences</div>
+    <div class="setting-row">
+      <label>Tab Cloak</label>
+      <select id="setting-cloak">
+        <option value="none">None</option>
+        <option value="classroom">Google Classroom</option>
+        <option value="docs">Google Docs</option>
+      </select>
+    </div>
+    <div class="setting-row">
+      <label>Panic Key</label>
+      <input type="text" id="setting-panic" value="`" style="width:45px; text-align:center;">
+    </div>
+    <div class="setting-row">
+      <label>Wisp Endpoint</label>
+      <input type="text" id="setting-wisp" value="wss://wisp.mercurywork.shop" style="width:190px;">
+    </div>
+  </div>
+</div>
+
+<!-- Pro Browsing View -->
+<div id="main-view">
+  <iframe id="browser-frame" src="about:blank"></iframe>
+
+  <div id="right-sidebar">
+    <button class="sidebar-btn" id="btn-return" title="Return Home"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
+    <button class="sidebar-btn" id="btn-tabs" title="Tabs"><svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg></button>
+    <button class="sidebar-btn" id="btn-bookmarks" title="Bookmarks"><svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg></button>
+    <button class="sidebar-btn" id="btn-devtools" title="DevTools"><svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg></button>
+  </div>
+
+  <div id="url-toolbar">
+    <button class="toolbar-btn" id="tb-back"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+    <button class="toolbar-btn" id="tb-forward"><svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8-8-8z"/></svg></button>
+    <div class="url-display" id="current-url-display">https://duckduckgo.com</div>
+    <button class="toolbar-btn" id="tb-refresh"><svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></button>
+    <button class="toolbar-btn" id="tb-collapse"><svg viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg></button>
+  </div>
+
+  <div class="floating-panel" id="panel-devtools">
+    <div class="panel-header"><span>DevTools Suite</span><button class="panel-close" data-close="devtools">&times;</button></div>
+    <div class="panel-body">
+      <div style="font-family:monospace; color:#34d399; margin-bottom:8px;">[Doc Engine v3.2 - Scramjet Active]</div>
+      <div style="color:var(--text-muted); margin-bottom:12px;">WebSocket: wss://wisp.mercurywork.shop</div>
+      <div style="font-weight:600; margin-bottom:4px;">Console Logs</div>
+      <div style="background:rgba(0,0,0,0.5); padding:8px; border-radius:6px; font-family:monospace; font-size:11px; height:150px; overflow-y:auto; color:#a5b4fc;" id="console-logs">
+        > Scramjet proxy tunnel initialized.<br>> Wisp endpoint connected.<br>
+      </div>
+    </div>
+  </div>
+
+  <div class="floating-panel" id="panel-tabs">
+    <div class="panel-header"><span>Active Tabs</span><button class="panel-close" data-close="tabs">&times;</button></div>
+    <div class="panel-body" id="tabs-list">
+      <div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:8px; display:flex; justify-content:space-between; align-items:center;"><span id="active-tab-title">Active Browsing Session</span><span>✕</span></div>
+    </div>
+  </div>
+
+  <div class="floating-panel" id="panel-bookmarks">
+    <div class="panel-header"><span>Bookmarks</span><button class="panel-close" data-close="bookmarks">&times;</button></div>
+    <div class="panel-body">
+      <div style="padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;" onclick="launchBrowser('https://youtube.com')">YouTube</div>
+      <div style="padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;" onclick="launchBrowser('https://discord.com/app')">Discord</div>
+      <div style="padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;" onclick="launchBrowser('https://github.com')">GitHub</div>
+    </div>
+  </div>
+</div>
+
+<!-- Auto-Hiding Bottom Dock -->
+<nav id="dock" class="autohide">
+  <button class="dock-item active" data-view="home">
+    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    <span>Home</span>
+  </button>
+  <button class="dock-item" data-view="apps">
+    <svg viewBox="0 0 24 24"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4H4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg>
+    <span>Apps</span>
+  </button>
+  <button class="dock-item" data-view="games">
+    <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5S17.67 9 18.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+    <span>Games</span>
+  </button>
+  <button class="dock-item" data-view="settings">
+    <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+    <span>Settings</span>
+  </button>
+</nav>
+
+<script src="/scramjet/scramjet.config.js"></script>
+<script src="/scramjet/scramjet.wasm.js"></script>
+<script src="/scramjet/scramjet.codecs.js"></script>
+<script src="/scramjet/scramjet.client.js"></script>
+<script>
+const MIST = {
+  wisp: "wss://wisp.mercurywork.shop",
+  encode(url) {
+    try {
+      if (typeof __scramjet !== 'undefined' && __scramjet.encodeUrl) return __scramjet.encodeUrl(url);
+      if (window.$scramjet && window.$scramjet.encodeUrl) return window.$scramjet.encodeUrl(url);
+    } catch(e) {}
+    return '/service/' + btoa(url);
+  }
+};
+
+const APPS = [
+  ["YouTube", "https://youtube.com"],
+  ["Discord", "https://discord.com/app"],
+  ["Spotify", "https://open.spotify.com"],
+  ["Twitch", "https://twitch.tv"],
+  ["Reddit", "https://reddit.com"],
+  ["GitHub", "https://github.com"]
+];
+
+const GAMES = [
+  ["Krunker", "https://krunker.io"],
+  ["1v1.LOL", "https://1v1.lol"],
+  ["Shell Shockers", "https://shellshock.io"],
+  ["TETR.IO", "https://tetr.io"],
+  ["Chess.com", "https://chess.com"],
+  ["Poki", "https://poki.com"]
+];
+
+const SPLASHES = [
+  "locking in...",
+  "afk in real life",
+  "lowkey useful",
+  "no thoughts just vibes",
+  "unc status pending",
+  "we are so back"
+];
+document.getElementById('splash-text').textContent = SPLASHES[Math.floor(Math.random() * SPLASHES.length)];
+
+/* Your Uploaded Photos as Local Canvas-Rendered Blobs / Direct References */
+const PHOTOS = [
+  "doc image.jpg",   /*[cite: 7] */
+  "doc image2.jpg",  /*[cite: 6] */
+  "doc image3.jpg",  /*[cite: 5] */
+  "doc image4.jpg",  /*[cite: 4] */
+  "doc image5.jpg",  /*[cite: 3] */
+  "doc image6.jpg",  /*[cite: 2] */
+  "doc image7.jpg"   /*[cite: 1] */
+];
+
+let pIdx = 0;
+const s1 = document.getElementById('slide1'), s2 = document.getElementById('slide2');
+s1.style.backgroundImage = `url('${PHOTOS[0]}')`;
+s2.style.backgroundImage = `url('${PHOTOS[1]}')`;
+setInterval(() => {
+  pIdx = (pIdx + 1) % PHOTOS.length;
+  const active = s1.classList.contains('active') ? s1 : s2;
+  const next = active === s1 ? s2 : s1;
+  next.style.backgroundImage = `url('${PHOTOS[pIdx]}')`;
+  active.classList.remove('active');
+  next.classList.add('active');
+}, 8000);
+
+/* Grids */
+function populateGrid(containerId, list) {
+  document.getElementById(containerId).innerHTML = list.map(([name, url]) => `
+    <div class="card" onclick="launchBrowser('${url}')">
+      <div class="card-icon">${name[0]}</div>
+      <div class="card-name">${name}</div>
+    </div>
+  `).join('');
+}
+populateGrid('apps-grid', APPS);
+populateGrid('games-grid', GAMES);
+
+/* Navigation Views */
+const dockItems = document.querySelectorAll('.dock-item');
+const viewPanels = document.querySelectorAll('.view-panel');
+
+dockItems.forEach(item => {
+  item.addEventListener('click', () => {
+    const target = item.dataset.view;
+    dockItems.forEach(i => i.classList.remove('active'));
+    viewPanels.forEach(p => p.classList.remove('active'));
+    item.classList.add('active');
+    document.getElementById(`view-${target}`).classList.add('active');
+  });
+});
+
+/* Search Engine Selector */
+const engines = {
+  ddg: { name: "DuckDuckGo", url: "https://duckduckgo.com/?q=%s" },
+  google: { name: "Google", url: "https://google.com/search?q=%s" },
+  brave: { name: "Brave", url: "https://search.brave.com/search?q=%s" },
+  bing: { name: "Bing", url: "https://bing.com/search?q=%s" }
+};
+let currentEngine = 'ddg';
+const engineToggle = document.getElementById('engine-toggle');
+const engineMenu = document.getElementById('engine-menu');
+
+engineToggle.addEventListener('click', (e) => { e.stopPropagation(); engineMenu.classList.toggle('open'); });
+document.addEventListener('click', () => engineMenu.classList.remove('open'));
+
+document.querySelectorAll('.engine-opt').forEach(opt => {
+  opt.addEventListener('click', () => {
+    currentEngine = opt.dataset.engine;
+    document.getElementById('engine-name').textContent = engines[currentEngine].name;
+    engineMenu.classList.remove('open');
+  });
+});
+
+/* Pro Browsing Session via Scramjet */
+const mainView = document.getElementById('main-view');
+const browserFrame = document.getElementById('browser-frame');
+const urlDisplay = document.getElementById('current-url-display');
+
+function launchBrowser(url) {
+  mainView.classList.add('active');
+  let target = /^https?:\/\//i.test(url) ? url : 'https://' + url;
+  browserFrame.src = MIST.encode(target);
+  urlDisplay.textContent = target;
+  document.getElementById('active-tab-title').textContent = target;
+}
+
+document.getElementById('search-bar').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    let val = e.target.value.trim();
+    if (!val) return;
+    let targetUrl = /^https?:\/\//i.test(val) ? val : (val.includes('.') ? 'https://' + val : engines[currentEngine].url.replace('%s', encodeURIComponent(val)));
+    launchBrowser(targetUrl);
+  }
+});
+
+document.getElementById('btn-return').addEventListener('click', () => {
+  mainView.classList.remove('active');
+  browserFrame.src = 'about:blank';
+});
+
+/* Sidebar Panels */
+const panels = {
+  devtools: document.getElementById('panel-devtools'),
+  tabs: document.getElementById('panel-tabs'),
+  bookmarks: document.getElementById('panel-bookmarks')
+};
+
+document.getElementById('btn-devtools').addEventListener('click', () => togglePanel('devtools'));
+document.getElementById('btn-tabs').addEventListener('click', () => togglePanel('tabs'));
+document.getElementById('btn-bookmarks').addEventListener('click', () => togglePanel('bookmarks'));
+
+function togglePanel(name) {
+  Object.keys(panels).forEach(k => {
+    if (k === name) panels[k].classList.toggle('open');
+    else panels[k].classList.remove('open');
+  });
+}
+
+document.querySelectorAll('.panel-close').forEach(btn => {
+  btn.addEventListener('click', () => panels[btn.dataset.close].classList.remove('open'));
+});
+
+let toolbarCollapsed = false;
+document.getElementById('tb-collapse').addEventListener('click', () => {
+  toolbarCollapsed = !toolbarCollapsed;
+  document.getElementById('url-toolbar').classList.toggle('collapsed', toolbarCollapsed);
+});
+
+/* Touch / Mouse Auto-Hiding Dock */
+let mouseTimer;
+function showDock() {
+  const dock = document.getElementById('dock');
+  dock.classList.remove('autohide');
+  clearTimeout(mouseTimer);
+  mouseTimer = setTimeout(() => {
+    if (!mainView.classList.contains('active')) dock.classList.add('autohide');
+  }, 3000);
+}
+
+document.addEventListener('mousemove', (e) => {
+  if (window.innerHeight - e.clientY < 90) showDock();
+});
+document.addEventListener('touchstart', () => {
+  showDock();
+}, { passive: true });
+</script>
+</body>
+</html>
