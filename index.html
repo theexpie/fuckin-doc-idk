@@ -851,13 +851,13 @@ rotateSplash();setInterval(rotateSplash,4200);
 
 /* Waterfront photo slideshow — use encoded, same-origin paths for GitHub Pages. */
 const PHOTOS = [
-  "doc image.jpg",
-  "doc image2.jpg",
-  "doc image3.jpg",
-  "doc image4.jpg",
-  "doc image5.jpg",
-  "doc image6.jpg",
-  "doc image7.jpg"
+  "./assets/images/waterfront-01.jpg",
+  "./assets/images/waterfront-02.jpg",
+  "./assets/images/waterfront-03.jpg",
+  "./assets/images/waterfront-04.jpg",
+  "./assets/images/waterfront-05.jpg",
+  "./assets/images/waterfront-06.jpg",
+  "./assets/images/waterfront-07.jpg"
 ];
 
 let pIdx = 0;
@@ -954,9 +954,9 @@ const TAB_CLOAKS = {
   none: { title: "Doc", icon: null },
   clever: { title: "Clever Portal", icon: "https://www.google.com/s2/favicons?domain=clever.com&sz=64" },
   canvas: { title: "Dashboard", icon: "https://www.google.com/s2/favicons?domain=canvas.instructure.com&sz=64" },
-  classroom: { title: "Home - Classroom", icon: "./google-classroom-cloak.svg" },
+  classroom: { title: "Home - Classroom", icon: "././assets/images/classroom.svg" },
   youtube: { title: "YouTube", icon: "https://www.google.com/s2/favicons?domain=youtube.com&sz=64" },
-  drive: { title: "Home - Google Drive", icon: "./google-drive-cloak.svg" }
+  drive: { title: "Home - Google Drive", icon: "././assets/images/google-drive.svg" }
 };
 const cloakRoot = document.getElementById("setting-cloak");
 const cloakOptions=[{value:"none",label:"None"},{value:"clever",label:"Clever Portal"},{value:"canvas",label:"Dashboard"},{value:"classroom",label:"Home - Classroom"},{value:"youtube",label:"YouTube"},{value:"drive",label:"Home - Google Drive"}];
