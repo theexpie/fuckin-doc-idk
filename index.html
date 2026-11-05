@@ -408,34 +408,33 @@ header {
 .panel-close { background: none; border: 0; color: var(--text-muted); cursor: pointer; font-size: 18px; padding: 4px; }
 .panel-body { flex: 1; padding: 14px; overflow-y: auto; -webkit-overflow-scrolling: touch; font-size: 12px; }
 
-/* Auto-hiding dock. The edge sensor is a separate hit target below the dock. */
+/* Persistent home taskbar; softly fades while a browser session is active. */
 #dock {
   position: fixed !important;
   left: 50% !important;
   bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
   z-index: 2147483000 !important;
   display: flex !important;
-  transform: translate3d(-50%, 0, 0);
+  gap: 3px;
+  padding: 5px;
+  background: rgba(14, 18, 26, 0.88);
+  border: 1px solid var(--panel-border);
+  border-radius: 99px;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 12px 35px rgba(0,0,0,0.6);
+  transform: translate3d(-50%, 0, 0) !important;
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
-  transition: transform .28s ease, opacity .28s ease;
+  transition: opacity .3s ease, background .3s ease;
 }
-#dock.autohide {
-  transform: translate3d(-50%, calc(100% + 28px), 0) !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
+#main-view.active ~ #dock {
+  opacity: .16;
 }
-#dock-edge-trigger {
-  position: fixed;
-  z-index: 2147482999;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 8px;
-  pointer-events: auto;
-  background: transparent;
+#main-view.active ~ #dock:hover,
+#main-view.active ~ #dock:focus-within {
+  opacity: 1;
 }
-#main-view.active ~ #dock { display: flex !important; }
 
 .dock-item {
   background: none;
@@ -903,51 +902,7 @@ document.getElementById('tb-collapse').addEventListener('click', () => {
   document.getElementById('tb-collapse').disabled = true;
 });
 
-/* Auto-hide dock: keep it open while the pointer is on either the dock or edge sensor. */
-const dock = document.getElementById("dock");
-const dockEdge = document.getElementById("dock-edge-trigger");
-let dockHideTimer = null;
-
-function clearDockHide() {
-  if (dockHideTimer !== null) clearTimeout(dockHideTimer);
-  dockHideTimer = null;
-}
-function revealDock() {
-  clearDockHide();
-  dock.classList.remove("autohide");
-}
-function hideDock() {
-  dockHideTimer = null;
-  if (dock.matches(":hover") || dockEdge.matches(":hover")) return;
-  dock.classList.add("autohide");
-}
-function scheduleDockHide(delay = 850) {
-  clearDockHide();
-  dockHideTimer = setTimeout(hideDock, delay);
-}
-
-dock.classList.remove("autohide");
-dockEdge.addEventListener("pointerenter", revealDock);
-dockEdge.addEventListener("pointermove", revealDock);
-dockEdge.addEventListener("pointerleave", () => scheduleDockHide());
-dockEdge.addEventListener("pointerdown", revealDock);
-dock.addEventListener("pointerenter", clearDockHide);
-dock.addEventListener("pointerleave", () => scheduleDockHide());
-document.addEventListener("mousemove", e => {
-  if (e.clientY >= window.innerHeight - 140) revealDock();
-});
-document.addEventListener("touchstart", e => {
-  const touch = e.touches && e.touches[0];
-  if (touch && touch.clientY >= window.innerHeight - 100) {
-    revealDock();
-    scheduleDockHide(3500);
-  }
-}, { passive: true });
-window.addEventListener("resize", () => {
-  revealDock();
-  scheduleDockHide(2600);
-});
-scheduleDockHide(2600);
+/* Taskbar is persistent; CSS only fades it during browsing. */
 </script>
 </body>
 </html>
