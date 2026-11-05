@@ -645,7 +645,7 @@ body.browsing .view-panel{visibility:hidden}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
     </button>
   </section>
-  <iframe id="browser-frame" src="about:blank" title="Web content"></iframe>
+  <iframe id="browser-frame" src="about:blank" title="Web content"></iframe>\n  <span id="active-tab-title" hidden>New tab</span>
   <div id="browser-chrome">
     <button class="chrome-icon-btn" id="browser-menu" title="More" aria-label="More">
       <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
@@ -657,7 +657,7 @@ body.browsing .view-panel{visibility:hidden}
     <button class="chrome-icon-btn" id="tb-back" title="Back" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
     <button class="chrome-icon-btn" id="tb-forward" title="Forward" aria-label="Forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
     <button class="chrome-icon-btn" id="tb-refresh" title="Reload" aria-label="Reload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.6 9a7 7 0 0 1 11.6-2L20 12M4 12l2.8 5a7 7 0 0 0 11.6-2"/></svg></button>
-    <div class="chrome-url-shell"><span class="url-lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span><div class="url-display" id="current-url-display">Search or enter address</div></div>
+    <div class="chrome-url-shell"><span class="url-lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span><input class="url-display" id="current-url-display" aria-label="Address" placeholder="Search or enter address" autocomplete="off" spellcheck="false"></div>
     <button class="chrome-icon-btn chrome-collapse" id="tb-collapse" title="Hide toolbar" aria-label="Hide toolbar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg></button>
   </div>
   <button id="chrome-reveal" aria-label="Show browser toolbar" title="Show toolbar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
@@ -743,7 +743,7 @@ const DOC_ENGINE=(()=>{
  }
  function attach(iframe){
   if(frame)return frame;if(!controller)throw new Error("Scramjet is not ready.");
-  const plugins=[new utils.HttpCachePlugin(),new utils.UrlWatcherPlugin(url=>{if(/^https?:\/\//i.test(String(url||""))){urlDisplay.textContent=url;document.getElementById("active-tab-title").textContent=(new URL(url)).hostname.replace(/^www\./,"")}}),new utils.CatchEscapedLinksPlugin(url=>{const target=new URL(window.location.href);target.search="";target.searchParams.set("url",url.href);return target})];
+  const plugins=[new utils.HttpCachePlugin(),new utils.UrlWatcherPlugin(url=>{if(/^https?:\/\//i.test(String(url||""))){urlDisplay.value=url;document.getElementById("active-tab-title").textContent=(new URL(url)).hostname.replace(/^www\./,"")}}),new utils.CatchEscapedLinksPlugin(url=>{const target=new URL(window.location.href);target.search="";target.searchParams.set("url",url.href);return target})];
   frame=controller.createFrame(iframe,{plugins});return frame;
  }
  async function go(iframe,url){await init();return attach(iframe).go(url)}
@@ -915,14 +915,14 @@ async function launchBrowser(url) {
   mainView.classList.add('active');
   syncBrowsingChrome();
   let target=/^https?:\/\//i.test(url)?url:'https://'+url;
-  urlDisplay.textContent=target;
+  urlDisplay.value=target;
   const title=new URL(target).hostname.replace(/^www\./,"");
   if(!activeBrowserTab)createBrowserTab();
   const tab=browserTabs.find(t=>t.id===activeBrowserTab);if(tab){tab.url=target;tab.title=title;renderBrowserTabs()}
   document.getElementById('active-tab-title').textContent=title;
   addHistory(target,title);
   try{await DOC_ENGINE.go(browserFrame,target)}
-  catch(e){const box=document.getElementById("console-logs");if(box){const line=document.createElement("div");line.style.color="#fb7185";line.textContent="> "+(e?.message||e);box.appendChild(line)}urlDisplay.textContent="Proxy error — open DevTools for details";}
+  catch(e){const box=document.getElementById("console-logs");if(box){const line=document.createElement("div");line.style.color="#fb7185";line.textContent="> "+(e?.message||e);box.appendChild(line)}urlDisplay.value="Proxy error — open DevTools for details";}
 }
 
 document.getElementById('search-bar').addEventListener('keydown', (e) => {
@@ -988,7 +988,7 @@ function createBrowserTab(url=""){
 function switchBrowserTab(id){
  const tab=browserTabs.find(t=>t.id===id);if(!tab)return;activeBrowserTab=id;
  if(tab.url){urlDisplay.textContent=tab.url;document.getElementById("active-tab-title").textContent=tab.title;try{DOC_ENGINE.go(browserFrame,tab.url).catch(e=>console.warn(e))}catch(e){}}
- else{browserFrame.src="about:blank";urlDisplay.textContent="Search or enter address"}
+ else{browserFrame.src="about:blank";urlDisplay.value=""}
  renderBrowserTabs();
 }
 function closeBrowserTab(id){
@@ -1016,6 +1016,11 @@ document.getElementById("browser-menu-popover").addEventListener("click",e=>e.st
 document.addEventListener("click",()=>document.getElementById("browser-menu-popover")?.classList.remove("open"));
 document.getElementById("btn-history").addEventListener("click",()=>openBrowserPanel("history"));
 document.getElementById("new-tab").addEventListener("click",()=>createBrowserTab());
+document.getElementById("current-url-display").addEventListener("keydown",e=>{
+ if(e.key!=="Enter")return;const raw=e.currentTarget.value.trim();if(!raw)return;
+ const target=/^https?:\\/\\//i.test(raw)?raw:(raw.includes(".")?"https://"+raw:engines[currentEngine].url.replace("%s",encodeURIComponent(raw)));
+ launchBrowser(target);e.currentTarget.blur();
+});
 document.getElementById("tb-collapse").addEventListener("click",()=>{browserChrome.classList.add("collapsed");chromeReveal.classList.add("visible")});
 chromeReveal.addEventListener("click",()=>{browserChrome.classList.remove("collapsed");chromeReveal.classList.remove("visible")});
 document.getElementById("btn-return").addEventListener("click",()=>{document.body.classList.remove("browsing");mainView.classList.remove("active");browserChrome.classList.remove("collapsed");chromeReveal.classList.remove("visible");document.getElementById("url-toolbar")?.classList.remove("collapsed");toolbarCollapsed=false;document.getElementById("tb-collapse").disabled=false;});
