@@ -796,11 +796,41 @@ body.browsing .view-panel{visibility:hidden}
 
 <script>
 const DOC_ENGINE=(()=>{
- const base=new URL("./",window.location.href),wisp="wss://wisp.mercurywork.shop/";
+ const base=new URL("./",document.baseURI),wisp="wss://wisp.mercurywork.shop/";
  const paths={sw:new URL("sw.js",base).href,runtime:new URL("scramjet.js",base).href,wasm:new URL("scramjet.wasm",base).href,utils:new URL("scramjet-utils.js",base).href,api:new URL("controller.api.js",base).href,inject:new URL("controller.inject.js",base).href,transport:"https://cdn.jsdelivr.net/gh/theexpie/Splooshi@343bcb5c839963d01ed3addb1487410876943756/libcurl-client.js"};
  let controller=null,utils=null,frame=null,starting=null;
  const log=m=>{const box=document.getElementById("console-logs");if(box){const line=document.createElement("div");line.textContent="> "+m;box.appendChild(line);box.scrollTop=box.scrollHeight;}console.info("[Doc]",m)};
  const load=src=>new Promise((resolve,reject)=>{const s=document.createElement("script");s.src=src;s.async=false;s.onload=resolve;s.onerror=()=>reject(new Error("Failed to load "+src));document.head.appendChild(s)});
+ async function waitForServiceWorkerControl(registration){
+  const container=navigator.serviceWorker;
+  const current=()=>container.controller;
+  if(current())return current();
+  log("Waiting for service worker control…");
+  return new Promise((resolve,reject)=>{
+   let settled=false;
+   const cleanup=()=>{
+    clearTimeout(timer);
+    container.removeEventListener("controllerchange",check);
+    registration.active?.removeEventListener("statechange",check);
+   };
+   const finish=worker=>{
+    if(settled||!worker)return;
+    settled=true;cleanup();resolve(worker);
+   };
+   const check=()=>finish(current());
+   const timer=setTimeout(()=>{
+    if(current())return check();
+    if(settled)return;
+    settled=true;cleanup();
+    reject(new Error("Service worker is active but has not taken control of this page. Doc will retry automatically when control changes; no manual refresh is needed."));
+   },20000);
+   container.addEventListener("controllerchange",check);
+   registration.active?.addEventListener("statechange",check);
+   // Re-check after listeners are attached so a controllerchange between the
+   // initial check and listener registration cannot leave initialization stuck.
+   check();
+  });
+ }
  async function init(){
   if(controller)return controller;if(starting)return starting;
   starting=(async()=>{
@@ -808,11 +838,9 @@ const DOC_ENGINE=(()=>{
    log("Registering Scramjet service worker…");
    await navigator.serviceWorker.register(paths.sw,{scope:base.pathname,updateViaCache:"none"});
    const registration=await navigator.serviceWorker.ready;
-   if(!navigator.serviceWorker.controller){
-    log("Waiting for service worker control…");
-    await Promise.race([new Promise(resolve=>navigator.serviceWorker.addEventListener("controllerchange",resolve,{once:true})),new Promise((_,reject)=>setTimeout(()=>reject(new Error("Service worker is active but does not control this tab yet. Reload Doc once and retry.")),12000))]);
-   }
-   const sw=navigator.serviceWorker.controller;if(!sw||!registration.active)throw new Error("Scramjet service worker is not controlling this tab.");
+   if(!registration.active)throw new Error("Scramjet service worker did not become active.");
+   const sw=await waitForServiceWorkerControl(registration);
+   if(!sw)throw new Error("Scramjet service worker is active but this page is not controlled. Check that Doc is opened from its GitHub Pages or JSDelivr URL.");
    log("Loading Scramjet runtime and Wisp transport…");
    await load(paths.runtime);await load(paths.api);await load(paths.utils);await load(paths.transport);
    const api=window.$scramjetController;utils=window.$scramjetUtils;
