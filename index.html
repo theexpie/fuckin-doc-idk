@@ -514,6 +514,55 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
  .catalog-head{gap:8px}
 }
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+/* Remastered browser chrome */
+#main-view{isolation:isolate}
+#browser-tabs{position:absolute;z-index:40;top:0;left:0;right:0;height:54px;display:flex;align-items:center;gap:8px;padding:7px 12px;background:rgba(5,28,36,.88);border-bottom:1px solid rgba(157,226,224,.14);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)}
+#tab-strip{display:flex;align-items:center;gap:6px;min-width:0;flex:1;height:100%;overflow-x:auto;scrollbar-width:none}
+#tab-strip::-webkit-scrollbar{display:none}
+.browser-tab{position:relative;display:flex;align-items:center;gap:9px;min-width:125px;max-width:225px;height:38px;padding:0 11px;border:1px solid transparent;border-radius:11px;background:rgba(255,255,255,.045);color:var(--text-muted);font-size:12px;cursor:grab;user-select:none;transition:background .2s,border-color .2s,transform .2s;flex:0 1 190px}
+.browser-tab.active{background:rgba(67,198,189,.16);border-color:rgba(110,221,210,.3);color:var(--text-main)}
+.browser-tab.dragging{opacity:.4;transform:scale(.96)}
+.browser-tab .tab-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;text-align:left}
+.browser-tab .tab-close{border:0;background:none;color:inherit;opacity:.6;font-size:16px;line-height:1;cursor:pointer;padding:2px 3px}
+.browser-tab .tab-close:hover{opacity:1;color:#ff9a9a}
+.chrome-icon-btn{width:37px;height:37px;flex:0 0 37px;border:1px solid transparent;border-radius:11px;background:transparent;color:#d9efec;display:grid;place-items:center;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+.chrome-icon-btn svg{width:19px;height:19px}
+.chrome-icon-btn:hover{background:rgba(255,255,255,.09);border-color:rgba(157,226,224,.18)}
+.chrome-icon-btn:active{transform:scale(.92)}
+#new-tab{background:rgba(255,255,255,.055);border-color:rgba(157,226,224,.14)}
+#browser-frame{position:absolute;inset:54px 0 0;width:100%;height:calc(100% - 54px)}
+#browser-chrome{position:absolute;z-index:50;left:50%;bottom:18px;transform:translate(-50%,0);width:min(690px,calc(100vw - 28px));min-height:58px;display:flex;align-items:center;gap:5px;padding:8px 10px;background:rgba(5,34,43,.91);border:1px solid rgba(157,226,224,.28);border-radius:19px;box-shadow:0 16px 55px rgba(0,0,0,.48),inset 0 1px rgba(255,255,255,.08);backdrop-filter:blur(26px) saturate(145%);-webkit-backdrop-filter:blur(26px) saturate(145%);transition:transform .42s cubic-bezier(.2,.8,.2,1),opacity .28s}
+#browser-chrome.collapsed{transform:translate(-50%,145%);opacity:0;pointer-events:none}
+.chrome-divider{width:1px;height:25px;background:rgba(157,226,224,.18);margin:0 3px;flex:0 0 1px}
+.chrome-url-shell{height:40px;min-width:0;flex:1;display:flex;align-items:center;gap:9px;padding:0 12px;border-radius:12px;background:rgba(0,0,0,.2);border:1px solid rgba(157,226,224,.12)}
+.chrome-url-shell .url-lock{display:grid;place-items:center;color:#75cfc5}
+.url-lock svg{width:14px;height:14px}
+.chrome-url-shell .url-display{max-width:none;min-width:0;flex:1;color:#d6e9e7;text-align:left}
+.chrome-collapse{margin-left:1px}
+#chrome-reveal{position:absolute;z-index:51;bottom:7px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;width:43px;height:25px;border:1px solid rgba(157,226,224,.25);border-bottom:0;border-radius:12px 12px 0 0;background:rgba(5,34,43,.94);color:#dffbf5;display:grid;place-items:center;transition:transform .3s,opacity .25s;cursor:pointer}
+#chrome-reveal svg{width:17px;height:17px}
+#chrome-reveal.visible{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+#browser-menu-popover{position:absolute;z-index:70;left:max(12px,calc(50% - 345px));bottom:88px;width:205px;padding:6px;background:rgba(5,34,43,.97);border:1px solid rgba(157,226,224,.23);border-radius:15px;box-shadow:0 18px 50px rgba(0,0,0,.5);backdrop-filter:blur(22px);opacity:0;transform:translateY(8px) scale(.98);pointer-events:none;transition:.2s}
+#browser-menu-popover.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+#browser-menu-popover button{width:100%;display:flex;align-items:center;gap:11px;padding:11px;border:0;border-radius:9px;background:none;color:var(--text-main);font:500 12px var(--font-body);text-align:left;cursor:pointer}
+#browser-menu-popover button:hover{background:rgba(255,255,255,.08)}
+#browser-menu-popover svg{width:17px;height:17px;color:#8ddbd2}
+.floating-panel{top:76px;left:18px;right:auto;width:min(390px,calc(100vw - 36px));height:min(460px,calc(100vh - 115px));max-width:none;margin:0;border-color:rgba(157,226,224,.26);background:rgba(5,34,43,.94);backdrop-filter:blur(25px) saturate(145%);border-radius:17px;touch-action:pan-y}
+.floating-panel.open{animation:panel-float-in .22s cubic-bezier(.2,.8,.2,1) both}
+@keyframes panel-float-in{from{opacity:0;transform:translateY(9px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+.panel-header.drag-handle{cursor:grab;user-select:none;touch-action:none}
+.panel-header.drag-handle:active{cursor:grabbing}
+.panel-close{font-size:21px}
+#main-view .panel-body{font-size:12px}
+.history-entry,.bookmark-entry{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 9px;border-bottom:1px solid rgba(157,226,224,.1);border-radius:8px;cursor:pointer}
+.history-entry:hover,.bookmark-entry:hover{background:rgba(255,255,255,.06)}
+.history-entry strong,.bookmark-entry strong{display:block;font-size:12px;font-weight:550;color:#e8f7f4}
+.history-entry small,.bookmark-entry small{display:block;margin-top:4px;color:var(--text-muted);font-size:10px;overflow-wrap:anywhere}
+.history-empty{padding:22px 10px;color:var(--text-muted);text-align:center}
+@media(max-width:600px){#browser-tabs{height:49px;padding:5px 7px}#browser-frame{top:49px;height:calc(100% - 49px)}.browser-tab{min-width:105px;max-width:155px;flex-basis:130px}.chrome-icon-btn{width:34px;height:34px;flex-basis:34px}#browser-chrome{bottom:calc(10px + env(safe-area-inset-bottom,0px));gap:2px;padding:6px;width:calc(100vw - 16px);border-radius:16px}.chrome-url-shell{padding:0 8px;gap:6px}.chrome-divider{margin:0 1px}.floating-panel{top:60px;left:8px;width:calc(100vw - 16px);height:min(420px,calc(100dvh - 85px))}#browser-menu-popover{left:8px;bottom:76px}}
+body.browsing .view-panel{visibility:hidden}
+
 </style>
 </head>
 <body>
@@ -588,47 +637,51 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
   </div>
 </div>
 
-<!-- Pro Browsing View -->
+<!-- Browser workspace -->
 <div id="main-view">
-  <iframe id="browser-frame" src="about:blank"></iframe>
-
-  <div id="right-sidebar" aria-label="Browsing controls">
-    <button class="sidebar-btn" id="btn-return" title="Home" aria-label="Return Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9M9 20v-7h6v7"/></svg></button>
+  <section id="browser-tabs" aria-label="Browser tabs">
+    <div id="tab-strip"></div>
+    <button id="new-tab" class="chrome-icon-btn" title="New tab" aria-label="New tab">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+  </section>
+  <iframe id="browser-frame" src="about:blank" title="Web content"></iframe>
+  <div id="browser-chrome">
+    <button class="chrome-icon-btn" id="browser-menu" title="More" aria-label="More">
+      <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
+    </button>
+    <button class="chrome-icon-btn" id="btn-return" title="Home" aria-label="Home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9M9 20v-7h6v7"/></svg>
+    </button>
+    <div class="chrome-divider"></div>
+    <button class="chrome-icon-btn" id="tb-back" title="Back" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+    <button class="chrome-icon-btn" id="tb-forward" title="Forward" aria-label="Forward"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+    <button class="chrome-icon-btn" id="tb-refresh" title="Reload" aria-label="Reload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.6 9a7 7 0 0 1 11.6-2L20 12M4 12l2.8 5a7 7 0 0 0 11.6-2"/></svg></button>
+    <div class="chrome-url-shell"><span class="url-lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span><div class="url-display" id="current-url-display">Search or enter address</div></div>
+    <button class="chrome-icon-btn chrome-collapse" id="tb-collapse" title="Hide toolbar" aria-label="Hide toolbar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg></button>
   </div>
-  <div id="url-toolbar">
-    <button class="toolbar-btn" id="tb-back"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
-    <button class="toolbar-btn" id="tb-forward"><svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8-8-8z"/></svg></button>
-    <div class="url-display" id="current-url-display">https://duckduckgo.com</div>
-    <button class="toolbar-btn" id="tb-refresh"><svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></button>
-    <button class="toolbar-btn" id="tb-collapse"><svg viewBox="0 0 24 24"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/></svg></button>
+  <button id="chrome-reveal" aria-label="Show browser toolbar" title="Show toolbar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+  <div id="browser-menu-popover" role="menu">
+    <button id="btn-devtools" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 4l-4 16"/></svg>Developer tools</button>
+    <button id="btn-bookmarks" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 4h12v17l-6-4-6 4z"/></svg>Bookmarks</button>
+    <button id="btn-history" role="menuitem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>History</button>
   </div>
-
   <div class="floating-panel" id="panel-devtools">
-    <div class="panel-header"><span>DevTools Suite</span><button class="panel-close" data-close="devtools">&times;</button></div>
+    <div class="panel-header drag-handle"><span>Developer tools</span><button class="panel-close" data-close="devtools" aria-label="Close">×</button></div>
     <div class="panel-body">
-      <div style="font-family:monospace; color:#34d399; margin-bottom:8px;">[Doc Engine — Scramjet 2.0.67-alpha.2]</div>
-      <div style="color:var(--text-muted); margin-bottom:12px;">Wisp transport: wss://wisp.mercurywork.shop/</div>
-      <div style="font-weight:600; margin-bottom:4px;">Console Logs</div>
-      <div style="background:rgba(0,0,0,0.5); padding:8px; border-radius:6px; font-family:monospace; font-size:11px; height:150px; overflow-y:auto; color:#a5b4fc;" id="console-logs">
-        > Waiting for service worker and Wisp handshake…<br>
-      </div>
+      <div style="font-family:monospace;color:#78ded2;margin-bottom:8px">Doc Engine · Scramjet</div>
+      <div style="color:var(--text-muted);margin-bottom:12px">Wisp transport: wss://wisp.mercurywork.shop/</div>
+      <div style="font-weight:600;margin-bottom:6px">Console</div>
+      <div id="console-logs" style="background:rgba(0,0,0,.48);padding:10px;border-radius:9px;font:11px/1.6 ui-monospace,monospace;min-height:170px;max-height:290px;overflow:auto;color:#a5b4fc">Waiting for engine…</div>
     </div>
   </div>
-
-  <div class="floating-panel" id="panel-tabs">
-    <div class="panel-header"><span>Active Tabs</span><button class="panel-close" data-close="tabs">&times;</button></div>
-    <div class="panel-body" id="tabs-list">
-      <div style="padding:10px; background:rgba(255,255,255,0.05); border-radius:8px; display:flex; justify-content:space-between; align-items:center;"><span id="active-tab-title">Active Browsing Session</span><span>✕</span></div>
-    </div>
-  </div>
-
   <div class="floating-panel" id="panel-bookmarks">
-    <div class="panel-header"><span>Bookmarks</span><button class="panel-close" data-close="bookmarks">&times;</button></div>
-    <div class="panel-body">
-      <div style="padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;" onclick="launchBrowser('https://youtube.com')">YouTube</div>
-      <div style="padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;" onclick="launchBrowser('https://discord.com/app')">Discord</div>
-      <div style="padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;" onclick="launchBrowser('https://github.com')">GitHub</div>
-    </div>
+    <div class="panel-header drag-handle"><span>Bookmarks</span><button class="panel-close" data-close="bookmarks" aria-label="Close">×</button></div>
+    <div class="panel-body" id="bookmarks-list"></div>
+  </div>
+  <div class="floating-panel" id="panel-history">
+    <div class="panel-header drag-handle"><span>History</span><button class="panel-close" data-close="history" aria-label="Close">×</button></div>
+    <div class="panel-body" id="history-list"></div>
   </div>
 </div>
 <nav id="dock" aria-label="Home taskbar">
@@ -863,7 +916,11 @@ async function launchBrowser(url) {
   syncBrowsingChrome();
   let target=/^https?:\/\//i.test(url)?url:'https://'+url;
   urlDisplay.textContent=target;
-  document.getElementById('active-tab-title').textContent=new URL(target).hostname.replace(/^www\./,"");
+  const title=new URL(target).hostname.replace(/^www\./,"");
+  if(!activeBrowserTab)createBrowserTab();
+  const tab=browserTabs.find(t=>t.id===activeBrowserTab);if(tab){tab.url=target;tab.title=title;renderBrowserTabs()}
+  document.getElementById('active-tab-title').textContent=title;
+  addHistory(target,title);
   try{await DOC_ENGINE.go(browserFrame,target)}
   catch(e){const box=document.getElementById("console-logs");if(box){const line=document.createElement("div");line.style.color="#fb7185";line.textContent="> "+(e?.message||e);box.appendChild(line)}urlDisplay.textContent="Proxy error — open DevTools for details";}
 }
@@ -886,31 +943,91 @@ DOC_ENGINE.init().catch(()=>{});
 /* Sidebar Panels */
 const panels = {
   devtools: document.getElementById('panel-devtools'),
-  tabs: document.getElementById('panel-tabs'),
-  bookmarks: document.getElementById('panel-bookmarks')
+  bookmarks: document.getElementById('panel-bookmarks'),
+  history: document.getElementById('panel-history')
 };
-
-document.getElementById('btn-devtools').addEventListener('click', () => togglePanel('devtools'));
-document.getElementById('btn-tabs').addEventListener('click', () => togglePanel('tabs'));
-document.getElementById('btn-bookmarks').addEventListener('click', () => togglePanel('bookmarks'));
-
-function togglePanel(name) {
-  Object.keys(panels).forEach(k => {
-    if (k === name) panels[k].classList.toggle('open');
-    else panels[k].classList.remove('open');
-  });
-}
-
-document.querySelectorAll('.panel-close').forEach(btn => {
-  btn.addEventListener('click', () => panels[btn.dataset.close].classList.remove('open'));
-});
+document.getElementById('btn-devtools').addEventListener('click',()=>openBrowserPanel('devtools'));
+document.getElementById('btn-bookmarks').addEventListener('click',()=>openBrowserPanel('bookmarks'));
+document.querySelectorAll('.panel-close').forEach(btn=>btn.addEventListener('click',()=>panels[btn.dataset.close]?.classList.remove('open')));
 
 let toolbarCollapsed = false;
-document.getElementById('tb-collapse').addEventListener('click', () => {
-  toolbarCollapsed = true;
-  document.getElementById('url-toolbar').classList.add('collapsed');
-  document.getElementById('tb-collapse').disabled = true;
-});
+
+/* Browser workspace: multi-tab state, persistent history, movable utility panels. */
+const browserTabs=[];
+let activeBrowserTab=null;
+let tabSequence=0;
+const historyStore=(()=>{try{return JSON.parse(localStorage.getItem("doc-history")||"[]")}catch{return []}})();
+const bookmarkStore=[
+ {title:"YouTube",url:"https://www.youtube.com"},
+ {title:"Discord",url:"https://discord.com/app"},
+ {title:"GitHub",url:"https://github.com"}
+];
+const tabStrip=document.getElementById("tab-strip");
+const browserChrome=document.getElementById("browser-chrome");
+const chromeReveal=document.getElementById("chrome-reveal");
+function tabTitle(url){try{return new URL(url).hostname.replace(/^www\./,"")}catch{return "New tab"}}
+function persistHistory(){try{localStorage.setItem("doc-history",JSON.stringify(historyStore.slice(0,100)))}catch{}}
+function renderBrowserTabs(){
+ tabStrip.innerHTML="";
+ browserTabs.forEach((tab,index)=>{
+  const el=document.createElement("div");el.className="browser-tab"+(tab.id===activeBrowserTab?" active":"");el.draggable=true;el.dataset.tabId=tab.id;
+  const title=document.createElement("span");title.className="tab-title";title.textContent=tab.title||"New tab";
+  const close=document.createElement("button");close.className="tab-close";close.type="button";close.setAttribute("aria-label","Close tab");close.textContent="×";
+  close.addEventListener("click",e=>{e.stopPropagation();closeBrowserTab(tab.id)});
+  el.append(title,close);el.addEventListener("click",()=>switchBrowserTab(tab.id));
+  el.addEventListener("dragstart",e=>{el.classList.add("dragging");e.dataTransfer.setData("text/plain",tab.id);e.dataTransfer.effectAllowed="move"});
+  el.addEventListener("dragend",()=>el.classList.remove("dragging"));
+  el.addEventListener("dragover",e=>e.preventDefault());
+  el.addEventListener("drop",e=>{e.preventDefault();const from=e.dataTransfer.getData("text/plain"),to=tab.id;if(from&&from!==to){const a=browserTabs.findIndex(t=>t.id===from),b=browserTabs.findIndex(t=>t.id===to);const moved=browserTabs.splice(a,1)[0];browserTabs.splice(b,0,moved);renderBrowserTabs()}});
+  tabStrip.appendChild(el);
+ });
+}
+function createBrowserTab(url=""){
+ const tab={id:"tab-"+(++tabSequence),url,title:url?tabTitle(url):"New tab"};browserTabs.push(tab);activeBrowserTab=tab.id;renderBrowserTabs();if(url)navigateBrowserTab(tab,url);return tab;
+}
+function switchBrowserTab(id){
+ const tab=browserTabs.find(t=>t.id===id);if(!tab)return;activeBrowserTab=id;
+ if(tab.url){urlDisplay.textContent=tab.url;document.getElementById("active-tab-title").textContent=tab.title;try{DOC_ENGINE.go(browserFrame,tab.url).catch(e=>console.warn(e))}catch(e){}}
+ else{browserFrame.src="about:blank";urlDisplay.textContent="Search or enter address"}
+ renderBrowserTabs();
+}
+function closeBrowserTab(id){
+ const i=browserTabs.findIndex(t=>t.id===id);if(i<0)return;browserTabs.splice(i,1);
+ if(!browserTabs.length){createBrowserTab();return}
+ if(activeBrowserTab===id){const next=browserTabs[Math.max(0,i-1)];switchBrowserTab(next.id)}else renderBrowserTabs();
+}
+function addHistory(url,title){if(!url)return;historyStore.unshift({url,title:title||tabTitle(url),time:Date.now()});historyStore.splice(100);persistHistory();renderHistory()}
+function renderHistory(){
+ const list=document.getElementById("history-list");if(!list)return;
+ list.innerHTML=historyStore.length?historyStore.map((item,i)=>'<div class="history-entry" data-history-index="'+i+'"><span><strong></strong><small></small></span><small>'+new Date(item.time).toLocaleString()+'</small></div>').join(""):'<div class="history-empty">Pages you visit will show up here.</div>';
+ list.querySelectorAll("[data-history-index]").forEach(el=>{const item=historyStore[Number(el.dataset.historyIndex)];el.querySelector("strong").textContent=item.title;el.querySelector("span small").textContent=item.url;el.addEventListener("click",()=>launchBrowser(item.url))});
+}
+function renderBookmarks(){
+ const list=document.getElementById("bookmarks-list");if(!list)return;
+ list.innerHTML=bookmarkStore.map((item,i)=>'<div class="bookmark-entry" data-bookmark-index="'+i+'"><span><strong></strong><small></small></span><span aria-hidden="true">↗</span></div>').join("");
+ list.querySelectorAll("[data-bookmark-index]").forEach(el=>{const item=bookmarkStore[Number(el.dataset.bookmarkIndex)];el.querySelector("strong").textContent=item.title;el.querySelector("small").textContent=item.url;el.addEventListener("click",()=>launchBrowser(item.url))});
+}
+function openBrowserPanel(name){
+ Object.entries(panels).forEach(([key,panel])=>panel.classList.toggle("open",key===name&&!panel.classList.contains("open")));
+ document.getElementById("browser-menu-popover").classList.remove("open");
+}
+document.getElementById("browser-menu").addEventListener("click",e=>{e.stopPropagation();document.getElementById("browser-menu-popover").classList.toggle("open")});
+document.getElementById("browser-menu-popover").addEventListener("click",e=>e.stopPropagation());
+document.addEventListener("click",()=>document.getElementById("browser-menu-popover")?.classList.remove("open"));
+document.getElementById("btn-history").addEventListener("click",()=>openBrowserPanel("history"));
+document.getElementById("new-tab").addEventListener("click",()=>createBrowserTab());
+document.getElementById("tb-collapse").addEventListener("click",()=>{browserChrome.classList.add("collapsed");chromeReveal.classList.add("visible")});
+chromeReveal.addEventListener("click",()=>{browserChrome.classList.remove("collapsed");chromeReveal.classList.remove("visible")});
+document.getElementById("btn-return").addEventListener("click",()=>{document.body.classList.remove("browsing");mainView.classList.remove("active");browserChrome.classList.remove("collapsed");chromeReveal.classList.remove("visible");document.getElementById("url-toolbar")?.classList.remove("collapsed");toolbarCollapsed=false;document.getElementById("tb-collapse").disabled=false;});
+function makePanelMovable(panel){
+ const handle=panel.querySelector(".drag-handle");if(!handle)return;let drag=null;
+ handle.addEventListener("pointerdown",e=>{if(e.target.closest("button"))return;const r=panel.getBoundingClientRect();drag={x:e.clientX-r.left,y:e.clientY-r.top};handle.setPointerCapture(e.pointerId)});
+ handle.addEventListener("pointermove",e=>{if(!drag)return;const x=Math.max(0,Math.min(innerWidth-panel.offsetWidth,e.clientX-drag.x));const y=Math.max(0,Math.min(innerHeight-panel.offsetHeight,e.clientY-drag.y));panel.style.left=x+"px";panel.style.top=y+"px";panel.style.right="auto"});
+ const stop=()=>drag=null;handle.addEventListener("pointerup",stop);handle.addEventListener("pointercancel",stop);
+}
+Object.values(panels).forEach(makePanelMovable);
+renderBookmarks();renderHistory();
+createBrowserTab();
 
 /* Dock visibility is synchronized to the actual browser-view state above. */
 </script>
