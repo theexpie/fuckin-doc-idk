@@ -17,7 +17,7 @@ Doc is a personal development project and is still evolving. Some features and w
 # Try it
 ## [Github Version](https://theexpie.github.io/fuckin-doc-idk/)
 
-# [SVG Version](https://cdn.jsdelivr.net/gh/theexpie/fuckin-doc-idk/index.svg) - might be a bit outdated if it caches too much, ctrl+shift+r every load so its new.
+## [SVG Version](https://cdn.jsdelivr.net/gh/theexpie/fuckin-doc-idk/index.svg) - might be a bit outdated if it caches too much, ctrl+shift+r every load so its new.
 ---
 
 not final build, still being worked on.
