@@ -934,7 +934,7 @@ document.getElementById('search-bar').addEventListener('keydown', (e) => {
   }
 });
 
-document.getElementById('btn-return').addEventListener('click', () => { mainView.classList.remove('active'); syncBrowsingChrome(); document.getElementById("url-toolbar").classList.remove("collapsed"); toolbarCollapsed=false; document.getElementById("tb-collapse").disabled=false; });
+document.getElementById('btn-return').addEventListener('click', () => { mainView.classList.remove('active'); syncBrowsingChrome(); document.getElementById("url-toolbar")?.classList.remove("collapsed"); toolbarCollapsed=false; document.getElementById("tb-collapse").disabled=false; });
 
 document.getElementById('tb-back').addEventListener('click',()=>DOC_ENGINE.back(browserFrame));
 document.getElementById('tb-forward').addEventListener('click',()=>DOC_ENGINE.forward(browserFrame));
@@ -1018,7 +1018,7 @@ document.getElementById("btn-history").addEventListener("click",()=>openBrowserP
 document.getElementById("new-tab").addEventListener("click",()=>createBrowserTab());
 document.getElementById("current-url-display").addEventListener("keydown",e=>{
  if(e.key!=="Enter")return;const raw=e.currentTarget.value.trim();if(!raw)return;
- const target=/^https?:\\/\\//i.test(raw)?raw:(raw.includes(".")?"https://"+raw:engines[currentEngine].url.replace("%s",encodeURIComponent(raw)));
+ const target=/^https?:\/\//i.test(raw)?raw:(raw.includes(".")?"https://"+raw:engines[currentEngine].url.replace("%s",encodeURIComponent(raw)));
  launchBrowser(target);e.currentTarget.blur();
 });
 document.getElementById("tb-collapse").addEventListener("click",()=>{browserChrome.classList.add("collapsed");chromeReveal.classList.add("visible")});
