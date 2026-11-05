@@ -659,6 +659,13 @@ body.browsing .view-panel{visibility:hidden}
 #view-apps .catalog-name,#view-games .catalog-name{font-size:12px}
 #view-apps .catalog-tag,#view-games .catalog-tag{font-size:8px;padding:2px 5px;width:max-content}
 @media(max-width:680px){#view-apps .catalog-controls,#view-games .catalog-controls{grid-template-columns:minmax(0,1fr) 125px}#view-apps .catalog-grid,#view-games .catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Give Doc's wordmark more presence without enlarging the surrounding controls. */
+.brand{font-size:30px;letter-spacing:-.8px}
+.home-title{font-size:46px;letter-spacing:-1.4px}
+.doc-loader-mark{font-size:38px;letter-spacing:-1.7px}
+#page-loader .doc-loader-mark{font-size:32px}
+@media(max-width:680px){.brand{font-size:28px}.home-title{font-size:clamp(38px,10vw,48px)}}
 </style>
 </head>
 <body>
