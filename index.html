@@ -660,12 +660,12 @@ body.browsing .view-panel{visibility:hidden}
 #view-apps .catalog-tag,#view-games .catalog-tag{font-size:8px;padding:2px 5px;width:max-content}
 @media(max-width:680px){#view-apps .catalog-controls,#view-games .catalog-controls{grid-template-columns:minmax(0,1fr) 125px}#view-apps .catalog-grid,#view-games .catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
-/* Give Doc's wordmark more presence without enlarging the surrounding controls. */
-.brand{font-size:30px;letter-spacing:-.8px}
-.home-title{font-size:46px;letter-spacing:-1.4px}
-.doc-loader-mark{font-size:38px;letter-spacing:-1.7px}
-#page-loader .doc-loader-mark{font-size:32px}
-@media(max-width:680px){.brand{font-size:28px}.home-title{font-size:clamp(38px,10vw,48px)}}
+/* Oversized Doc wordmark. */
+.brand{font-size:44px;letter-spacing:-1.8px;line-height:1}
+.home-title{font-size:clamp(64px,8vw,88px);letter-spacing:-3px;line-height:.98}
+.doc-loader-mark{font-size:58px;letter-spacing:-2.8px;line-height:1}
+#page-loader .doc-loader-mark{font-size:50px}
+@media(max-width:680px){.brand{font-size:38px}.home-title{font-size:clamp(54px,13vw,72px);letter-spacing:-2.4px}.doc-loader-mark{font-size:50px}}
 </style>
 </head>
 <body>
