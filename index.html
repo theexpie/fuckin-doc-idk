@@ -641,8 +641,8 @@ body.browsing .view-panel{visibility:hidden}
 
 
 /* Navigation loader: fade over the page, then clear only after the frame responds. */
-#page-loader{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .26s ease,visibility .26s ease}
-#page-loader.is-visible{opacity:1;visibility:visible;pointer-events:auto}
+#page-loader{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .26s ease,visibility 0s linear .26s}
+#page-loader.is-visible{opacity:1;visibility:visible;pointer-events:auto;transition-delay:0s}
 /* Simple app/play library: keep search and category filtering, remove extra decoration. */
 #view-apps .catalog-kicker,#view-games .catalog-kicker,#view-apps .catalog-subtitle,#view-games .catalog-subtitle,#view-apps .catalog-section-label,#view-games .catalog-section-label{display:none}
 #view-apps .catalog-hero,#view-games .catalog-hero{padding:18px 18px 14px;margin-bottom:14px;border-radius:16px;background:rgba(5,39,49,.66);box-shadow:none}
