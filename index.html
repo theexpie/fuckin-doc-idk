@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Doc</title>
+<link id="tab-cloak-icon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230088a8'/%3E%3Ctext x='32' y='44' font-size='42' text-anchor='middle' fill='white' font-family='Arial'%3ED%3C/text%3E%3C/svg%3E">
 <style>
 :root {
   --bg-dark: #07090E;
@@ -426,6 +427,8 @@ header {
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 #dock.autohide { transform: translateX(-50%) translateY(90px); opacity: 0; pointer-events: none; }
+/* The desktop dock is a home-screen taskbar, not a browsing control. */
+#main-view.active ~ #dock { display: none !important; }
 
 .dock-item {
   background: none;
@@ -507,8 +510,11 @@ header {
       <label>Tab Cloak</label>
       <select id="setting-cloak">
         <option value="none">None</option>
-        <option value="classroom">Google Classroom</option>
-        <option value="docs">Google Docs</option>
+        <option value="clever">Clever Portal</option>
+        <option value="canvas">Dashboard</option>
+        <option value="classroom">Home - Classroom</option>
+        <option value="youtube">YouTube</option>
+        <option value="drive">Home - Google Drive</option>
       </select>
     </div>
     <div class="setting-row">
@@ -705,6 +711,32 @@ document.querySelectorAll('.engine-opt').forEach(opt => {
     engineMenu.classList.remove('open');
   });
 });
+
+
+/* Tab Cloak: changes the browser-tab title and favicon together. */
+const TAB_CLOAKS = {
+  none: { title: "Doc", icon: null },
+  clever: { title: "Clever Portal", icon: "https://www.google.com/s2/favicons?domain=clever.com&sz=64" },
+  canvas: { title: "Dashboard", icon: "https://www.google.com/s2/favicons?domain=canvas.instructure.com&sz=64" },
+  classroom: { title: "Home - Classroom", icon: "https://www.google.com/s2/favicons?domain=classroom.google.com&sz=64" },
+  youtube: { title: "YouTube", icon: "https://www.google.com/s2/favicons?domain=youtube.com&sz=64" },
+  drive: { title: "Home - Google Drive", icon: "https://www.google.com/s2/favicons?domain=drive.google.com&sz=64" }
+};
+const cloakSelect = document.getElementById("setting-cloak");
+const cloakIcon = document.getElementById("tab-cloak-icon");
+function applyTabCloak(value) {
+  const cloak = TAB_CLOAKS[value] || TAB_CLOAKS.none;
+  document.title = cloak.title;
+  if (cloak.icon) cloakIcon.href = cloak.icon;
+  else cloakIcon.href = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230088a8'/%3E%3Ctext x='32' y='44' font-size='42' text-anchor='middle' fill='white' font-family='Arial'%3ED%3C/text%3E%3C/svg%3E";
+  try { localStorage.setItem("doc-tab-cloak", value); } catch (e) {}
+}
+try {
+  const savedCloak = localStorage.getItem("doc-tab-cloak");
+  if (savedCloak && TAB_CLOAKS[savedCloak]) cloakSelect.value = savedCloak;
+} catch (e) {}
+applyTabCloak(cloakSelect.value);
+cloakSelect.addEventListener("change", () => applyTabCloak(cloakSelect.value));
 
 /* Pro Browsing Session via Scramjet */
 const mainView = document.getElementById('main-view');
