@@ -639,6 +639,26 @@ body.browsing .view-panel{visibility:hidden}
 #page-loader .doc-loader-mark{font-size:25px}
 @media(prefers-reduced-motion:reduce){.doc-loader-spinner{animation-duration:1.8s}}
 
+
+/* Navigation loader: fade over the page, then clear only after the frame responds. */
+#page-loader{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .26s ease,visibility .26s ease}
+#page-loader.is-visible{opacity:1;visibility:visible;pointer-events:auto}
+/* Simple app/play library: keep search and category filtering, remove extra decoration. */
+#view-apps .catalog-kicker,#view-games .catalog-kicker,#view-apps .catalog-subtitle,#view-games .catalog-subtitle,#view-apps .catalog-section-label,#view-games .catalog-section-label{display:none}
+#view-apps .catalog-hero,#view-games .catalog-hero{padding:18px 18px 14px;margin-bottom:14px;border-radius:16px;background:rgba(5,39,49,.66);box-shadow:none}
+#view-apps .catalog-title-row,#view-games .catalog-title-row{align-items:center;margin-bottom:12px}
+#view-apps .catalog-title,#view-games .catalog-title{font-size:25px;letter-spacing:-.7px}
+#view-apps .catalog-count,#view-games .catalog-count{padding:5px 8px;font-size:10px}
+#view-apps .catalog-controls,#view-games .catalog-controls{grid-template-columns:minmax(0,1fr) minmax(125px,155px);gap:8px}
+#view-apps .catalog-grid,#view-games .catalog-grid{grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px}
+#view-apps .catalog-card,#view-games .catalog-card{min-height:68px;grid-template-columns:36px minmax(0,1fr);gap:10px;padding:10px 12px;border-radius:12px;box-shadow:none;animation:none;background:rgba(255,255,255,.045)}
+#view-apps .catalog-card:before,#view-games .catalog-card:before,#view-apps .catalog-arrow,#view-games .catalog-arrow,#view-apps .catalog-desc,#view-games .catalog-desc{display:none}
+#view-apps .catalog-icon,#view-games .catalog-icon{width:36px;height:36px;border-radius:10px}
+#view-apps .catalog-icon img,#view-games .catalog-icon img{width:22px;height:22px}
+#view-apps .catalog-copy,#view-games .catalog-copy{gap:5px}
+#view-apps .catalog-name,#view-games .catalog-name{font-size:12px}
+#view-apps .catalog-tag,#view-games .catalog-tag{font-size:8px;padding:2px 5px;width:max-content}
+@media(max-width:680px){#view-apps .catalog-controls,#view-games .catalog-controls{grid-template-columns:minmax(0,1fr) 125px}#view-apps .catalog-grid,#view-games .catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -1085,14 +1105,39 @@ const startupLoader=document.getElementById("startup-loader");
 const pageLoader=document.getElementById("page-loader");
 let pageLoadToken=0;
 function showPageLoader(){
-  if(!pageLoader)return;
-  pageLoader.hidden=false;
-  pageLoader.setAttribute("aria-busy","true");
-  return ++pageLoadToken;
+  const token=++pageLoadToken;
+  if(pageLoader){
+    pageLoader.hidden=false;
+    pageLoader.setAttribute("aria-busy","true");
+    requestAnimationFrame(()=>{if(token===pageLoadToken)pageLoader.classList.add("is-visible")});
+  }
+  return token;
 }
 function hidePageLoader(token){
   if(token!==undefined&&token!==pageLoadToken)return;
-  if(pageLoader){pageLoader.hidden=true;pageLoader.removeAttribute("aria-busy")}
+  if(!pageLoader)return;
+  pageLoader.classList.remove("is-visible");
+  pageLoader.removeAttribute("aria-busy");
+  setTimeout(()=>{if(token===undefined||token===pageLoadToken)pageLoader.hidden=true},260);
+}
+function waitForBrowserFrameLoad(timeout=18000){
+  return new Promise(resolve=>{
+    let finished=false;
+    const finish=()=>{if(finished)return;finished=true;clearTimeout(timer);browserFrame.removeEventListener("load",finish);resolve()};
+    browserFrame.addEventListener("load",finish,{once:true});
+    const timer=setTimeout(finish,timeout);
+  });
+}
+async function navigateWithLoader(action){
+  const token=showPageLoader();
+  const started=performance.now();
+  const frameReady=waitForBrowserFrameLoad();
+  try{
+    await Promise.all([Promise.resolve().then(action),frameReady]);
+  }finally{
+    await new Promise(resolve=>setTimeout(resolve,Math.max(0,520-(performance.now()-started))));
+    hidePageLoader(token);
+  }
 }
 
 
@@ -1117,10 +1162,8 @@ async function launchBrowser(url) {
   const tab=browserTabs.find(t=>t.id===activeBrowserTab);if(tab){tab.url=target;tab.title=title;renderBrowserTabs()}
   document.getElementById('active-tab-title').textContent=title;
   addHistory(target,title);
-  const loadToken=showPageLoader("Opening "+title);
-  try{await DOC_ENGINE.go(browserFrame,target)}
+  try{await navigateWithLoader(()=>DOC_ENGINE.go(browserFrame,target))}
   catch(e){const box=document.getElementById("console-logs");if(box){const line=document.createElement("div");line.style.color="#fb7185";line.textContent="> "+(e?.message||e);box.appendChild(line)}urlDisplay.value="Proxy error — open DevTools for details";}
-  finally{hidePageLoader(loadToken)}
 }
 
 document.getElementById('search-bar').addEventListener('keydown', (e) => {
@@ -1136,9 +1179,9 @@ document.getElementById('btn-return').addEventListener('click', () => { mainView
 mainView.addEventListener("transitionend",applyDocUpdateIfReady);
 new MutationObserver(applyDocUpdateIfReady).observe(mainView,{attributes:true,attributeFilter:["class"]});
 
-document.getElementById('tb-back').addEventListener('click',()=>DOC_ENGINE.back(browserFrame));
-document.getElementById('tb-forward').addEventListener('click',()=>DOC_ENGINE.forward(browserFrame));
-document.getElementById('tb-refresh').addEventListener('click',()=>DOC_ENGINE.reload(browserFrame));
+document.getElementById('tb-back').addEventListener('click',()=>navigateWithLoader(()=>DOC_ENGINE.back(browserFrame)).catch(e=>console.warn("[Doc] Back navigation:",e)));
+document.getElementById('tb-forward').addEventListener('click',()=>navigateWithLoader(()=>DOC_ENGINE.forward(browserFrame)).catch(e=>console.warn("[Doc] Forward navigation:",e)));
+document.getElementById('tb-refresh').addEventListener('click',()=>navigateWithLoader(()=>DOC_ENGINE.reload(browserFrame)).catch(e=>console.warn("[Doc] Reload:",e)));
 DOC_ENGINE.init().catch(error=>{const box=document.getElementById("console-logs");if(box){const line=document.createElement("div");line.style.color="#fb7185";line.textContent="Engine initialization: "+(error?.message||error);box.appendChild(line)}});
 function dismissStartupLoader(){if(!startupLoader||startupLoader.dataset.dismissed)return;startupLoader.dataset.dismissed="1";startupLoader.style.opacity="0";startupLoader.style.visibility="hidden";setTimeout(()=>startupLoader.remove(),320)}
 if(document.readyState==="complete")requestAnimationFrame(()=>setTimeout(dismissStartupLoader,180));
@@ -1239,8 +1282,7 @@ function switchBrowserTab(id){
  const tab=browserTabs.find(t=>t.id===id);if(!tab)return;activeBrowserTab=id;
  if(tab.url){
   urlDisplay.value=tab.url;document.getElementById("active-tab-title").textContent=tab.title;
-  const loadToken=showPageLoader("Returning to "+tab.title);
-  try{Promise.resolve(DOC_ENGINE.go(browserFrame,tab.url)).catch(e=>console.warn(e)).finally(()=>hidePageLoader(loadToken))}catch(e){hidePageLoader(loadToken)}
+  navigateWithLoader(()=>DOC_ENGINE.go(browserFrame,tab.url)).catch(e=>console.warn("[Doc] Tab navigation:",e));
  }else{browserFrame.src="about:blank";urlDisplay.value="";hidePageLoader()}
  renderBrowserTabs();
 }
