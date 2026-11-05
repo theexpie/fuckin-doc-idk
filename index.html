@@ -1034,6 +1034,45 @@ try {
 applyTabCloak(cloakSelect.value);
 
 /* Pro Browsing Session via Scramjet */
+const DOC_UPDATE_REPO="theexpie/fuckin-doc-idk";
+const DOC_UPDATE_API="https://api.github.com/repos/"+DOC_UPDATE_REPO+"/commits/main";
+let docKnownCommit=null,docPendingCommit=null,docUpdateBusy=false;
+async function checkForDocUpdate(){
+ if(docUpdateBusy||document.visibilityState==="hidden")return;
+ docUpdateBusy=true;
+ try{
+  const response=await fetch(DOC_UPDATE_API,{cache:"no-store",headers:{Accept:"application/vnd.github+json"}});
+  if(!response.ok)throw new Error("Update check unavailable");
+  const latest=(await response.json())?.sha;
+  if(!latest)return;
+  if(!docKnownCommit){
+   docKnownCommit=latest;
+   const pinned=location.pathname.match(/\/gh\/theexpie\/fuckin-doc-idk@([0-9a-f]{40})\//i)?.[1];
+   if(pinned&&pinned!==latest)docPendingCommit=latest;
+  }else if(latest!==docKnownCommit){
+   docKnownCommit=latest;
+   docPendingCommit=latest;
+  }
+  applyDocUpdateIfReady();
+ }catch(error){console.debug("[Doc] Update check skipped:",error?.message||error)}
+ finally{docUpdateBusy=false}
+}
+function applyDocUpdateIfReady(){
+ if(!docPendingCommit||mainView.classList.contains("active"))return;
+ const commit=docPendingCommit;
+ docPendingCommit=null;
+ console.info("[Doc] Applying update",commit);
+ if(location.hostname==="cdn.jsdelivr.net"){
+  const next=location.href.replace(/\/gh\/theexpie\/fuckin-doc-idk(?:@[0-9a-f]{40})?\//i,"/gh/theexpie/fuckin-doc-idk@"+commit+"/");
+  if(next!==location.href){location.replace(next);return}
+ }
+ const next=new URL(location.href);
+ next.searchParams.set("doc-build",commit);
+ location.replace(next.href);
+}
+setTimeout(checkForDocUpdate,12000);
+setInterval(checkForDocUpdate,180000);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")checkForDocUpdate()});
 const mainView = document.getElementById('main-view');
 const browserFrame = document.getElementById('browser-frame');
 const urlDisplay = document.getElementById('current-url-display');
@@ -1090,6 +1129,8 @@ document.getElementById('search-bar').addEventListener('keydown', (e) => {
 });
 
 document.getElementById('btn-return').addEventListener('click', () => { mainView.classList.remove('active'); syncBrowsingChrome(); document.getElementById("url-toolbar")?.classList.remove("collapsed"); toolbarCollapsed=false; document.getElementById("tb-collapse").disabled=false; });
+mainView.addEventListener("transitionend",applyDocUpdateIfReady);
+new MutationObserver(applyDocUpdateIfReady).observe(mainView,{attributes:true,attributeFilter:["class"]});
 
 document.getElementById('tb-back').addEventListener('click',()=>DOC_ENGINE.back(browserFrame));
 document.getElementById('tb-forward').addEventListener('click',()=>DOC_ENGINE.forward(browserFrame));
