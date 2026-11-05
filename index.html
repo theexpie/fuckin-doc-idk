@@ -428,10 +428,10 @@ header {
   pointer-events: auto;
   transition: opacity .3s ease, background .3s ease;
 }
-#main-view.active ~ #dock {
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+/* Hard state switch: the home taskbar and its edge sensor do not exist visually while browsing. */
+body.browsing #dock,
+body.browsing #dock-edge-trigger {
+  display: none !important;
 }
 
 .dock-item {
@@ -848,6 +848,7 @@ const browserFrame = document.getElementById('browser-frame');
 const urlDisplay = document.getElementById('current-url-display');
 
 async function launchBrowser(url) {
+  document.body.classList.add('browsing');
   mainView.classList.add('active');
   let target=/^https?:\/\//i.test(url)?url:'https://'+url;
   urlDisplay.textContent=target;
@@ -865,7 +866,7 @@ document.getElementById('search-bar').addEventListener('keydown', (e) => {
   }
 });
 
-document.getElementById('btn-return').addEventListener('click', () => { mainView.classList.remove('active'); document.getElementById("url-toolbar").classList.remove("collapsed"); toolbarCollapsed=false; document.getElementById("tb-collapse").disabled=false; });
+document.getElementById('btn-return').addEventListener('click', () => { document.body.classList.remove('browsing'); mainView.classList.remove('active'); document.getElementById("url-toolbar").classList.remove("collapsed"); toolbarCollapsed=false; document.getElementById("tb-collapse").disabled=false; });
 
 document.getElementById('tb-back').addEventListener('click',()=>DOC_ENGINE.back(browserFrame));
 document.getElementById('tb-forward').addEventListener('click',()=>DOC_ENGINE.forward(browserFrame));
