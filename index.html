@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<base href="./">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <title>Doc</title>
 <link id="tab-cloak-icon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230088a8'/%3E%3Ctext x='32' y='44' font-size='42' text-anchor='middle' fill='white' font-family='Arial'%3ED%3C/text%3E%3C/svg%3E">
 <style>
@@ -615,32 +619,28 @@ body.browsing .view-panel{visibility:hidden}
 @media(max-width:390px){.catalog-dropdown-trigger{height:42px}}
 
 
-/* Purpose-built loading surfaces: startup and proxied navigation are independent. */
-.doc-loader{position:fixed;inset:0;z-index:2147483600;display:grid;place-items:center;padding:24px;background:rgba(4,25,33,.94);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);opacity:1;visibility:visible;transition:opacity .28s ease,visibility .28s ease}
+
+/* Minimal Doc loading treatment */
+.doc-loader{position:fixed;inset:0;z-index:2147483600;display:grid;place-items:center;padding:24px;background:rgba(4,25,33,.94);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
 .doc-loader[hidden]{display:none}
-.doc-loader-card{width:min(330px,calc(100vw - 48px));padding:25px 23px 22px;border:1px solid rgba(157,226,224,.2);border-radius:20px;background:rgba(7,48,58,.78);box-shadow:0 24px 70px rgba(0,0,0,.36);text-align:center}
-.doc-loader-mark{font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:-1px;color:var(--text-main);margin-bottom:7px}
-.doc-loader-mark span{color:var(--accent)}
-.doc-loader-label{font-size:12px;color:var(--text-muted);letter-spacing:.15px}
-.doc-loader-track{height:3px;margin-top:21px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.1)}
-.doc-loader-progress{height:100%;width:38%;border-radius:99px;background:linear-gradient(90deg,#43c6bd,#9de9df);animation:doc-loader-travel 1.15s cubic-bezier(.45,0,.55,1) infinite}
-@keyframes doc-loader-travel{0%{transform:translateX(-115%)}100%{transform:translateX(285%)}}
+.doc-loader-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:19px;padding:0;border:0;background:transparent;box-shadow:none;text-align:center}
+.doc-loader-mark{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:30px;line-height:1;font-weight:600;letter-spacing:-1.4px;color:#f2fbf9;margin:0}
+.doc-loader-mark span{display:none}
+.doc-loader-label,.doc-loader-track{display:none!important}
+.doc-loader-spinner{width:27px;height:27px;border:2px solid rgba(157,226,224,.2);border-top-color:#9de9df;border-right-color:#43c6bd;border-radius:50%;animation:doc-spin .72s linear infinite}
+@keyframes doc-spin{to{transform:rotate(360deg)}}
 #startup-loader{z-index:2147483601}
 #page-loader{position:absolute;inset:0;z-index:15;background:rgba(4,25,33,.68)}
-#page-loader .doc-loader-card{width:min(270px,calc(100vw - 48px));padding:18px 20px}
-#page-loader .doc-loader-mark{font-size:19px;margin-bottom:4px}
-#page-loader .doc-loader-track{margin-top:14px}
-.browser-tab{touch-action:pan-y;cursor:grab;will-change:transform}
-.browser-tab.pointer-dragging{z-index:8;cursor:grabbing;opacity:.92;transition:transform .08s ease,opacity .12s ease;box-shadow:0 12px 30px rgba(0,0,0,.25)}
-.browser-tab.tab-shift{transition:transform .16s cubic-bezier(.2,.75,.25,1)}
-@media(prefers-reduced-motion:reduce){.doc-loader-progress{animation-duration:2.5s}.browser-tab,.browser-tab.tab-shift{transition:none}}
+#page-loader .doc-loader-card{gap:15px}
+#page-loader .doc-loader-mark{font-size:25px}
+@media(prefers-reduced-motion:reduce){.doc-loader-spinner{animation-duration:1.8s}}
 
 </style>
 </head>
 <body>
 
 <div class="doc-loader" id="startup-loader" role="status" aria-live="polite">
-  <div class="doc-loader-card"><div class="doc-loader-mark">Doc<span>.</span></div><div class="doc-loader-label">Preparing your workspace</div><div class="doc-loader-track"><div class="doc-loader-progress"></div></div></div>
+  <div class="doc-loader-card"><div class="doc-loader-mark">Doc</div><div class="doc-loader-spinner" aria-hidden="true"></div></div>
 </div>
 
 <!-- Your Uploaded Waterfront Photos Background Slideshow -->
@@ -721,7 +721,7 @@ body.browsing .view-panel{visibility:hidden}
 <div id="main-view">
   
 <div class="doc-loader" id="page-loader" role="status" aria-live="polite" hidden>
-  <div class="doc-loader-card"><div class="doc-loader-mark">Loading page</div><div class="doc-loader-label" id="page-loader-label">Connecting securely</div><div class="doc-loader-track"><div class="doc-loader-progress"></div></div></div>
+  <div class="doc-loader-card"><div class="doc-loader-mark">Doc</div><div class="doc-loader-spinner" aria-hidden="true"></div></div>
 </div>
   <iframe id="browser-frame" src="about:blank" title="Web content"></iframe>\n  <span id="active-tab-title" hidden>New tab</span>
   <div id="browser-chrome">
@@ -1013,9 +1013,8 @@ const urlDisplay = document.getElementById('current-url-display');
 const startupLoader=document.getElementById("startup-loader");
 const pageLoader=document.getElementById("page-loader");
 let pageLoadToken=0;
-function showPageLoader(label="Connecting securely"){
+function showPageLoader(){
   if(!pageLoader)return;
-  pageLoader.querySelector("#page-loader-label").textContent=label;
   pageLoader.hidden=false;
   pageLoader.setAttribute("aria-busy","true");
   return ++pageLoadToken;
@@ -1067,7 +1066,11 @@ document.getElementById('btn-return').addEventListener('click', () => { mainView
 document.getElementById('tb-back').addEventListener('click',()=>DOC_ENGINE.back(browserFrame));
 document.getElementById('tb-forward').addEventListener('click',()=>DOC_ENGINE.forward(browserFrame));
 document.getElementById('tb-refresh').addEventListener('click',()=>DOC_ENGINE.reload(browserFrame));
-DOC_ENGINE.init().catch(error=>{const box=document.getElementById("console-logs");if(box){const line=document.createElement("div");line.style.color="#fb7185";line.textContent="Engine initialization: "+(error?.message||error);box.appendChild(line)}}).finally(()=>{if(startupLoader){startupLoader.style.opacity="0";startupLoader.style.visibility="hidden";setTimeout(()=>startupLoader.remove(),320)}});
+DOC_ENGINE.init().catch(error=>{const box=document.getElementById("console-logs");if(box){const line=document.createElement("div");line.style.color="#fb7185";line.textContent="Engine initialization: "+(error?.message||error);box.appendChild(line)}});
+function dismissStartupLoader(){if(!startupLoader||startupLoader.dataset.dismissed)return;startupLoader.dataset.dismissed="1";startupLoader.style.opacity="0";startupLoader.style.visibility="hidden";setTimeout(()=>startupLoader.remove(),320)}
+if(document.readyState==="complete")requestAnimationFrame(()=>setTimeout(dismissStartupLoader,180));
+else window.addEventListener("load",()=>setTimeout(dismissStartupLoader,180),{once:true});
+setTimeout(dismissStartupLoader,4500);
 /* Sidebar Panels */
 const panels = {
   devtools: document.getElementById('panel-devtools'),
