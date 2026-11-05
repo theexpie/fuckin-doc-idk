@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml" width="100%" height="100%" viewBox="0 0 1280 800" preserveAspectRatio="xMidYMid slice">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xhtml="http://www.w3.org/1999/xhtml" width="100%" height="100%">
   <title>Doc</title>
   <rect width="1280" height="800" fill="#061d25"/>
   <text x="50%" y="49%" text-anchor="middle" fill="#f2fbf9" font-family="Inter,Arial,sans-serif" font-size="50" font-weight="600" letter-spacing="-2.8">Doc</text><circle cx="640" cy="455" r="13.5" fill="none" stroke="#9de9df" stroke-opacity=".22" stroke-width="2"/><path d="M640 441.5a13.5 13.5 0 0 1 13.5 13.5" fill="none" stroke="#43c6bd" stroke-width="2" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 640 455" to="360 640 455" dur=".72s" repeatCount="indefinite"/></path>
