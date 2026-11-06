@@ -681,6 +681,14 @@ body.browsing .view-panel{visibility:hidden}
 /* Oversized Doc wordmark. */
 .brand{font-size:44px;letter-spacing:-1.8px;line-height:1}
 .home-title{font-size:clamp(64px,8vw,88px);letter-spacing:-3px;line-height:.98}
+.home-shortcuts{display:flex;justify-content:center;align-items:stretch;flex-wrap:wrap;gap:12px;margin:26px auto 0;max-width:760px}
+.home-shortcut{display:flex;align-items:center;gap:10px;min-width:132px;padding:10px 14px;border:1px solid rgba(190,220,220,.16);border-radius:14px;background:rgba(14,18,26,.62);color:var(--text-main);font:inherit;font-size:12px;text-align:left;cursor:pointer;transition:background .18s,border-color .18s,transform .18s}
+.home-shortcut:hover{background:rgba(67,198,189,.13);border-color:rgba(157,226,224,.35);transform:translateY(-2px)}
+.home-shortcut-icon{display:grid;place-items:center;width:30px;height:30px;flex:0 0 30px;border-radius:9px;background:rgba(255,255,255,.08)}
+.home-shortcut-icon img{width:20px;height:20px;object-fit:contain}
+.dock-cloak-button{margin-left:auto}
+@media(max-width:680px){.home-shortcuts{gap:8px;margin-top:20px}.home-shortcut{min-width:calc(50% - 8px);flex:1 1 calc(50% - 8px);padding:9px 10px}}
+
 .doc-loader-mark{font-size:58px;letter-spacing:-2.8px;line-height:1}
 #page-loader .doc-loader-mark{font-size:50px}
 @media(max-width:680px){.brand{font-size:38px}.home-title{font-size:clamp(54px,13vw,72px);letter-spacing:-2.4px}.doc-loader-mark{font-size:50px}}
@@ -907,6 +915,13 @@ body.browsing .view-panel{visibility:hidden}
         </div>
         <input type="text" class="search-input" id="search-bar" placeholder="Search or URL..." autocomplete="off">
       </div>
+      <div class="home-shortcuts" aria-label="Home shortcuts">
+        <button class="home-shortcut" type="button" data-shortcut-url="https://clever.com/"><span class="home-shortcut-icon"><img src="https://www.google.com/s2/favicons?domain=clever.com&sz=64" alt=""></span><span>Clever Portal</span></button>
+        <button class="home-shortcut" type="button" data-shortcut-url="https://canvas.instructure.com/"><span class="home-shortcut-icon"><img src="https://www.google.com/s2/favicons?domain=instructure.com&sz=64" alt=""></span><span>Dashboard</span></button>
+        <button class="home-shortcut" type="button" data-shortcut-url="https://classroom.google.com/"><span class="home-shortcut-icon"><img src="https://www.google.com/s2/favicons?domain=classroom.google.com&sz=64" alt=""></span><span>Home - Classroom</span></button>
+        <button class="home-shortcut" type="button" data-shortcut-url="https://www.youtube.com/"><span class="home-shortcut-icon"><img src="https://www.google.com/s2/favicons?domain=youtube.com&sz=64" alt=""></span><span>YouTube</span></button>
+        <button class="home-shortcut" type="button" data-shortcut-url="https://drive.google.com/"><span class="home-shortcut-icon"><img src="https://www.google.com/s2/favicons?domain=drive.google.com&sz=64" alt=""></span><span>Home - Google Drive</span></button>
+      </div>
     </div>
   </div>
 
@@ -1029,11 +1044,11 @@ body.browsing .view-panel{visibility:hidden}
     <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5S17.67 9 18.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
     <span>Play</span>
   </button>
-  <button class="dock-item dock-cloak-button" id="dock-cloak" type="button" aria-label="Open cloaked Doc tab" title="Open cloaked tab"><span aria-hidden="true">a:b</span></button>
   <button class="dock-item" data-view="settings">
     <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
     <span>Settings</span>
   </button>
+  <button class="dock-item dock-cloak-button" id="dock-cloak" type="button" aria-label="Open cloaked Doc tab" title="Open cloaked tab"><span aria-hidden="true">a:b</span></button>
 </nav>
 <div id="dock-edge-trigger" aria-hidden="true"></div>
 
@@ -1442,12 +1457,18 @@ function openCloakedDocTab(){
  try{
   const cloak=TAB_CLOAKS[cloakSelect.value]||TAB_CLOAKS.none;
   const source="<!doctype html>\\n"+document.documentElement.outerHTML;
+  popup.addEventListener("load",()=>{
+   try{
+    popup.document.querySelector('[data-view="home"]')?.click();
+    popup.document.title=cloak.title||"Doc";
+    const icon=popup.document.querySelector('link[rel="icon"]');
+    if(icon)icon.href=cloak.icon||"";
+   }catch(error){console.warn("[Doc] Could not switch cloaked tab home:",error)}
+   setTimeout(()=>{try{window.close()}catch{}},180);
+  },{once:true});
   popup.document.open();
   popup.document.write(source);
   popup.document.close();
-  popup.document.title=cloak.title||"Doc";
-  const icon=popup.document.querySelector('link[rel="icon"]');
-  if(icon)icon.href=cloak.icon||"";
   try{popup.opener=null}catch{}
  }catch(error){
   console.warn("[Doc] Could not create cloaked tab:",error);
@@ -1591,6 +1612,9 @@ function finishTabReorder(e){
 window.addEventListener("pointermove",moveTabReorder,{passive:false});
 window.addEventListener("pointerup",finishTabReorder);
 window.addEventListener("pointercancel",finishTabReorder);
+document.querySelectorAll(".home-shortcut[data-shortcut-url]").forEach(button=>{
+ button.addEventListener("click",()=>createBrowserTab(button.dataset.shortcutUrl));
+});
 function createBrowserTab(url=""){
  const tab={id:"tab-"+(++tabSequence),url,title:url?tabTitle(url):"New tab"};browserTabs.push(tab);activeBrowserTab=tab.id;renderBrowserTabs();if(url)navigateBrowserTab(tab,url);return tab;
 }
