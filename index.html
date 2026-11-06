@@ -1537,10 +1537,10 @@ window.addEventListener("pointermove",moveTabReorder,{passive:false});
 window.addEventListener("pointerup",finishTabReorder);
 window.addEventListener("pointercancel",finishTabReorder);
 function createBrowserTab(url=""){
- const tab={id:"tab-"+(++tabSequence),url,title:url?tabTitle(url):"New tab"};browserTabs.push(tab);activeBrowserTab=tab.id;renderBrowserTabs();if(url)navigateBrowserTab(tab,url);return tab;
+ const tab={id:"tab-"+(++tabSequence),url,title:url?tabTitle(url):"New tab"};browserTabs.push(tab);activeBrowserTab=tab.id;renderBrowserTabs();if(url)navigateBrowserTab(tab,url);else if(docSettings.autoCloak)applyTabCloak(cloakSelect.value);return tab;
 }
 function switchBrowserTab(id){
- const tab=browserTabs.find(t=>t.id===id);if(!tab)return;activeBrowserTab=id;
+ const tab=browserTabs.find(t=>t.id===id);if(!tab)return;activeBrowserTab=id;if(docSettings.autoCloak)applyTabCloak(tab.url?"none":cloakSelect.value);
  if(tab.url){
   urlDisplay.value=tab.url;document.getElementById("active-tab-title").textContent=tab.title;
   navigateWithLoader(()=>DOC_ENGINE.go(browserFrame,tab.url)).catch(e=>console.warn("[Doc] Tab navigation:",e));
@@ -1589,6 +1589,7 @@ function makePanelMovable(panel){
 Object.values(panels).forEach(makePanelMovable);
 renderBookmarks();renderHistory();
 createBrowserTab();
+if(docSettings.aboutBlank&&docSettings.autoCloak)applyTabCloak(cloakSelect.value);
 
 /* Dock visibility is synchronized to the actual browser-view state above. */
 </script>
