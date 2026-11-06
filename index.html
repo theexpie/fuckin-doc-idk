@@ -695,6 +695,56 @@ body.browsing .view-panel{visibility:hidden}
   }
 }
 
+
+/* Shared home UI glass: match the taskbar's dark slate tint, not blue. */
+:root{
+  --ui-glass:rgba(14,18,26,.74);
+  --ui-glass-strong:rgba(14,18,26,.86);
+  --ui-glass-border:rgba(190,220,220,.16);
+}
+/* App and Play categories stay in the data/filter logic; only their chips are hidden. */
+#view-apps .catalog-tag,
+#view-games .catalog-tag{display:none!important}
+/* Keep every non-browser UI surface on the same neutral tinted-glass material. */
+.search-container,
+.engine-dropdown,
+.floating-panel,
+#view-apps .catalog-hero,
+#view-games .catalog-hero,
+#view-apps .catalog-search-wrap,
+#view-games .catalog-search-wrap,
+#view-apps .catalog-dropdown-trigger,
+#view-games .catalog-dropdown-trigger,
+#view-settings .custom-select-trigger,
+#view-apps .catalog-dropdown-menu,
+#view-games .catalog-dropdown-menu,
+#view-settings .custom-select-menu,
+#view-settings .setting-row select,
+#view-settings .setting-row input,
+.card,
+.catalog-card{
+  background:var(--ui-glass)!important;
+  border-color:var(--ui-glass-border)!important;
+  -webkit-backdrop-filter:blur(18px);
+  backdrop-filter:blur(18px);
+}
+.search-container{background:var(--ui-glass-strong)!important}
+.catalog-search-wrap:focus-within,
+.catalog-dropdown.open .catalog-dropdown-trigger,
+.custom-select.open .custom-select-trigger,
+.catalog-dropdown-trigger:hover,
+.custom-select-trigger:hover{
+  background:rgba(14,18,26,.9)!important;
+  border-color:rgba(125,211,198,.42)!important;
+  box-shadow:0 0 0 3px rgba(67,198,189,.09)!important;
+}
+.engine-dropdown{background:var(--ui-glass-strong)!important}
+.floating-panel{background:var(--ui-glass-strong)!important}
+#view-apps .catalog-card:hover,
+#view-games .catalog-card:hover{
+  background:rgba(24,39,48,.88)!important;
+}
+
 </style>
 </head>
 <body>
