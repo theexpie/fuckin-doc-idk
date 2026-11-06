@@ -1341,29 +1341,8 @@ function runPanicShortcut(){
  try{
   popup.opener=null;
   popup.document.open();
-  popup.document.write("<!doctype html><html><head><meta charset='utf-8'><title></title><link rel='icon'></head><body><script id=\"doc-scrambled-text\">\n(function(){\n  const alphabet=\"abcdefghijklmnopqrstuvwxyz\";\n  /* Reverse the supplied font's cmap: plaintext glyph -> stored QWERTY character. */\n  const fontGlyphs=\"ruwzvyijpadltfhqkmscobxgne\";\n  const encode=value=>String(value).replace(/[a-z]/gi,ch=>{\n    const index=fontGlyphs.indexOf(ch.toLowerCase());\n    if(index<0)return ch;\n    const out=alphabet[index];\n    return ch===ch.toUpperCase()?out.toUpperCase():out;\n  });\n  const seenText=new WeakMap(),seenAttrs=new WeakMap();\n  const skipText=\"SCRIPT,STYLE,NOSCRIPT,TEXTAREA,INPUT,CODE,PRE\";\n  function encodeText(node){\n    const parent=node&&node.parentElement;\n    if(!parent||parent.closest(skipText)||parent.isContentEditable)return;\n    const value=node.nodeValue;\n    if(seenText.get(node)===value)return;\n    const encoded=encode(value);\n    seenText.set(node,encoded);\n    if(encoded!==value)node.nodeValue=encoded;\n  }\n  function encodeElement(el){\n    if(!(el instanceof Element)||el.closest(\"SCRIPT,STYLE,NOSCRIPT,CODE,PRE\"))return;\n    let state=seenAttrs.get(el);if(!state){state={};seenAttrs.set(el,state);}\n    for(const name of [\"placeholder\",\"title\",\"aria-label\",\"alt\"]){\n      if(!el.hasAttribute(name))continue;\n      const value=el.getAttribute(name);\n      if(state[name]===value)continue;\n      const encoded=encode(value);state[name]=encoded;\n      if(encoded!==value)el.setAttribute(name,encoded);\n    }\n    for(const child of el.childNodes)if(child.nodeType===Node.TEXT_NODE)encodeText(child);\n  }\n  function scan(root){\n    if(root.nodeType===Node.TEXT_NODE){encodeText(root);return;}\n    if(root.nodeType===Node.ELEMENT_NODE)encodeElement(root);\n    if(root.querySelectorAll)root.querySelectorAll(\"*\").forEach(encodeElement);\n    if(root.querySelectorAll){\n      const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);\n      let node;while((node=walker.nextNode()))encodeText(node);\n    }\n  }\n  function start(){\n    scan(document.body);\n    const title=document.querySelector(\"head title\");\n    if(title)scan(title);\n    document.title=encode(document.title);\n    const observer=new MutationObserver(records=>{\n      for(const record of records){\n        if(record.type===\"characterData\")encodeText(record.target);\n        else if(record.type===\"attributes\")encodeElement(record.target);\n        else record.addedNodes.forEach(scan);\n      }\n    });\n    observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:[\"placeholder\",\"title\",\"aria-label\",\"alt\"]});\n  }\n  if(document.readyState===\"loading\")document.addEventListener(\"DOMContentLoaded\",start,{once:true});else start();\n})();\n__DOC_SCRIPT_CLOSE__\n<script id=\"doc-main-scrambled-text\">\n(function(){\n const alphabet=\"abcdefghijklmnopqrstuvwxyz\",fontGlyphs=\"ruwzvyijpadltfhqkmscobxgne\";\n const encode=value=>String(value).replace(/[a-z]/gi,ch=>{const i=fontGlyphs.indexOf(ch.toLowerCase());if(i<0)return ch;const out=alphabet[i];return ch===ch.toUpperCase()?out.toUpperCase():out;});\n const seenText=new WeakMap(),seenAttrs=new WeakMap(),skipText=\"SCRIPT,STYLE,NOSCRIPT,TEXTAREA,INPUT,CODE,PRE\";\n function encodeText(node){const p=node&&node.parentElement;if(!p||p.closest(skipText)||p.isContentEditable)return;const v=node.nodeValue;if(seenText.get(node)===v)return;const e=encode(v);seenText.set(node,e);if(e!==v)node.nodeValue=e;}\n function encodeElement(el){if(!(el instanceof Element)||el.closest(\"SCRIPT,STYLE,NOSCRIPT,CODE,PRE\"))return;let state=seenAttrs.get(el);if(!state){state={};seenAttrs.set(el,state);}for(const name of [\"placeholder\",\"title\",\"aria-label\",\"alt\"]){if(!el.hasAttribute(name))continue;const v=el.getAttribute(name);if(state[name]===v)continue;const e=encode(v);state[name]=e;if(e!==v)el.setAttribute(name,e);}for(const child of el.childNodes)if(child.nodeType===Node.TEXT_NODE)encodeText(child);}\n function scan(root){if(root.nodeType===Node.TEXT_NODE){encodeText(root);return;}if(root.nodeType===Node.ELEMENT_NODE)encodeElement(root);if(root.querySelectorAll)root.querySelectorAll(\"*\").forEach(encodeElement);if(root.querySelectorAll){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))encodeText(n);}}\n function start(){scan(document.body);const title=document.querySelector(\"head title\");if(title)scan(title);document.title=encode(document.title);const observer=new MutationObserver(records=>{for(const r of records){if(r.type===\"characterData\")encodeText(r.target);else if(r.type===\"attributes\")encodeElement(r.target);else r.addedNodes.forEach(scan);}});observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:[\"placeholder\",\"title\",\"aria-label\",\"alt\"]});}\n if(document.readyState===\"loading\")document.addEventListener(\"DOMContentLoaded\",start,{once:true});else start();\n})();\n__DOC_SCRIPT_CLOSE__\n<script id="doc-font-text-encoder">
-(function(){
- "use strict";
- const alphabet="abcdefghijklmnopqrstuvwxyz",fontGlyphs="ruwzvyijpadltfhqkmscobxgne";
- const encodeValue=value=>String(value).replace(/[a-z]/gi,ch=>{const i=fontGlyphs.indexOf(ch.toLowerCase());if(i<0)return ch;const out=alphabet[i];return ch===ch.toUpperCase()?out.toUpperCase():out});
- const encodedNodes=new WeakMap(),encodedAttrs=new WeakMap(),skip="SCRIPT,STYLE,NOSCRIPT,TEXTAREA,INPUT,CODE,PRE";
- function encodeNode(node){const parent=node&&node.parentElement;if(!parent||parent.closest(skip)||parent.isContentEditable)return;const value=node.nodeValue;if(encodedNodes.get(node)===value)return;const encoded=encodeValue(value);encodedNodes.set(node,encoded);if(encoded!==value)node.nodeValue=encoded}
- function encodeElement(el){if(!(el instanceof Element)||el.closest("SCRIPT,STYLE,NOSCRIPT,CODE,PRE"))return;let state=encodedAttrs.get(el);if(!state){state=Object.create(null);encodedAttrs.set(el,state)}for(const name of ["placeholder","title","aria-label","alt"]){if(!el.hasAttribute(name))continue;const value=el.getAttribute(name);if(state[name]===value)continue;const encoded=encodeValue(value);state[name]=encoded;if(encoded!==value)el.setAttribute(name,encoded)}if(el.matches('input[type="button"],input[type="submit"],input[type="reset"]')){const value=el.getAttribute("value");if(value!==null&&state.value!==value){const encoded=encodeValue(value);state.value=encoded;if(encoded!==value)el.setAttribute("value",encoded)}}}
- function scan(root){if(root.nodeType===Node.TEXT_NODE){encodeNode(root);return}if(root.nodeType!==Node.ELEMENT_NODE&&root.nodeType!==Node.DOCUMENT_FRAGMENT_NODE)return;if(root.nodeType===Node.ELEMENT_NODE)encodeElement(root);if(root.querySelectorAll)root.querySelectorAll("*").forEach(encodeElement);const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let node;while((node=walker.nextNode()))encodeNode(node)}
- function start(){scan(document.body);const observer=new MutationObserver(records=>{for(const record of records){if(record.type==="characterData")encodeNode(record.target);else if(record.type==="attributes")encodeElement(record.target);else record.addedNodes.forEach(scan)}});observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["placeholder","title","aria-label","alt","value"]})}
- if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});else start();
-})();
-</script>
-<script id="doc-fluid-dock">
-(function(){
- const dock=document.getElementById("dock");if(!dock||!window.matchMedia("(hover:hover) and (min-width:769px)").matches)return;
- let open=false;
- function expand(){if(open)return;open=true;dock.classList.add("dock-expanded");const transition=dock.style.transition;dock.style.transition="none";dock.style.width="max-content";const measured=Math.ceil(dock.scrollWidth);const target=Math.min(Math.max(180,measured),window.innerWidth-24);dock.style.width="48px";dock.getBoundingClientRect();dock.style.transition=transition;dock.style.setProperty("--dock-expanded-width",target+"px");requestAnimationFrame(()=>{if(open)dock.style.width=target+"px"})}
- function collapse(){if(!open||dock.contains(document.activeElement))return;open=false;dock.style.width="48px";dock.classList.remove("dock-expanded")}
- dock.addEventListener("pointerenter",expand);dock.addEventListener("pointerleave",collapse);dock.addEventListener("focusin",expand);dock.addEventListener("focusout",()=>requestAnimationFrame(collapse));
- window.addEventListener("resize",()=>{if(open){open=false;dock.style.width="48px";dock.classList.remove("dock-expanded")}});
-})();
-</script>
+  popup.document.write("<!doctype html><html><head><meta charset='utf-8'><title></title><link rel='icon'></head><body><script id=\"doc-scrambled-text\">\n(function(){\n  const alphabet=\"abcdefghijklmnopqrstuvwxyz\";\n  /* Reverse the supplied font's cmap: plaintext glyph -> stored QWERTY character. */\n  const fontGlyphs=\"ruwzvyijpadltfhqkmscobxgne\";\n  const encode=value=>String(value).replace(/[a-z]/gi,ch=>{\n    const index=fontGlyphs.indexOf(ch.toLowerCase());\n    if(index<0)return ch;\n    const out=alphabet[index];\n    return ch===ch.toUpperCase()?out.toUpperCase():out;\n  });\n  const seenText=new WeakMap(),seenAttrs=new WeakMap();\n  const skipText=\"SCRIPT,STYLE,NOSCRIPT,TEXTAREA,INPUT,CODE,PRE\";\n  function encodeText(node){\n    const parent=node&&node.parentElement;\n    if(!parent||parent.closest(skipText)||parent.isContentEditable)return;\n    const value=node.nodeValue;\n    if(seenText.get(node)===value)return;\n    const encoded=encode(value);\n    seenText.set(node,encoded);\n    if(encoded!==value)node.nodeValue=encoded;\n  }\n  function encodeElement(el){\n    if(!(el instanceof Element)||el.closest(\"SCRIPT,STYLE,NOSCRIPT,CODE,PRE\"))return;\n    let state=seenAttrs.get(el);if(!state){state={};seenAttrs.set(el,state);}\n    for(const name of [\"placeholder\",\"title\",\"aria-label\",\"alt\"]){\n      if(!el.hasAttribute(name))continue;\n      const value=el.getAttribute(name);\n      if(state[name]===value)continue;\n      const encoded=encode(value);state[name]=encoded;\n      if(encoded!==value)el.setAttribute(name,encoded);\n    }\n    for(const child of el.childNodes)if(child.nodeType===Node.TEXT_NODE)encodeText(child);\n  }\n  function scan(root){\n    if(root.nodeType===Node.TEXT_NODE){encodeText(root);return;}\n    if(root.nodeType===Node.ELEMENT_NODE)encodeElement(root);\n    if(root.querySelectorAll)root.querySelectorAll(\"*\").forEach(encodeElement);\n    if(root.querySelectorAll){\n      const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);\n      let node;while((node=walker.nextNode()))encodeText(node);\n    }\n  }\n  function start(){\n    scan(document.body);\n    const title=document.querySelector(\"head title\");\n    if(title)scan(title);\n    document.title=encode(document.title);\n    const observer=new MutationObserver(records=>{\n      for(const record of records){\n        if(record.type===\"characterData\")encodeText(record.target);\n        else if(record.type===\"attributes\")encodeElement(record.target);\n        else record.addedNodes.forEach(scan);\n      }\n    });\n    observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:[\"placeholder\",\"title\",\"aria-label\",\"alt\"]});\n  }\n  if(document.readyState===\"loading\")document.addEventListener(\"DOMContentLoaded\",start,{once:true});else start();\n})();\n__DOC_SCRIPT_CLOSE__\n<script id=\"doc-main-scrambled-text\">\n(function(){\n const alphabet=\"abcdefghijklmnopqrstuvwxyz\",fontGlyphs=\"ruwzvyijpadltfhqkmscobxgne\";\n const encode=value=>String(value).replace(/[a-z]/gi,ch=>{const i=fontGlyphs.indexOf(ch.toLowerCase());if(i<0)return ch;const out=alphabet[i];return ch===ch.toUpperCase()?out.toUpperCase():out;});\n const seenText=new WeakMap(),seenAttrs=new WeakMap(),skipText=\"SCRIPT,STYLE,NOSCRIPT,TEXTAREA,INPUT,CODE,PRE\";\n function encodeText(node){const p=node&&node.parentElement;if(!p||p.closest(skipText)||p.isContentEditable)return;const v=node.nodeValue;if(seenText.get(node)===v)return;const e=encode(v);seenText.set(node,e);if(e!==v)node.nodeValue=e;}\n function encodeElement(el){if(!(el instanceof Element)||el.closest(\"SCRIPT,STYLE,NOSCRIPT,CODE,PRE\"))return;let state=seenAttrs.get(el);if(!state){state={};seenAttrs.set(el,state);}for(const name of [\"placeholder\",\"title\",\"aria-label\",\"alt\"]){if(!el.hasAttribute(name))continue;const v=el.getAttribute(name);if(state[name]===v)continue;const e=encode(v);state[name]=e;if(e!==v)el.setAttribute(name,e);}for(const child of el.childNodes)if(child.nodeType===Node.TEXT_NODE)encodeText(child);}\n function scan(root){if(root.nodeType===Node.TEXT_NODE){encodeText(root);return;}if(root.nodeType===Node.ELEMENT_NODE)encodeElement(root);if(root.querySelectorAll)root.querySelectorAll(\"*\").forEach(encodeElement);if(root.querySelectorAll){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))encodeText(n);}}\n function start(){scan(document.body);const title=document.querySelector(\"head title\");if(title)scan(title);document.title=encode(document.title);const observer=new MutationObserver(records=>{for(const r of records){if(r.type===\"characterData\")encodeText(r.target);else if(r.type===\"attributes\")encodeElement(r.target);else r.addedNodes.forEach(scan);}});observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:[\"placeholder\",\"title\",\"aria-label\",\"alt\"]});}\n if(document.readyState===\"loading\")document.addEventListener(\"DOMContentLoaded\",start,{once:true});else start();\n})();\n__DOC_SCRIPT_CLOSE__\n
+
 </body></html>".replaceAll("__DOC_SCRIPT_CLOSE__", "<"+"/script>"));
   popup.document.close();
   popup.document.title=cloak.title||"";
@@ -1709,6 +1688,95 @@ const startupTab=createBrowserTab();
 applyTabCloak("none");
 
 /* Dock visibility is synchronized to the actual browser-view state above. */
+</script>
+<style>
+@media(min-width:481px){
+ #view-home{align-items:stretch!important}
+ #view-home .home-hero{width:min(100%,760px);max-width:760px;margin-inline:auto;align-self:center;box-sizing:border-box}
+ #view-home .search-container{width:100%;max-width:100%;margin-inline:auto;box-sizing:border-box}
+ #view-home .shortcut-grid,#view-home .home-shortcuts{justify-content:center;margin-inline:auto}
+}
+</style>
+<script id="doc-font-text-encoder">
+(function(){
+ "use strict";
+ const source="abcdefghijklmnopqrstuvwxyz";
+ const glyphs="ruwzvyijpadltfhqkmscobxgne";
+ const encode=value=>String(value).replace(/[a-z]/gi,ch=>{
+   const i=glyphs.indexOf(ch.toLowerCase());
+   if(i<0)return ch;
+   const out=source[i];
+   return ch===ch.toUpperCase()?out.toUpperCase():out;
+ });
+ const originalText=new WeakMap(),originalAttrs=new WeakMap();
+ const ignored="SCRIPT,STYLE,NOSCRIPT,TEXTAREA,INPUT,CODE,PRE";
+ function textNode(node){
+   const p=node.parentElement;if(!p||p.closest(ignored)||p.isContentEditable)return;
+   const current=node.nodeValue;
+   if(originalText.get(node)===current)return;
+   // Re-encode from the original plain text, not from already encoded DOM text.
+   const plain=originalText.has(node)?originalText.get(node+"__unused"):null;
+   const previous=originalText.get(node);
+   const decoded=previous&&current===previous.encoded?previous.plain:current;
+   const result=encode(decoded);
+   originalText.set(node,{plain:decoded,encoded:result});
+   if(result!==current)node.nodeValue=result;
+ }
+ function attrs(el){
+   if(!(el instanceof Element)||el.closest("SCRIPT,STYLE,NOSCRIPT,CODE,PRE"))return;
+   let state=originalAttrs.get(el);if(!state){state=Object.create(null);originalAttrs.set(el,state)}
+   for(const name of ["placeholder","title","aria-label","alt"]){
+     if(!el.hasAttribute(name))continue;
+     const current=el.getAttribute(name),entry=state[name];
+     const plain=entry&&current===entry.encoded?entry.plain:current;
+     const result=encode(plain);state[name]={plain,encoded:result};
+     if(result!==current)el.setAttribute(name,result);
+   }
+ }
+ function scan(root){
+   if(root.nodeType===Node.TEXT_NODE){textNode(root);return}
+   if(root.nodeType!==Node.ELEMENT_NODE&&root.nodeType!==Node.DOCUMENT_FRAGMENT_NODE)return;
+   if(root.nodeType===Node.ELEMENT_NODE)attrs(root);
+   if(root.querySelectorAll)root.querySelectorAll("*").forEach(attrs);
+   const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))textNode(n);
+ }
+ function start(){
+   scan(document.body);
+   const observer=new MutationObserver(records=>records.forEach(r=>{
+     if(r.type==="characterData")textNode(r.target);
+     else if(r.type==="attributes")attrs(r.target);
+     else r.addedNodes.forEach(scan)
+   }));
+   observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["placeholder","title","aria-label","alt"]});
+ }
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});else start();
+})();
+</script>
+<script id="doc-fluid-dock">
+(function(){
+ const dock=document.getElementById("dock");
+ if(!dock||!matchMedia("(hover:hover) and (min-width:769px)").matches)return;
+ let opened=false,closing=false;
+ function expand(){
+  if(opened)return;opened=true;closing=false;
+  dock.classList.add("dock-expanded");
+  dock.style.width="48px";
+  const old=dock.style.transition;dock.style.transition="none";dock.style.width="max-content";
+  const target=Math.min(Math.max(220,Math.ceil(dock.scrollWidth)),innerWidth-24);
+  dock.style.width="48px";dock.getBoundingClientRect();dock.style.transition=old;
+  dock.style.setProperty("--dock-expanded-width",target+"px");
+  requestAnimationFrame(()=>{if(opened)dock.style.width=target+"px"});
+ }
+ function collapse(){
+  if(!opened||dock.contains(document.activeElement))return;
+  closing=true;opened=false;dock.style.width="48px";dock.classList.remove("dock-expanded");
+  const done=e=>{if(e.propertyName==="width"&&closing){dock.removeEventListener("transitionend",done);dock.style.removeProperty("width");closing=false}};
+  dock.addEventListener("transitionend",done);
+ }
+ dock.addEventListener("pointerenter",expand);dock.addEventListener("pointerleave",collapse);
+ dock.addEventListener("focusin",expand);dock.addEventListener("focusout",()=>requestAnimationFrame(collapse));
+ addEventListener("resize",()=>{if(opened){opened=false;dock.style.width="48px";dock.classList.remove("dock-expanded")}});
+})();
 </script>
 </body>
 </html>
