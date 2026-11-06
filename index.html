@@ -846,6 +846,13 @@ html[data-doc-theme="light"] .settings-row small{color:#506b7d}
 html[data-background-design="dots"] #bg-container .bg-slide,html[data-background-design="none"] #bg-container .bg-slide{opacity:0!important}
 html[data-background-design="dots"] #bg-overlay{background-image:radial-gradient(rgba(150,190,205,.14) 2px,transparent 2.5px);background-size:24px 24px}
 html[data-background-design="none"] #bg-overlay{background:none}
+
+/* Keep the category rail snug to its controls instead of stretching its menu surface. */
+.settings-sidebar{width:196px;min-width:196px;padding:17px 10px;gap:16px}
+.settings-nav{width:100%;height:max-content;align-self:flex-start;gap:6px;padding:0;margin:0}
+.settings-nav-item{width:100%;min-height:41px;height:41px;flex:0 0 41px}
+@media(max-width:700px){.settings-sidebar{width:100%;min-width:0;padding:9px 10px 8px;gap:8px}.settings-nav{width:100%;height:auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.settings-nav-item{width:100%;height:38px;min-height:38px;flex:initial}}
+
 </style>
 </head>
 <body>
@@ -936,7 +943,7 @@ html[data-background-design="none"] #bg-overlay{background:none}
     </nav></aside><div class="settings-content">
       <section class="settings-page active" data-settings-page="privacy"><h2>Privacy</h2><div class="settings-card">
         <div class="settings-row" data-search="site title tab title icon"><div><strong>Site Title</strong><small>Change the site's tab title and icon.</small></div><div class="custom-select settings-control" id="setting-cloak"></div></div>
-        <div class="settings-row is-disabled" data-search="auto cloak"><div><strong>Auto Cloak</strong><small>Automatically apply the selected cloak when you switch tabs, restore original when you return.</small></div><label class="settings-switch"><input type="checkbox" disabled><span></span></label></div>
+        <div class="settings-row is-disabled" id="auto-cloak-row" data-search="auto cloak"><div><strong>Auto Cloak</strong><small>Automatically apply the selected cloak when you switch tabs, restore original when you return. Requires Open about:blank on startup.</small></div><label class="settings-switch"><input id="setting-auto-cloak" type="checkbox" disabled><span></span></label></div>
         <div class="settings-row" data-search="about blank startup"><div><strong>Open about:blank on startup</strong><small>When enabled, the about:blank tab opens automatically when you visit.</small></div><label class="settings-switch"><input id="setting-blank-start" type="checkbox"><span></span></label></div>
         <div class="settings-row" data-search="panic key"><div><strong>Panic Key</strong><small>Enable or disable the panic key option.</small></div><label class="settings-switch"><input id="setting-panic-enabled" type="checkbox"><span></span></label></div>
         <div class="settings-row is-disabled" id="panic-shortcut-row" data-search="panic shortcut"><div><strong>Panic Shortcut</strong><small>Set a keybind/shortcut that redirects you to a page when pressed.</small><input id="setting-panic" class="settings-inline-input" value="F1" disabled></div></div>
@@ -1291,7 +1298,7 @@ try {
 applyTabCloak(cloakSelect.value);
 
 /* Persisted Doc preferences. Waterfront + slideshow are the established defaults. */
-const DOC_SETTINGS_KEY="doc-preferences-v2",settingDefaults={theme:"waterfront",background:"slideshow",appsPage:"20",navScale:"100",searchEngine:"ddg",tabsBar:true,donation:true,compactHeader:false,aboutBlank:false,panicEnabled:false,panicKey:"F1",confirmLeave:true,wisp:"wss://wisp.mercurywork.shop"};
+const DOC_SETTINGS_KEY="doc-preferences-v2",settingDefaults={theme:"waterfront",background:"slideshow",appsPage:"20",navScale:"100",searchEngine:"ddg",tabsBar:true,donation:true,compactHeader:false,aboutBlank:false,autoCloak:false,panicEnabled:false,panicKey:"F1",confirmLeave:true,wisp:"wss://wisp.mercurywork.shop"};
 let docSettings={...settingDefaults};try{docSettings={...docSettings,...JSON.parse(localStorage.getItem(DOC_SETTINGS_KEY)||"{}")}}catch{}
 function saveDocSettings(){try{localStorage.setItem(DOC_SETTINGS_KEY,JSON.stringify(docSettings))}catch{}}
 const themeOpts=[{value:"waterfront",label:"Waterfront (selected)"},{value:"midnight",label:"Midnight"},{value:"light",label:"Light"}],bgOpts=[{value:"slideshow",label:"Image Slideshow (selected)"},{value:"dots",label:"Dots"},{value:"none",label:"None"}],pageOpts=[{value:"20",label:"20 apps (selected)"},{value:"all",label:"All apps"},{value:"10",label:"10 apps"},{value:"15",label:"15 apps"}],scaleOpts=[{value:"100",label:"100% (selected)"},{value:"90",label:"90%"},{value:"110",label:"110%"},{value:"125",label:"125%"}],searchOpts=[{value:"ddg",label:"DuckDuckGo (selected)"},{value:"google",label:"Google"},{value:"brave",label:"Brave"},{value:"bing",label:"Bing"}];
@@ -1304,6 +1311,13 @@ settingSelect("setting-search-engine",searchOpts,"searchEngine",v=>{currentEngin
 function bindPref(id,key,type="checkbox"){const el=document.getElementById(id);if(!el)return;el[type==="checkbox"?"checked":"value"]=docSettings[key];el.addEventListener("change",()=>{docSettings[key]=type==="checkbox"?el.checked:el.value;saveDocSettings()})}
 ["tabsBar","donation","compactHeader","aboutBlank","panicEnabled","confirmLeave"].forEach((key,i)=>bindPref(["setting-tabs-bar","setting-donation","setting-compact-header","setting-blank-start","setting-panic-enabled","setting-confirm-leave"][i],key));
 bindPref("setting-panic","panicKey","text");bindPref("setting-wisp","wisp","text");
+const blankStartToggle=document.getElementById("setting-blank-start"),autoCloakToggle=document.getElementById("setting-auto-cloak"),autoCloakRow=document.getElementById("auto-cloak-row");
+function syncAutoCloakAvailability(){const available=blankStartToggle.checked;autoCloakToggle.disabled=!available;if(!available){autoCloakToggle.checked=false;docSettings.autoCloak=false;saveDocSettings()}autoCloakRow.classList.toggle("is-disabled",!available)}
+autoCloakToggle.checked=!!docSettings.autoCloak&&!!docSettings.aboutBlank;
+syncAutoCloakAvailability();
+blankStartToggle.addEventListener("change",()=>{docSettings.aboutBlank=blankStartToggle.checked;syncAutoCloakAvailability();});
+autoCloakToggle.addEventListener("change",()=>{docSettings.autoCloak=autoCloakToggle.checked;saveDocSettings();if(docSettings.autoCloak)applyTabCloak(cloakSelect.value);});
+
 document.getElementById("setting-panic").disabled=!docSettings.panicEnabled;document.getElementById("panic-shortcut-row").classList.toggle("is-disabled",!docSettings.panicEnabled);
 document.documentElement.dataset.docTheme=docSettings.theme;document.documentElement.dataset.backgroundDesign=docSettings.background;document.documentElement.style.setProperty("--doc-nav-scale",Number(docSettings.navScale||100)/100);
 document.getElementById("browser-tabs").style.display=docSettings.tabsBar?"flex":"none";currentEngine=docSettings.searchEngine||"ddg";document.getElementById("engine-name").textContent=engines[currentEngine].name;
