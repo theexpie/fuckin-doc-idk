@@ -827,13 +827,23 @@ body.browsing .view-panel{visibility:hidden}
  #view-apps .catalog-grid,#view-games .catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:390px){.settings-nav-item{font-size:10px;gap:4px}.settings-row{align-items:flex-start}.settings-control{max-width:46%;width:46%}}
-/* Detached water-droplet surfaces: use a visibility-safe transition rather than
-   animating an element while its [hidden] attribute is being removed. */
-.catalog-dropdown-menu,.custom-select-menu{transform-origin:top center;visibility:hidden;opacity:0;transform:translateY(-7px) scale(.94,.88);transition:opacity .2s ease,transform .32s var(--ease-water),visibility 0s linear .32s;will-change:opacity,transform}
-.catalog-dropdown.drop-up .catalog-dropdown-menu,.custom-select.drop-up .custom-select-menu{transform-origin:bottom center;transform:translateY(7px) scale(.94,.88)}
-.catalog-dropdown.open .catalog-dropdown-menu.is-visible,.custom-select.open .custom-select-menu.is-visible{visibility:visible;opacity:1;transform:translateY(0) scale(1);transition-delay:0s}
-.engine-dropdown,.floating-panel{transform-origin:top center}
-.engine-dropdown.open,.floating-panel.open{animation:water-droplet-in .34s var(--ease-water) both}
+/* Dropdown visibility is driven by the open state itself. The menu is explicitly
+   rendered as a block; hidden is only used while closed, never during animation. */
+.catalog-dropdown-menu,.custom-select-menu{
+ display:block;
+ visibility:hidden;
+ opacity:0;
+ transform:translateY(-7px) scale(.94,.88);
+ transform-origin:top center;
+ transition:opacity .18s ease,transform .28s var(--ease-water),visibility 0s linear .28s;
+ will-change:opacity,transform;
+}
+.catalog-dropdown.drop-up .catalog-dropdown-menu,.custom-select.drop-up .custom-select-menu{
+ transform-origin:bottom center;transform:translateY(7px) scale(.94,.88);
+}
+.catalog-dropdown.open .catalog-dropdown-menu,.custom-select.open .custom-select-menu{
+ visibility:visible;opacity:1;transform:translateY(0) scale(1);pointer-events:auto;transition-delay:0s;
+}
 @keyframes water-droplet-in{0%{opacity:0;transform:translateY(-7px) scale(.96,.9);filter:blur(3px)}65%{opacity:1;transform:translateY(1px) scale(1.008,1.015);filter:blur(0)}100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
 
 @media(prefers-reduced-motion:reduce){.settings-page,.settings-nav-item,.settings-switch span,.settings-switch span:after,.catalog-dropdown-menu,.custom-select-menu,.engine-dropdown,.floating-panel{animation:none!important;transition:none!important}}
@@ -1228,7 +1238,7 @@ function makeDocDropdown(root,options,initial,onChange,kind="catalog"){
   const selected=options.find(o=>o.value===value)||options[0];label.textContent=selected.label;
   menu.innerHTML=options.map(o=>`<button type="button" class="${optionClass}" role="option" data-value="${o.value}" aria-selected="${o.value===value}">${o.label}</button>`).join("");
  }
- function close(){root.classList.remove("open","drop-up");menu.classList.remove("is-visible");menu.style.maxHeight="";menu.style.position="";menu.style.left="";menu.style.top="";menu.style.width="";menu.style.zIndex="";trigger.setAttribute("aria-expanded","false");menu.hidden=true}
+ function close(){root.classList.remove("open","drop-up");menu.style.maxHeight="";menu.style.position="";menu.style.left="";menu.style.top="";menu.style.width="";menu.style.zIndex="";trigger.setAttribute("aria-expanded","false");menu.hidden=true}
  function placeMenu(){
   const rect=trigger.getBoundingClientRect(),gap=7,edge=12;
   const below=Math.max(0,window.innerHeight-rect.bottom-edge),above=Math.max(0,rect.top-edge);
@@ -1238,7 +1248,7 @@ function makeDocDropdown(root,options,initial,onChange,kind="catalog"){
   menu.style.maxHeight=max+"px";menu.style.top=(up?Math.max(edge,rect.top-Math.min(desired,max)-gap):rect.bottom+gap)+"px";
   menu.style.bottom="auto";menu.style.right="auto";menu.style.zIndex="2147483000";
  }
- trigger.addEventListener("click",()=>{const opening=!root.classList.contains("open");document.querySelectorAll(".catalog-dropdown.open,.custom-select.open").forEach(el=>{el.classList.remove("open","drop-up");const m=el.querySelector('[role="listbox"]');if(m){m.classList.remove("is-visible");m.hidden=true;m.style.maxHeight="";m.style.position="";m.style.left="";m.style.top="";m.style.width="";m.style.zIndex="";m.style.position="";m.style.left="";m.style.top="";m.style.width="";m.style.zIndex=""}el.querySelector("button")?.setAttribute("aria-expanded","false")});if(opening){root.classList.add("open");trigger.setAttribute("aria-expanded","true");menu.hidden=false;menu.classList.remove("is-visible");placeMenu();requestAnimationFrame(()=>{if(root.classList.contains("open")&&!menu.hidden)menu.classList.add("is-visible")})}});
+ trigger.addEventListener("click",()=>{const opening=!root.classList.contains("open");document.querySelectorAll(".catalog-dropdown.open,.custom-select.open").forEach(el=>{el.classList.remove("open","drop-up");const m=el.querySelector('[role="listbox"]');if(m){m.hidden=true;m.style.maxHeight="";m.style.position="";m.style.left="";m.style.top="";m.style.width="";m.style.zIndex="";m.style.position="";m.style.left="";m.style.top="";m.style.width="";m.style.zIndex=""}el.querySelector("button")?.setAttribute("aria-expanded","false")});if(opening){root.classList.add("open");trigger.setAttribute("aria-expanded","true");menu.hidden=false;placeMenu()}});
  menu.addEventListener("click",e=>{const option=e.target.closest("[data-value]");if(!option)return;value=option.dataset.value;draw();close();onChange(value)});
  root._docSelect={get value(){return value},set value(v){if(options.some(o=>o.value===v)){value=v;draw();onChange(value)}}};
  draw();return root._docSelect;
