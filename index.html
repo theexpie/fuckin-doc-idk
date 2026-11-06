@@ -872,6 +872,20 @@ body.browsing .view-panel{visibility:hidden}
  .catalog-dropdown-menu.doc-dropdown-menu-open,.custom-select-menu.doc-dropdown-menu-open{animation:none;opacity:1;transform:none;filter:none}
 }
 </style>
+
+<style id="doc-home-centering-fix">
+@media(min-width:481px){
+ #view-home{display:flex;align-items:center!important;justify-content:center!important;width:100%;box-sizing:border-box}
+ #view-home .home-hero{width:min(100%,760px)!important;max-width:760px!important;margin:0 auto 60px!important;align-self:center!important;position:relative;left:auto;transform:none;box-sizing:border-box}
+ #view-home .search-container{width:100%!important;max-width:100%!important;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box}
+ #view-home .shortcut-grid,#view-home .home-shortcuts{width:100%;justify-content:center!important;margin-left:auto!important;margin-right:auto!important}
+}
+</style>
+
+<style id="doc-circle-loader-restore">
+.doc-loader-spinner{display:block!important;width:28px!important;height:28px!important;min-width:28px!important;min-height:28px!important;border:2px solid rgba(157,226,224,.22)!important;border-top-color:#9de9df!important;border-right-color:#43c6bd!important;border-radius:50%!important;animation:doc-spin .72s linear infinite!important;flex:none!important}
+.doc-loader-card{align-items:center!important;justify-content:center!important}
+</style>
 </head>
 <body>
 
@@ -1700,56 +1714,64 @@ applyTabCloak("none");
 <script id="doc-font-text-encoder">
 (function(){
  "use strict";
- const source="abcdefghijklmnopqrstuvwxyz";
- const glyphs="ruwzvyijpadltfhqkmscobxgne";
- const encode=value=>String(value).replace(/[a-z]/gi,ch=>{
-   const i=glyphs.indexOf(ch.toLowerCase());
-   if(i<0)return ch;
-   const out=source[i];
-   return ch===ch.toUpperCase()?out.toUpperCase():out;
- });
- const originalText=new WeakMap(),originalAttrs=new WeakMap();
- const ignored="SCRIPT,STYLE,NOSCRIPT,TEXTAREA,INPUT,CODE,PRE";
- function textNode(node){
-   const p=node.parentElement;if(!p||p.closest(ignored)||p.isContentEditable)return;
-   const current=node.nodeValue;
-   if(originalText.get(node)===current)return;
-   // Re-encode from the original plain text, not from already encoded DOM text.
-   const plain=originalText.has(node)?originalText.get(node+"__unused"):null;
-   const previous=originalText.get(node);
-   const decoded=previous&&current===previous.encoded?previous.plain:current;
-   const result=encode(decoded);
-   originalText.set(node,{plain:decoded,encoded:result});
-   if(result!==current)node.nodeValue=result;
+ // cmap: source Unicode character -> glyph that the scrambled font visibly draws.
+ // To display a normal letter, write the inverse character into the DOM.
+ const normal="abcdefghijklmnopqrstuvwxyz";
+ const drawn="ruwzvyijpadltfhqkmscobxgne";
+ const inverse=Object.create(null);
+ for(let i=0;i<drawn.length;i++)inverse[drawn[i]]=normal[i];
+ function encode(value){
+   return String(value).replace(/[a-z]/gi,ch=>{
+     const lower=ch.toLowerCase(),mapped=inverse[lower];
+     if(!mapped)return ch;
+     return ch===ch.toUpperCase()?mapped.toUpperCase():mapped;
+   });
  }
- function attrs(el){
+ const textState=new WeakMap(),attrState=new WeakMap();
+ const skip="SCRIPT,STYLE,NOSCRIPT,TEXTAREA,INPUT,CODE,PRE";
+ function processText(node){
+   const parent=node.parentElement;
+   if(!parent||parent.closest(skip)||parent.isContentEditable)return;
+   const current=node.nodeValue,prior=textState.get(node);
+   const plain=prior&&prior.encoded===current?prior.plain:current;
+   const encoded=encode(plain);
+   textState.set(node,{plain,encoded});
+   if(current!==encoded)node.nodeValue=encoded;
+ }
+ function processElement(el){
    if(!(el instanceof Element)||el.closest("SCRIPT,STYLE,NOSCRIPT,CODE,PRE"))return;
-   let state=originalAttrs.get(el);if(!state){state=Object.create(null);originalAttrs.set(el,state)}
+   let state=attrState.get(el);
+   if(!state){state=Object.create(null);attrState.set(el,state);}
    for(const name of ["placeholder","title","aria-label","alt"]){
      if(!el.hasAttribute(name))continue;
-     const current=el.getAttribute(name),entry=state[name];
-     const plain=entry&&current===entry.encoded?entry.plain:current;
-     const result=encode(plain);state[name]={plain,encoded:result};
-     if(result!==current)el.setAttribute(name,result);
+     const current=el.getAttribute(name),prior=state[name];
+     const plain=prior&&prior.encoded===current?prior.plain:current;
+     const encoded=encode(plain);
+     state[name]={plain,encoded};
+     if(current!==encoded)el.setAttribute(name,encoded);
    }
  }
  function scan(root){
-   if(root.nodeType===Node.TEXT_NODE){textNode(root);return}
+   if(root.nodeType===Node.TEXT_NODE){processText(root);return;}
    if(root.nodeType!==Node.ELEMENT_NODE&&root.nodeType!==Node.DOCUMENT_FRAGMENT_NODE)return;
-   if(root.nodeType===Node.ELEMENT_NODE)attrs(root);
-   if(root.querySelectorAll)root.querySelectorAll("*").forEach(attrs);
-   const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))textNode(n);
+   if(root.nodeType===Node.ELEMENT_NODE)processElement(root);
+   if(root.querySelectorAll)root.querySelectorAll("*").forEach(processElement);
+   const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+   let node;while((node=walker.nextNode()))processText(node);
  }
- function start(){
+ function boot(){
    scan(document.body);
-   const observer=new MutationObserver(records=>records.forEach(r=>{
-     if(r.type==="characterData")textNode(r.target);
-     else if(r.type==="attributes")attrs(r.target);
-     else r.addedNodes.forEach(scan)
-   }));
+   const observer=new MutationObserver(records=>{
+     for(const record of records){
+       if(record.type==="characterData")processText(record.target);
+       else if(record.type==="attributes")processElement(record.target);
+       else for(const added of record.addedNodes)scan(added);
+     }
+   });
    observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["placeholder","title","aria-label","alt"]});
  }
- if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});else start();
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});
+ else boot();
 })();
 </script>
 <script id="doc-fluid-dock">
