@@ -422,6 +422,76 @@ header {
   pointer-events: auto;
   transition: opacity .3s ease, background .3s ease;
 }
+/* Desktop dock: collapsed to the active page icon; expands as a water droplet on hover. */
+@media (hover: hover) and (min-width: 769px) {
+  #dock {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    box-sizing: border-box;
+    padding: 4px;
+    gap: 4px;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    transform: translate3d(-50%, 0, 0) !important;
+    transform-origin: 50% 100%;
+    transition: width .42s cubic-bezier(.2,.85,.25,1.18), height .32s ease,
+      padding .32s ease, border-radius .32s ease, background .3s ease,
+      box-shadow .3s ease;
+  }
+  #dock:not(:hover):not(:focus-within) .dock-item:not(.active),
+  #dock:not(:hover):not(:focus-within) .dock-cloak-button {
+    display: none !important;
+  }
+  #dock:not(:hover):not(:focus-within) .dock-item.active {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    padding: 0;
+    flex: 0 0 38px;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(67,198,189,.16);
+    color: var(--text-main);
+  }
+  #dock:not(:hover):not(:focus-within) .dock-item.active span { display: none; }
+  #dock:not(:hover):not(:focus-within) .dock-item.active svg { width: 19px; height: 19px; }
+  #dock:hover,
+  #dock:focus-within {
+    width: max-content;
+    height: 48px;
+    padding: 5px;
+    border-radius: 28px 28px 22px 22px;
+    animation: dock-water-open .48s cubic-bezier(.2,.85,.25,1.18) both;
+  }
+  #dock:hover .dock-item,
+  #dock:focus-within .dock-item {
+    display: flex !important;
+  }
+  #dock:hover .dock-item span,
+  #dock:focus-within .dock-item span { display: inline; }
+  #dock:hover .dock-item.active,
+  #dock:focus-within .dock-item.active {
+    width: auto;
+    height: auto;
+    min-width: 0;
+    padding: 8px 14px;
+    flex: 0 0 auto;
+    border-radius: 99px;
+  }
+  #dock:hover .dock-cloak-button,
+  #dock:focus-within .dock-cloak-button { display: flex !important; }
+}
+@keyframes dock-water-open {
+  0% { transform: translate3d(-50%, 0, 0) scale(.72,.28); filter: blur(5px); border-radius: 50%; }
+  58% { transform: translate3d(-50%, 0, 0) scale(1.035,1.08); filter: blur(0); border-radius: 30px 30px 20px 20px; }
+  78% { transform: translate3d(-50%, 0, 0) scale(.99,.98); }
+  100% { transform: translate3d(-50%, 0, 0) scale(1,1); filter: blur(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #dock { transition: none !important; animation: none !important; }
+}
 /* Hard state switch: the home taskbar and its edge sensor do not exist visually while browsing. */
 body.browsing #dock,
 body.browsing #dock-edge-trigger {
