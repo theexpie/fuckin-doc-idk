@@ -669,6 +669,32 @@ body.browsing .view-panel{visibility:hidden}
 .doc-loader-mark{font-size:58px;letter-spacing:-2.8px;line-height:1}
 #page-loader .doc-loader-mark{font-size:50px}
 @media(max-width:680px){.brand{font-size:38px}.home-title{font-size:clamp(54px,13vw,72px);letter-spacing:-2.4px}.doc-loader-mark{font-size:50px}}
+
+/* Apps, Play and Settings are full home-style views, not inset glass panels. */
+#view-apps,
+#view-games,
+#view-settings{
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+  padding:16px 4px!important;
+}
+#view-apps,
+#view-games,
+#view-settings{
+  inset:65px 12px 75px 12px;
+}
+#view-settings{align-items:stretch}
+@media(max-width:680px){
+  #view-apps,#view-games,#view-settings{
+    inset:58px 8px calc(76px + env(safe-area-inset-bottom,0px)) 8px;
+    padding:13px 4px!important;
+  }
+}
+
 </style>
 </head>
 <body>
