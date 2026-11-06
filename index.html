@@ -1387,6 +1387,18 @@ function runPanicShortcut(){
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});else start();
 })();
 </script>
+<script id="doc-main-scrambled-text">
+(function(){
+ const alphabet="abcdefghijklmnopqrstuvwxyz",fontGlyphs="ruwzvyijpadltfhqkmscobxgne";
+ const encode=value=>String(value).replace(/[a-z]/gi,ch=>{const i=fontGlyphs.indexOf(ch.toLowerCase());if(i<0)return ch;const out=alphabet[i];return ch===ch.toUpperCase()?out.toUpperCase():out;});
+ const seenText=new WeakMap(),seenAttrs=new WeakMap(),skipText="SCRIPT,STYLE,NOSCRIPT,TEXTAREA,INPUT,CODE,PRE";
+ function encodeText(node){const p=node&&node.parentElement;if(!p||p.closest(skipText)||p.isContentEditable)return;const v=node.nodeValue;if(seenText.get(node)===v)return;const e=encode(v);seenText.set(node,e);if(e!==v)node.nodeValue=e;}
+ function encodeElement(el){if(!(el instanceof Element)||el.closest("SCRIPT,STYLE,NOSCRIPT,CODE,PRE"))return;let state=seenAttrs.get(el);if(!state){state={};seenAttrs.set(el,state);}for(const name of ["placeholder","title","aria-label","alt"]){if(!el.hasAttribute(name))continue;const v=el.getAttribute(name);if(state[name]===v)continue;const e=encode(v);state[name]=e;if(e!==v)el.setAttribute(name,e);}for(const child of el.childNodes)if(child.nodeType===Node.TEXT_NODE)encodeText(child);}
+ function scan(root){if(root.nodeType===Node.TEXT_NODE){encodeText(root);return;}if(root.nodeType===Node.ELEMENT_NODE)encodeElement(root);if(root.querySelectorAll)root.querySelectorAll("*").forEach(encodeElement);if(root.querySelectorAll){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))encodeText(n);}}
+ function start(){scan(document.body);const title=document.querySelector("head title");if(title)scan(title);document.title=encode(document.title);const observer=new MutationObserver(records=>{for(const r of records){if(r.type==="characterData")encodeText(r.target);else if(r.type==="attributes")encodeElement(r.target);else r.addedNodes.forEach(scan);}});observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["placeholder","title","aria-label","alt"]});}
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});else start();
+})();
+</script>
 </body></html>");
   popup.document.close();
   popup.document.title=cloak.title||"";
