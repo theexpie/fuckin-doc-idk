@@ -771,6 +771,16 @@ body.browsing .view-panel{visibility:hidden}
 @media(max-width:700px){#view-settings{flex-direction:column!important}.settings-sidebar{width:100%;min-width:0;height:auto;flex:0 0 auto;padding:9px 10px 8px;border-right:0;border-bottom:1px solid rgba(157,226,224,.12);gap:8px}.settings-filter{height:34px}.settings-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.settings-nav-item{height:38px;justify-content:center;gap:6px;padding:0 5px;font-size:11px}.settings-nav-item span{font-size:15px;width:auto}.settings-content{width:100%;padding:16px 10px calc(22px + env(safe-area-inset-bottom,0px))}.settings-page h2{font-size:18px}.settings-row{min-height:70px;padding:12px 13px;gap:12px}.settings-row strong{font-size:13px}.settings-row small{font-size:11px}.settings-control{width:150px;max-width:44%}.settings-control .custom-select-trigger{font-size:11px;padding:0 9px}.settings-switch{transform:scale(.9);transform-origin:right center}.settings-text-input,.settings-inline-input{width:44%;max-width:44%;font-size:12px;padding:0 9px}.settings-action{font-size:11px;padding:9px 10px}#view-apps .catalog-hero,#view-games .catalog-hero{padding:12px 8px 10px;margin:0 0 10px}#view-apps .catalog-controls,#view-games .catalog-controls{grid-template-columns:minmax(0,1fr) minmax(112px,34%)}#view-apps .catalog-grid,#view-games .catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:390px){.settings-nav-item{font-size:10px;gap:4px}.settings-row{align-items:flex-start}.settings-control{max-width:46%;width:46%}}
 
+
+/* Preference-driven presentation options. */
+html[data-doc-theme="midnight"] body{background:linear-gradient(145deg,#050914,#101827 58%,#080e1a)}
+html[data-doc-theme="light"] body{background:linear-gradient(145deg,#dce9ed,#b8d2d6 58%,#e8f0f2);color:#18313c}
+html[data-doc-theme="light"] .settings-card{background:rgba(235,244,249,.88);border-color:rgba(30,66,84,.13)}
+html[data-doc-theme="light"] .settings-page h2,html[data-doc-theme="light"] .settings-row strong{color:#203b4d}
+html[data-doc-theme="light"] .settings-row small{color:#506b7d}
+html[data-background-design="dots"] #bg-container .bg-slide,html[data-background-design="none"] #bg-container .bg-slide{opacity:0!important}
+html[data-background-design="dots"] #bg-overlay{background-image:radial-gradient(rgba(150,190,205,.14) 2px,transparent 2.5px);background-size:24px 24px}
+html[data-background-design="none"] #bg-overlay{background:none}
 </style>
 </head>
 <body>
@@ -1233,6 +1243,7 @@ document.getElementById("setting-panic").disabled=!docSettings.panicEnabled;docu
 document.documentElement.dataset.docTheme=docSettings.theme;document.documentElement.dataset.backgroundDesign=docSettings.background;document.documentElement.style.setProperty("--doc-nav-scale",Number(docSettings.navScale||100)/100);
 document.getElementById("browser-tabs").style.display=docSettings.tabsBar?"flex":"none";currentEngine=docSettings.searchEngine||"ddg";document.getElementById("engine-name").textContent=engines[currentEngine].name;
 document.getElementById("setting-panic-enabled").addEventListener("change",e=>{document.getElementById("setting-panic").disabled=!e.target.checked;document.getElementById("panic-shortcut-row").classList.toggle("is-disabled",!e.target.checked)});
+window.addEventListener("beforeunload",e=>{if(docSettings.confirmLeave){e.preventDefault();e.returnValue=""}});
 document.querySelectorAll(".settings-nav-item").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll(".settings-nav-item").forEach(x=>x.classList.toggle("active",x===btn));document.querySelectorAll(".settings-page").forEach(p=>p.classList.toggle("active",p.dataset.settingsPage===btn.dataset.settingsTab));document.getElementById("settings-filter").value="";filterSettings("")}));
 function filterSettings(q){q=q.trim().toLowerCase();let shown=0;document.querySelectorAll(".settings-page").forEach(p=>{let n=0;p.querySelectorAll(".settings-row").forEach(row=>{const ok=!q||(row.dataset.search+" "+row.innerText).toLowerCase().includes(q);row.hidden=!ok;if(ok)n++});p.hidden=!!q&&!n;if(!p.hidden)shown++});document.querySelector(".settings-no-results").hidden=shown>0}
 document.getElementById("settings-filter").addEventListener("input",e=>{if(e.target.value){document.querySelectorAll(".settings-nav-item").forEach(x=>x.classList.remove("active"));filterSettings(e.target.value)}else{document.querySelectorAll(".settings-nav-item").forEach((x,i)=>x.classList.toggle("active",i===0));filterSettings("")}});
