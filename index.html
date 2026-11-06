@@ -446,7 +446,7 @@ body.browsing #dock-edge-trigger {
 .dock-item:active, .dock-item.active { color: var(--text-main); background: rgba(255,255,255,0.08); }
 .dock-item svg { width: 16px; height: 16px; fill: currentColor; }
 .dock-item.dock-cloak-button{width:38px;height:38px;min-width:38px;padding:0;flex:0 0 38px;justify-content:center;border-radius:50%;background:rgba(67,198,189,.14);border:1px solid rgba(157,226,224,.2);color:var(--text-main)}
-.dock-item.dock-cloak-button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+.dock-item.dock-cloak-button span{font-size:11px;font-weight:700;letter-spacing:-.7px;line-height:1;color:currentColor}
 .dock-item.dock-cloak-button:hover{background:rgba(67,198,189,.26);border-color:rgba(157,226,224,.42)}
 @media(max-width:480px){.dock-item.dock-cloak-button{width:40px;height:40px;min-width:40px;flex-basis:40px;padding:0}}
 
@@ -1029,9 +1029,7 @@ body.browsing .view-panel{visibility:hidden}
     <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5S17.67 9 18.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
     <span>Play</span>
   </button>
-  <button class="dock-item dock-cloak-button" id="dock-cloak" type="button" aria-label="Open cloaked Doc tab" title="Open cloaked tab">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 7.2h4.1v2H7.2a2.8 2.8 0 0 0 0 5.6h4.1v2H7.2a4.8 4.8 0 0 1 0-9.6Zm5.5 3.8h-1.4v2h1.4v-2Zm4.1-3.8h-4.1v2h4.1a2.8 2.8 0 0 1 0 5.6h-4.1v2h4.1a4.8 4.8 0 0 0 0-9.6Z"/></svg>
-  </button>
+  <button class="dock-item dock-cloak-button" id="dock-cloak" type="button" aria-label="Open cloaked Doc tab" title="Open cloaked tab"><span aria-hidden="true">a:b</span></button>
   <button class="dock-item" data-view="settings">
     <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
     <span>Settings</span>
