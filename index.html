@@ -445,6 +445,11 @@ body.browsing #dock-edge-trigger {
 }
 .dock-item:active, .dock-item.active { color: var(--text-main); background: rgba(255,255,255,0.08); }
 .dock-item svg { width: 16px; height: 16px; fill: currentColor; }
+.dock-item.dock-cloak-button{width:38px;height:38px;min-width:38px;padding:0;flex:0 0 38px;justify-content:center;border-radius:50%;background:rgba(67,198,189,.14);border:1px solid rgba(157,226,224,.2);color:var(--text-main)}
+.dock-item.dock-cloak-button svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round}
+.dock-item.dock-cloak-button:hover{background:rgba(67,198,189,.26);border-color:rgba(157,226,224,.42)}
+@media(max-width:480px){.dock-item.dock-cloak-button{width:40px;height:40px;min-width:40px;flex-basis:40px;padding:0}}
+
 
 @media (max-width: 480px) {
   .dock-item span { display: none; }
@@ -934,8 +939,6 @@ body.browsing .view-panel{visibility:hidden}
     </nav></aside><div class="settings-content">
       <section class="settings-page active" data-settings-page="privacy"><h2>Privacy</h2><div class="settings-card">
         <div class="settings-row" data-search="site title tab title icon"><div><strong>Site Title</strong><small>Change the site's tab title and icon.</small></div><div class="custom-select settings-control" id="setting-cloak"></div></div>
-        <div class="settings-row is-disabled" id="auto-cloak-row" data-search="auto cloak"><div><strong>Auto Cloak</strong><small>Automatically apply the selected cloak when you switch tabs, restore original when you return. Requires Open about:blank on startup.</small></div><label class="settings-switch"><input id="setting-auto-cloak" type="checkbox" disabled><span></span></label></div>
-        <div class="settings-row" data-search="about blank startup"><div><strong>Open about:blank on startup</strong><small>When enabled, the about:blank tab opens automatically when you visit.</small></div><label class="settings-switch"><input id="setting-blank-start" type="checkbox"><span></span></label></div>
         <div class="settings-row" data-search="panic key"><div><strong>Panic Key</strong><small>Enable or disable the panic key option.</small></div><label class="settings-switch"><input id="setting-panic-enabled" type="checkbox"><span></span></label></div>
         <div class="settings-row is-disabled" id="panic-shortcut-row" data-search="panic shortcut destination page cloak"><div><strong>Panic Shortcut</strong><small>Choose the key and where it opens. Enter a full URL, or leave the destination as “Use selected cloak”.</small><input id="setting-panic" class="settings-inline-input" value="F1" disabled aria-label="Panic key"><input id="setting-panic-destination" class="settings-inline-input" value="cloak" placeholder="https://example.com or cloak" disabled aria-label="Panic destination"></div></div>
       </div></section>
@@ -1025,6 +1028,9 @@ body.browsing .view-panel{visibility:hidden}
   <button class="dock-item" data-view="games">
     <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm3-3c-.83 0-1.5-.67-1.5-1.5S17.67 9 18.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
     <span>Play</span>
+  </button>
+  <button class="dock-item dock-cloak-button" id="dock-cloak" type="button" aria-label="Open cloaked Doc tab" title="Open cloaked tab">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.2 7.2h4.1v2H7.2a2.8 2.8 0 0 0 0 5.6h4.1v2H7.2a4.8 4.8 0 0 1 0-9.6Zm5.5 3.8h-1.4v2h1.4v-2Zm4.1-3.8h-4.1v2h4.1a2.8 2.8 0 0 1 0 5.6h-4.1v2h4.1a4.8 4.8 0 0 0 0-9.6Z"/></svg>
   </button>
   <button class="dock-item" data-view="settings">
     <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
@@ -1276,7 +1282,7 @@ try {
 applyTabCloak("none");
 
 /* Persisted Doc preferences. Waterfront + slideshow are the established defaults. */
-const DOC_SETTINGS_KEY="doc-preferences-v2",settingDefaults={theme:"waterfront",background:"slideshow",appsPage:"20",navScale:"100",searchEngine:"ddg",tabsBar:true,donation:true,compactHeader:false,aboutBlank:false,autoCloak:false,panicEnabled:false,panicKey:"F1",panicDestination:"cloak",confirmLeave:true,wisp:"wss://wisp.mercurywork.shop"};
+const DOC_SETTINGS_KEY="doc-preferences-v2",settingDefaults={theme:"waterfront",background:"slideshow",appsPage:"20",navScale:"100",searchEngine:"ddg",tabsBar:true,donation:true,compactHeader:false,panicEnabled:false,panicKey:"F1",panicDestination:"cloak",confirmLeave:true,wisp:"wss://wisp.mercurywork.shop"};
 let docSettings={...settingDefaults};try{docSettings={...docSettings,...JSON.parse(localStorage.getItem(DOC_SETTINGS_KEY)||"{}")}}catch{}
 function saveDocSettings(){try{localStorage.setItem(DOC_SETTINGS_KEY,JSON.stringify(docSettings))}catch{}}
 const themeOpts=[{value:"waterfront",label:"Waterfront (selected)"},{value:"midnight",label:"Midnight"},{value:"light",label:"Light"}],bgOpts=[{value:"slideshow",label:"Image Slideshow (selected)"},{value:"dots",label:"Dots"},{value:"none",label:"None"}],pageOpts=[{value:"20",label:"20 apps (selected)"},{value:"all",label:"All apps"},{value:"10",label:"10 apps"},{value:"15",label:"15 apps"}],scaleOpts=[{value:"100",label:"100% (selected)"},{value:"90",label:"90%"},{value:"110",label:"110%"},{value:"125",label:"125%"}],searchOpts=[{value:"ddg",label:"DuckDuckGo (selected)"},{value:"google",label:"Google"},{value:"brave",label:"Brave"},{value:"bing",label:"Bing"}];
@@ -1288,18 +1294,8 @@ settingSelect("setting-apps-page",pageOpts,"appsPage",applyAppsPage);
 settingSelect("setting-nav-scale",scaleOpts,"navScale",v=>document.documentElement.style.setProperty("--doc-nav-scale",Number(v)/100));
 settingSelect("setting-search-engine",searchOpts,"searchEngine",v=>{currentEngine=v;document.getElementById("engine-name").textContent=engines[v].name});
 function bindPref(id,key,type="checkbox"){const el=document.getElementById(id);if(!el)return;el[type==="checkbox"?"checked":"value"]=docSettings[key];el.addEventListener("change",()=>{docSettings[key]=type==="checkbox"?el.checked:el.value;saveDocSettings()})}
-["tabsBar","donation","compactHeader","aboutBlank","panicEnabled","confirmLeave"].forEach((key,i)=>bindPref(["setting-tabs-bar","setting-donation","setting-compact-header","setting-blank-start","setting-panic-enabled","setting-confirm-leave"][i],key));document.getElementById("setting-tabs-bar").addEventListener("change",e=>{document.getElementById("browser-tabs").style.display=e.target.checked?"flex":"none"});document.getElementById("setting-compact-header").addEventListener("change",e=>applyCompactHeader(e.target.checked));
+["tabsBar","donation","compactHeader","panicEnabled","confirmLeave"].forEach((key,i)=>bindPref(["setting-tabs-bar","setting-donation","setting-compact-header","setting-panic-enabled","setting-confirm-leave"][i],key));document.getElementById("setting-tabs-bar").addEventListener("change",e=>{document.getElementById("browser-tabs").style.display=e.target.checked?"flex":"none"});document.getElementById("setting-compact-header").addEventListener("change",e=>applyCompactHeader(e.target.checked));
 bindPref("setting-panic","panicKey","text");bindPref("setting-panic-destination","panicDestination","text");const wispInput=document.getElementById("setting-wisp");wispInput.value=docSettings.wisp||settingDefaults.wisp;wispInput.addEventListener("change",()=>{const v=wispInput.value.trim();if(!/^wss?:\/\//i.test(v)){wispInput.setCustomValidity("Enter a valid ws:// or wss:// address.");wispInput.reportValidity();return}wispInput.setCustomValidity("");docSettings.wisp=v.replace(/\/$/,"");saveDocSettings();if(confirm("Wisp server saved. Reload Doc now to apply it?"))location.reload()});
-const blankStartToggle=document.getElementById("setting-blank-start"),autoCloakToggle=document.getElementById("setting-auto-cloak"),autoCloakRow=document.getElementById("auto-cloak-row");
-function syncAutoCloakAvailability(){const available=blankStartToggle.checked;autoCloakToggle.disabled=!available;if(!available){autoCloakToggle.checked=false;docSettings.autoCloak=false;saveDocSettings()}autoCloakRow.classList.toggle("is-disabled",!available)}
-autoCloakToggle.checked=!!docSettings.autoCloak&&!!docSettings.aboutBlank;
-syncAutoCloakAvailability();
-blankStartToggle.addEventListener("change",()=>{docSettings.aboutBlank=blankStartToggle.checked;syncAutoCloakAvailability();saveDocSettings();if(!docSettings.aboutBlank)applyTabCloak("none");});
-autoCloakToggle.addEventListener("change",()=>{docSettings.autoCloak=autoCloakToggle.checked;saveDocSettings();if(!docSettings.autoCloak)applyTabCloak("none");});
-/* Startup cloak waits for the first real user click. Never navigate the embedded frame to about:blank here: inside srcdoc Firefox can expose it as about:sourcedoc. */
-let startupCloakPending=!!(docSettings.aboutBlank&&docSettings.autoCloak);
-if(startupCloakPending){document.addEventListener("click",function applyStartupCloak(){if(!startupCloakPending)return;startupCloakPending=false;applyTabCloak(cloakSelect.value);},{once:true,capture:true});}
-
 document.getElementById("setting-panic").disabled=!docSettings.panicEnabled;document.getElementById("setting-panic-destination").disabled=!docSettings.panicEnabled;document.getElementById("panic-shortcut-row").classList.toggle("is-disabled",!docSettings.panicEnabled);
 document.documentElement.dataset.docTheme=docSettings.theme;document.documentElement.dataset.backgroundDesign=docSettings.background;document.documentElement.style.setProperty("--doc-nav-scale",Number(docSettings.navScale||100)/100);
 document.getElementById("browser-tabs").style.display=docSettings.tabsBar?"flex":"none";applyCompactHeader(docSettings.compactHeader);applyAppsPage(docSettings.appsPage);currentEngine=docSettings.searchEngine||"ddg";document.getElementById("engine-name").textContent=engines[currentEngine].name;
@@ -1442,6 +1438,26 @@ async function navigateWithLoader(action){
 }
 
 
+function openCloakedDocTab(){
+ const popup=window.open("about:blank","_blank");
+ if(!popup)return;
+ try{
+  const cloak=TAB_CLOAKS[cloakSelect.value]||TAB_CLOAKS.none;
+  const source="<!doctype html>\\n"+document.documentElement.outerHTML;
+  popup.document.open();
+  popup.document.write(source);
+  popup.document.close();
+  popup.document.title=cloak.title||"Doc";
+  const icon=popup.document.querySelector('link[rel="icon"]');
+  if(icon)icon.href=cloak.icon||"";
+  try{popup.opener=null}catch{}
+ }catch(error){
+  console.warn("[Doc] Could not create cloaked tab:",error);
+  try{popup.close()}catch{}
+ }
+}
+document.getElementById("dock-cloak")?.addEventListener("click",openCloakedDocTab);
+
 const homeDock = document.getElementById('dock');
 const dockEdgeTrigger = document.getElementById('dock-edge-trigger');
 function syncBrowsingChrome() {
@@ -1578,10 +1594,10 @@ window.addEventListener("pointermove",moveTabReorder,{passive:false});
 window.addEventListener("pointerup",finishTabReorder);
 window.addEventListener("pointercancel",finishTabReorder);
 function createBrowserTab(url=""){
- const tab={id:"tab-"+(++tabSequence),url,title:url?tabTitle(url):"New tab"};browserTabs.push(tab);activeBrowserTab=tab.id;renderBrowserTabs();if(url)navigateBrowserTab(tab,url);else if(docSettings.autoCloak)applyTabCloak(cloakSelect.value);return tab;
+ const tab={id:"tab-"+(++tabSequence),url,title:url?tabTitle(url):"New tab"};browserTabs.push(tab);activeBrowserTab=tab.id;renderBrowserTabs();if(url)navigateBrowserTab(tab,url);return tab;
 }
 function switchBrowserTab(id){
- const tab=browserTabs.find(t=>t.id===id);if(!tab)return;activeBrowserTab=id;if(docSettings.autoCloak)applyTabCloak(tab.url?"none":cloakSelect.value);
+ const tab=browserTabs.find(t=>t.id===id);if(!tab)return;activeBrowserTab=id;
  if(tab.url){
   urlDisplay.value=tab.url;document.getElementById("active-tab-title").textContent=tab.title;
   navigateWithLoader(()=>DOC_ENGINE.go(browserFrame,tab.url)).catch(e=>console.warn("[Doc] Tab navigation:",e));
@@ -1631,7 +1647,7 @@ Object.values(panels).forEach(makePanelMovable);
 renderBookmarks();renderHistory();
 /* Keep the startup frame on its normal in-app blank state. Cloaking is deferred until the first user click above. */
 const startupTab=createBrowserTab();
-if(!docSettings.aboutBlank||!docSettings.autoCloak)applyTabCloak("none");
+applyTabCloak("none");
 
 /* Dock visibility is synchronized to the actual browser-view state above. */
 </script>
