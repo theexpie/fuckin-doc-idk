@@ -1278,7 +1278,7 @@ const blankStartToggle=document.getElementById("setting-blank-start"),autoCloakT
 function syncAutoCloakAvailability(){const available=blankStartToggle.checked;autoCloakToggle.disabled=!available;if(!available){autoCloakToggle.checked=false;docSettings.autoCloak=false;saveDocSettings()}autoCloakRow.classList.toggle("is-disabled",!available)}
 autoCloakToggle.checked=!!docSettings.autoCloak&&!!docSettings.aboutBlank;
 syncAutoCloakAvailability();
-blankStartToggle.addEventListener("change",()=>{docSettings.aboutBlank=blankStartToggle.checked;syncAutoCloakAvailability();});
+blankStartToggle.addEventListener("change",()=>{docSettings.aboutBlank=blankStartToggle.checked;syncAutoCloakAvailability();saveDocSettings();if(docSettings.aboutBlank&&docSettings.autoCloak)applyTabCloak(cloakSelect.value);else if(!docSettings.autoCloak)applyTabCloak("none");});
 autoCloakToggle.addEventListener("change",()=>{docSettings.autoCloak=autoCloakToggle.checked;saveDocSettings();if(docSettings.autoCloak)applyTabCloak(cloakSelect.value);});
 
 document.getElementById("setting-panic").disabled=!docSettings.panicEnabled;document.getElementById("panic-shortcut-row").classList.toggle("is-disabled",!docSettings.panicEnabled);
@@ -1588,8 +1588,9 @@ function makePanelMovable(panel){
 }
 Object.values(panels).forEach(makePanelMovable);
 renderBookmarks();renderHistory();
-createBrowserTab();
-if(docSettings.aboutBlank&&docSettings.autoCloak)applyTabCloak(cloakSelect.value);
+/* Startup cloak is applied after preferences and the saved cloak choice are restored. */
+const startupTab=createBrowserTab();
+if(docSettings.aboutBlank){browserFrame.src="about:blank";urlDisplay.value="";startupTab.url="";startupTab.title="New tab";renderBrowserTabs();if(docSettings.autoCloak)applyTabCloak(cloakSelect.value);else applyTabCloak("none");}else applyTabCloak("none");
 
 /* Dock visibility is synchronized to the actual browser-view state above. */
 </script>
