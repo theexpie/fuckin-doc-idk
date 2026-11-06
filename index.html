@@ -1327,7 +1327,57 @@ function runPanicShortcut(){
  try{
   popup.opener=null;
   popup.document.open();
-  popup.document.write("<!doctype html><html><head><meta charset='utf-8'><title></title><link rel='icon'></head><body></body></html>");
+  popup.document.write("<!doctype html><html><head><meta charset='utf-8'><title></title><link rel='icon'></head><body><script id="doc-scrambled-text">
+(function(){
+  const plain="abcdefghijklmnopqrstuvwxyz", keyed="qwertyuiopasdfghjklzxcvbnm";
+  const encode=value=>String(value).replace(/[a-z]/gi,ch=>{
+    const i=plain.indexOf(ch.toLowerCase()), out=keyed[i]||ch;
+    return ch===ch.toUpperCase()?out.toUpperCase():out;
+  });
+  const seenText=new WeakMap(), seenAttrs=new WeakMap();
+  const excluded="SCRIPT,STYLE,NOSCRIPT,TEXTAREA,INPUT,OPTION,CODE,PRE";
+  function encodeText(node){
+    const parent=node&&node.parentElement;
+    if(!parent||parent.closest(excluded)||parent.isContentEditable)return;
+    const value=node.nodeValue;
+    if(seenText.get(node)===value)return;
+    const encoded=encode(value);
+    seenText.set(node,encoded);
+    if(encoded!==value)node.nodeValue=encoded;
+  }
+  function encodeElement(el){
+    if(!(el instanceof Element)||el.closest(excluded))return;
+    let state=seenAttrs.get(el);if(!state){state={};seenAttrs.set(el,state);}
+    for(const name of ["placeholder","title","aria-label","alt"]){
+      if(!el.hasAttribute(name))continue;
+      const value=el.getAttribute(name);
+      if(state[name]===value)continue;
+      const encoded=encode(value);state[name]=encoded;
+      if(encoded!==value)el.setAttribute(name,encoded);
+    }
+    for(const child of el.childNodes)if(child.nodeType===Node.TEXT_NODE)encodeText(child);
+  }
+  function scan(root){
+    if(root.nodeType===Node.TEXT_NODE){encodeText(root);return;}
+    if(root.nodeType===Node.ELEMENT_NODE)encodeElement(root);
+    if(root.querySelectorAll)root.querySelectorAll("*").forEach(encodeElement);
+    if(root.querySelectorAll){const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while((n=walker.nextNode()))encodeText(n);}
+  }
+  function start(){
+    scan(document.body);
+    const observer=new MutationObserver(records=>{
+      for(const record of records){
+        if(record.type==="characterData")encodeText(record.target);
+        else if(record.type==="attributes")encodeElement(record.target);
+        else record.addedNodes.forEach(scan);
+      }
+    });
+    observer.observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["placeholder","title","aria-label","alt"]});
+  }
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});else start();
+})();
+</script>
+</body></html>");
   popup.document.close();
   popup.document.title=cloak.title||"";
   const icon=popup.document.querySelector("link[rel='icon']");
