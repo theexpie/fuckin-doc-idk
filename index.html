@@ -866,32 +866,34 @@ html[data-background-design="none"] #bg-overlay{background:none}
 @media(max-width:700px){.settings-sidebar{width:100%;min-width:0;padding:9px 10px 8px;gap:8px}.settings-nav{width:100%;height:auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.settings-nav-item{width:100%;height:38px;min-height:38px;flex:initial}}
 
 
-/* Settings category selector: compact horizontal glass panel above the settings pages. */
-#view-settings{flex-direction:column!important}
+/* Settings category selector: retain its original left-side vertical position,
+   with a compact glass panel fitted around the search and category buttons. */
+#view-settings{flex-direction:row!important}
 #view-settings .settings-sidebar{
-  width:auto!important;min-width:0!important;height:auto!important;flex:0 0 auto;
-  margin:14px 18px 0;padding:10px 12px!important;gap:10px!important;
-  flex-direction:row!important;align-items:center!important;
+  width:196px!important;min-width:196px!important;height:max-content!important;max-height:calc(100% - 28px);flex:0 0 196px;
+  margin:14px 0 14px 14px;padding:12px 10px!important;gap:12px!important;
+  flex-direction:column!important;align-items:stretch!important;
   border:1px solid rgba(151,225,213,.16)!important;border-radius:18px;
   background:linear-gradient(145deg,rgba(8,42,51,.78),rgba(5,29,39,.68))!important;
   box-shadow:0 12px 34px rgba(0,12,18,.16),inset 0 1px rgba(255,255,255,.045);
 }
-#view-settings .settings-filter{width:min(220px,28%);min-width:145px;flex:0 1 220px}
-#view-settings .settings-nav{display:flex;flex:1;min-width:0;flex-direction:row!important;align-items:center;justify-content:flex-start;gap:6px;flex-wrap:wrap}
-#view-settings .settings-nav-item{height:38px;min-width:0;flex:0 0 auto;padding:0 13px;border-radius:11px}
-#view-settings .settings-nav-item.active:before{left:9px;right:9px;top:auto;bottom:-1px;width:auto;height:2px}
-#view-settings .settings-content{width:100%;min-height:0}
+#view-settings .settings-filter{width:100%;min-width:0;flex:0 0 38px}
+#view-settings .settings-nav{display:flex;flex:0 0 auto;min-width:0;flex-direction:column!important;align-items:stretch;justify-content:flex-start;gap:6px;flex-wrap:nowrap}
+#view-settings .settings-nav-item{width:100%;height:40px;min-width:0;flex:0 0 40px;padding:0 12px;border-radius:11px}
+#view-settings .settings-nav-item.active:before{left:-1px;right:auto;top:9px;bottom:9px;width:2px;height:auto}
+#view-settings .settings-content{flex:1;min-width:0;min-height:0}
 @media(max-width:680px){
-  #view-settings .settings-sidebar{margin:8px 8px 0;padding:9px!important;gap:8px!important;flex-direction:column!important;align-items:stretch!important}
+  #view-settings{flex-direction:column!important}
+  #view-settings .settings-sidebar{width:auto!important;min-width:0!important;max-height:none;height:auto!important;flex:0 0 auto;margin:8px 8px 0;padding:9px!important;gap:8px!important;flex-direction:column!important;align-items:stretch!important}
   #view-settings .settings-filter{width:100%;min-width:0;flex:0 0 38px}
-  #view-settings .settings-nav{width:100%;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;justify-content:flex-start;scrollbar-width:none;padding-bottom:1px}
+  #view-settings .settings-nav{width:100%;flex-direction:row!important;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;justify-content:flex-start;scrollbar-width:none;padding-bottom:1px}
   #view-settings .settings-nav::-webkit-scrollbar{display:none}
-  #view-settings .settings-nav-item{flex:0 0 auto;height:38px;padding:0 12px;white-space:nowrap}
+  #view-settings .settings-nav-item{width:auto;flex:0 0 auto;height:38px;padding:0 12px;white-space:nowrap}
+  #view-settings .settings-nav-item.active:before{left:9px;right:9px;top:auto;bottom:-1px;width:auto;height:2px}
   #view-settings .settings-content{padding:20px 12px calc(28px + env(safe-area-inset-bottom,0px))}
 }
 @media(min-width:681px) and (max-width:900px){
-  #view-settings .settings-sidebar{margin:12px 12px 0}
-  #view-settings .settings-filter{width:180px;min-width:130px}
+  #view-settings .settings-sidebar{width:180px!important;min-width:180px!important;flex-basis:180px;margin:12px 0 12px 12px}
   #view-settings .settings-nav-item{padding:0 10px;font-size:12px}
 }
 
