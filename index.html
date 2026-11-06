@@ -827,79 +827,7 @@ body.browsing .view-panel{visibility:hidden}
  #view-apps .catalog-grid,#view-games .catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:390px){.settings-nav-item{font-size:10px;gap:4px}.settings-row{align-items:flex-start}.settings-control{max-width:46%;width:46%}}
-/* Dropdown visibility is driven by the open state itself. The menu is explicitly
-   rendered as a block; hidden is only used while closed, never during animation. */
-.catalog-dropdown-menu,.custom-select-menu{
- display:block;
- visibility:hidden;
- opacity:0;
- transform:translateY(-7px) scale(.94,.88);
- transform-origin:top center;
- transition:opacity .18s ease,transform .28s var(--ease-water),visibility 0s linear .28s;
- will-change:opacity,transform;
-}
-.catalog-dropdown.drop-up .catalog-dropdown-menu,.custom-select.drop-up .custom-select-menu{
- transform-origin:bottom center;transform:translateY(7px) scale(.94,.88);
-}
-.catalog-dropdown.open .catalog-dropdown-menu,.custom-select.open .custom-select-menu{
- visibility:visible;opacity:1;transform:translateY(0) scale(1);pointer-events:auto;transition-delay:0s;
-}
-@keyframes water-droplet-in{0%{opacity:0;transform:translateY(-7px) scale(.96,.9);filter:blur(3px)}65%{opacity:1;transform:translateY(1px) scale(1.008,1.015);filter:blur(0)}100%{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
-
-@media(prefers-reduced-motion:reduce){.settings-page,.settings-nav-item,.settings-switch span,.settings-switch span:after,.catalog-dropdown-menu,.custom-select-menu,.engine-dropdown,.floating-panel{animation:none!important;transition:none!important}}
-
-
-/* Preference-driven presentation options. */
-html[data-doc-theme="midnight"] body{background:linear-gradient(145deg,#050914,#101827 58%,#080e1a)}
-html[data-doc-theme="light"] body{background:linear-gradient(145deg,#dce9ed,#b8d2d6 58%,#e8f0f2);color:#18313c}
-html[data-doc-theme="light"] .settings-card{background:rgba(235,244,249,.88);border-color:rgba(30,66,84,.13)}
-html[data-doc-theme="light"] .settings-page h2,html[data-doc-theme="light"] .settings-row strong{color:#203b4d}
-html[data-doc-theme="light"] .settings-row small{color:#506b7d}
-html[data-background-design="dots"] #bg-container .bg-slide,html[data-background-design="none"] #bg-container .bg-slide{opacity:0!important}
-html[data-background-design="dots"] #bg-overlay{background-image:radial-gradient(rgba(150,190,205,.14) 2px,transparent 2.5px);background-size:24px 24px}
-html[data-background-design="none"] #bg-overlay{background:none}
-
-/* Keep the category rail snug to its controls instead of stretching its menu surface. */
-.settings-sidebar{width:196px;min-width:196px;padding:17px 10px;gap:16px}
-.settings-nav{width:100%;height:max-content;align-self:flex-start;gap:6px;padding:0;margin:0}
-.settings-nav-item{width:100%;min-height:41px;height:41px;flex:0 0 41px}
-@media(max-width:700px){.settings-sidebar{width:100%;min-width:0;padding:9px 10px 8px;gap:8px}.settings-nav{width:100%;height:auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.settings-nav-item{width:100%;height:38px;min-height:38px;flex:initial}}
-
-
-/* Settings category selector: retain its original left-side vertical position,
-   with a compact glass panel fitted around the search and category buttons. */
-#view-settings{flex-direction:row!important}
-#view-settings .settings-sidebar{
-  width:196px!important;min-width:196px!important;height:max-content!important;max-height:calc(100% - 28px);flex:0 0 196px;
-  margin:14px 0 14px 14px;padding:12px 10px!important;gap:12px!important;
-  flex-direction:column!important;align-items:stretch!important;
-  border:1px solid rgba(151,225,213,.16)!important;border-radius:18px;
-  background:linear-gradient(145deg,rgba(8,42,51,.78),rgba(5,29,39,.68))!important;
-  box-shadow:0 12px 34px rgba(0,12,18,.16),inset 0 1px rgba(255,255,255,.045);
-}
-#view-settings .settings-filter{width:100%;min-width:0;flex:0 0 38px}
-#view-settings .settings-nav{display:flex;flex:0 0 auto;min-width:0;flex-direction:column!important;align-items:stretch;justify-content:flex-start;gap:6px;flex-wrap:nowrap}
-#view-settings .settings-nav-item{width:100%;height:40px;min-width:0;flex:0 0 40px;padding:0 12px;border-radius:11px}
-#view-settings .settings-nav-item.active:before{left:-1px;right:auto;top:9px;bottom:9px;width:2px;height:auto}
-#view-settings .settings-content{flex:1;min-width:0;min-height:0}
-@media(max-width:680px){
-  #view-settings{flex-direction:column!important}
-  #view-settings .settings-sidebar{width:auto!important;min-width:0!important;max-height:none;height:auto!important;flex:0 0 auto;margin:8px 8px 0;padding:9px!important;gap:8px!important;flex-direction:column!important;align-items:stretch!important}
-  #view-settings .settings-filter{width:100%;min-width:0;flex:0 0 38px}
-  #view-settings .settings-nav{width:100%;flex-direction:row!important;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;justify-content:flex-start;scrollbar-width:none;padding-bottom:1px}
-  #view-settings .settings-nav::-webkit-scrollbar{display:none}
-  #view-settings .settings-nav-item{width:auto;flex:0 0 auto;height:38px;padding:0 12px;white-space:nowrap}
-  #view-settings .settings-nav-item.active:before{left:9px;right:9px;top:auto;bottom:-1px;width:auto;height:2px}
-  #view-settings .settings-content{padding:20px 12px calc(28px + env(safe-area-inset-bottom,0px))}
-}
-@media(min-width:681px) and (max-width:900px){
-  #view-settings .settings-sidebar{width:180px!important;min-width:180px!important;flex-basis:180px;margin:12px 0 12px 12px}
-  #view-settings .settings-nav-item{padding:0 10px;font-size:12px}
-}
-
-
-/* Search results may span categories; reveal each matching settings page. */
-#view-settings .settings-page.search-visible{display:block!important}
+.catalog-dropdown-menu,.custom-select-menu{display:block;visibility:hidden;opacity:0;pointer-events:none;transform:translateY(-7px) scale(.96,.9);transform-origin:top center;transition:opacity .18s ease,transform .28s var(--ease-water),visibility 0s linear .28s;will-change:opacity,transform}.catalog-dropdown-menu.doc-dropdown-menu-open,.custom-select-menu.doc-dropdown-menu-open{visibility:visible;opacity:1;pointer-events:auto;transform:translateY(0) scale(1);transition-delay:0s}.catalog-dropdown-menu[hidden],.custom-select-menu[hidden]{display:none!important}#view-apps.compact-catalog .catalog-hero,#view-games.compact-catalog .catalog-hero{padding-top:12px;padding-bottom:10px}#view-apps.compact-catalog .catalog-title-row,#view-games.compact-catalog .catalog-title-row{margin-bottom:8px}#view-apps.compact-catalog .catalog-heading,#view-games.compact-catalog .catalog-heading{font-size:22px}#view-apps.compact-catalog .catalog-card,#view-games.compact-catalog .catalog-card{min-height:58px;padding:8px 11px}#view-apps.compact-catalog .catalog-section-label,#view-games.compact-catalog .catalog-section-label{margin-bottom:7px}
 </style>
 </head>
 <body>
@@ -1095,7 +1023,7 @@ html[data-background-design="none"] #bg-overlay{background:none}
 
 <script>
 const DOC_ENGINE=(()=>{
- const base=new URL("./",document.baseURI),wisp="wss://wisp.mercurywork.shop/";
+ const base=new URL("./",document.baseURI),wisp=(JSON.parse(localStorage.getItem("doc-preferences-v2")||"{}").wisp||"wss://wisp.mercurywork.shop").replace(/\/$/,"")+"/";
  const paths={sw:new URL("sw.js",base).href,runtime:new URL("scramjet.js",base).href,wasm:new URL("scramjet.wasm",base).href,utils:new URL("scramjet-utils.js",base).href,api:new URL("controller.api.js",base).href,inject:new URL("controller.inject.js",base).href,transport:"https://cdn.jsdelivr.net/gh/theexpie/Splooshi@343bcb5c839963d01ed3addb1487410876943756/libcurl-client.js"};
  let controller=null,utils=null,frame=null,starting=null;
  const log=m=>{const box=document.getElementById("console-logs");if(box){const line=document.createElement("div");line.textContent="> "+m;box.appendChild(line);box.scrollTop=box.scrollHeight;}console.info("[Doc]",m)};
@@ -1233,33 +1161,19 @@ setInterval(() => {
 const ICON_SLUGS={"youtube.com":"youtube","discord.com":"discord","spotify.com":"spotify","twitch.tv":"twitch","reddit.com":"reddit","github.com":"github","drive.google.com":"googledrive","classroom.google.com":"googleclassroom","canva.com":"canva","chatgpt.com":"openai","mail.google.com":"gmail","wikipedia.org":"wikipedia","roblox.com":"roblox","krunker.io":"krunker","1v1.lol":"1v1dotlol","shellshock.io":"egghead","tetr.io":"tetris","chess.com":"chessdotcom","poki.com":"poki","crazygames.com":"crazygames","itch.io":"itchdotio","agar.io":"agar","geoguessr.com":"geoguessr","play2048.co":"2048"};
 /* Grids */
 function makeDocDropdown(root,options,initial,onChange,kind="catalog"){
- let value=initial;
- const triggerClass=kind==="catalog"?"catalog-dropdown-trigger":"custom-select-trigger";
- const menuClass=kind==="catalog"?"catalog-dropdown-menu":"custom-select-menu";
- const optionClass=kind==="catalog"?"catalog-dropdown-option":"custom-select-option";
- root.innerHTML=`<button type="button" class="${triggerClass}" aria-haspopup="listbox" aria-expanded="false"><span></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><div class="${menuClass}" role="listbox" hidden></div>`;
- const trigger=root.querySelector("button"),label=trigger.querySelector("span"),menu=root.querySelector('[role="listbox"]');
- function draw(){
-  const selected=options.find(o=>o.value===value)||options[0];label.textContent=selected.label;
-  menu.innerHTML=options.map(o=>`<button type="button" class="${optionClass}" role="option" data-value="${o.value}" aria-selected="${o.value===value}">${o.label}</button>`).join("");
- }
- function close(){root.classList.remove("open","drop-up");menu.style.maxHeight="";menu.style.position="";menu.style.left="";menu.style.top="";menu.style.width="";menu.style.zIndex="";trigger.setAttribute("aria-expanded","false");menu.hidden=true}
- function placeMenu(){
-  const rect=trigger.getBoundingClientRect(),gap=7,edge=12;
-  const below=Math.max(0,window.innerHeight-rect.bottom-edge),above=Math.max(0,rect.top-edge);
-  const desired=Math.min(240,menu.scrollHeight+10),up=below<desired&&above>below;
-  const available=up?above:below,max=Math.max(70,Math.min(240,available-4));
-  menu.style.position="fixed";menu.style.left=Math.round(rect.left)+"px";menu.style.width=Math.round(rect.width)+"px";
-  menu.style.maxHeight=max+"px";menu.style.top=(up?Math.max(edge,rect.top-Math.min(desired,max)-gap):rect.bottom+gap)+"px";
-  menu.style.bottom="auto";menu.style.right="auto";menu.style.zIndex="2147483000";
- }
- trigger.addEventListener("click",()=>{const opening=!root.classList.contains("open");document.querySelectorAll(".catalog-dropdown.open,.custom-select.open").forEach(el=>{el.classList.remove("open","drop-up");const m=el.querySelector('[role="listbox"]');if(m){m.hidden=true;m.style.maxHeight="";m.style.position="";m.style.left="";m.style.top="";m.style.width="";m.style.zIndex="";m.style.position="";m.style.left="";m.style.top="";m.style.width="";m.style.zIndex=""}el.querySelector("button")?.setAttribute("aria-expanded","false")});if(opening){root.classList.add("open");trigger.setAttribute("aria-expanded","true");menu.hidden=false;placeMenu()}});
+ let value=initial;const triggerClass=kind==="catalog"?"catalog-dropdown-trigger":"custom-select-trigger",menuClass=kind==="catalog"?"catalog-dropdown-menu":"custom-select-menu",optionClass=kind==="catalog"?"catalog-dropdown-option":"custom-select-option";
+ root.innerHTML=`<button type="button" class="${triggerClass}" aria-haspopup="listbox" aria-expanded="false"><span></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>`;
+ const trigger=root.querySelector("button"),label=trigger.querySelector("span"),menu=document.createElement("div");menu.className=menuClass;menu.setAttribute("role","listbox");menu.hidden=true;menu.dataset.docDropdownMenu="true";document.body.appendChild(menu);
+ function draw(){const selected=options.find(o=>o.value===value)||options[0];label.textContent=selected?.label||"";menu.innerHTML=options.map(o=>`<button type="button" class="${optionClass}" role="option" data-value="${String(o.value).replace(/&/g,"&amp;").replace(/"/g,"&quot;")}" aria-selected="${o.value===value}">${o.label}</button>`).join("")}
+ function placeMenu(){const r=trigger.getBoundingClientRect(),edge=12,gap=7,below=window.innerHeight-r.bottom-edge,above=r.top-edge,desired=Math.min(240,menu.scrollHeight+10),up=below<desired&&above>below,available=Math.max(70,(up?above:below)-4),height=Math.min(desired,available);root.classList.toggle("drop-up",up);menu.classList.add("doc-dropdown-menu-open");menu.style.position="fixed";menu.style.left=Math.max(edge,Math.min(r.left,window.innerWidth-r.width-edge))+"px";menu.style.width=Math.min(r.width,window.innerWidth-edge*2)+"px";menu.style.maxHeight=height+"px";menu.style.top=(up?Math.max(edge,r.top-height-gap):r.bottom+gap)+"px";menu.style.bottom="auto";menu.style.zIndex="2147483000"}
+ function close(){root.classList.remove("open","drop-up");menu.classList.remove("doc-dropdown-menu-open");menu.hidden=true;menu.style.cssText="";trigger.setAttribute("aria-expanded","false")}
+ trigger.addEventListener("click",e=>{e.stopPropagation();const opening=!root.classList.contains("open");document.querySelectorAll(".catalog-dropdown.open,.custom-select.open").forEach(el=>{if(el!==root)el._docSelect?.close?.()});if(!opening){close();return}root.classList.add("open");menu.hidden=false;trigger.setAttribute("aria-expanded","true");placeMenu()});
  menu.addEventListener("click",e=>{const option=e.target.closest("[data-value]");if(!option)return;value=option.dataset.value;draw();close();onChange(value)});
- root._docSelect={get value(){return value},set value(v){if(options.some(o=>o.value===v)){value=v;draw();onChange(value)}}};
- draw();return root._docSelect;
+ root._docSelect={get value(){return value},set value(v){if(options.some(o=>o.value===v)){value=v;draw();onChange(value)}},close,reposition:placeMenu};draw();return root._docSelect;
 }
-window.addEventListener("resize",()=>document.querySelectorAll(".catalog-dropdown.open,.custom-select.open").forEach(el=>{const t=el.querySelector("button"),m=el.querySelector('[role="listbox"]');if(t&&m){const r=t.getBoundingClientRect();m.style.left=Math.round(r.left)+"px";m.style.top=(r.bottom+7)+"px"}}));
-document.addEventListener("click",e=>{if(!e.target.closest(".catalog-dropdown,.custom-select"))document.querySelectorAll(".catalog-dropdown.open,.custom-select.open").forEach(el=>{el.classList.remove("open","drop-up");el.querySelector("button")?.setAttribute("aria-expanded","false");const m=el.querySelector('[role="listbox"]');if(m){m.hidden=true;m.style.maxHeight=""}})});
+window.addEventListener("resize",()=>document.querySelectorAll(".catalog-dropdown.open,.custom-select.open").forEach(root=>root._docSelect?.reposition?.()));
+window.addEventListener("scroll",()=>document.querySelectorAll(".catalog-dropdown.open,.custom-select.open").forEach(root=>root._docSelect?.reposition?.()),true);
+document.addEventListener("click",e=>{if(e.target.closest('[data-doc-dropdown-menu="true"]')||e.target.closest(".catalog-dropdown,.custom-select"))return;document.querySelectorAll(".catalog-dropdown.open,.custom-select.open").forEach(root=>root._docSelect?.close?.())});
 function populateGrid(containerId,list,filterId,categoryId,countId,kind){
  const grid=document.getElementById(containerId),search=document.getElementById(filterId),categoryRoot=document.getElementById(categoryId),count=document.getElementById(countId);
  let categoryValue="all";
@@ -1268,8 +1182,9 @@ function populateGrid(containerId,list,filterId,categoryId,countId,kind){
  function render(){
   const q=search.value.trim().toLowerCase(),cat=categoryValue;
   const filtered=list.filter(x=>(cat==="all"||x.category===cat)&&[x.name,x.desc,x.category].join(" ").toLowerCase().includes(q));
-  if(count)count.textContent=filtered.length+" "+(kind==="play"?"experiences":"destinations");
-  grid.innerHTML=filtered.length?filtered.map((x,i)=>{const slug=ICON_SLUGS[x.icon]||"",src=slug?"https://cdn.simpleicons.org/"+slug:"https://icons.duckduckgo.com/ip3/"+x.icon+".ico";return `<button class="card catalog-card ${kind}-card" type="button" data-url="${x.url}" style="--card-order:${i}" aria-label="Open ${x.name}"><span class="catalog-icon"><img src="${src}" alt="" loading="lazy" onerror="this.onerror=null;this.src='https://icons.duckduckgo.com/ip3/${x.icon}.ico'"></span><span class="catalog-copy"><span class="catalog-name">${x.name}</span><span class="catalog-desc">${x.desc}</span><span class="catalog-tag">${x.category}</span></span><span class="catalog-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 17 17 7M7 7h10v10"/></svg></span></button>`}).join(""):'<div class="catalog-empty">No matches. Try a different search or category.</div>';
+  const pageLimit=window.docAppsPage==="all"?filtered.length:Math.max(1,parseInt(window.docAppsPage||"20",10)||20);const visibleItems=filtered.slice(0,pageLimit);
+  if(count)count.textContent=(filtered.length>visibleItems.length?visibleItems.length+" of ":"")+filtered.length+" "+(kind==="play"?"experiences":"destinations");
+  grid.innerHTML=filtered.length?visibleItems.map((x,i)=>{const slug=ICON_SLUGS[x.icon]||"",src=slug?"https://cdn.simpleicons.org/"+slug:"https://icons.duckduckgo.com/ip3/"+x.icon+".ico";return `<button class="card catalog-card ${kind}-card" type="button" data-url="${x.url}" style="--card-order:${i}" aria-label="Open ${x.name}"><span class="catalog-icon"><img src="${src}" alt="" loading="lazy" onerror="this.onerror=null;this.src='https://icons.duckduckgo.com/ip3/${x.icon}.ico'"></span><span class="catalog-copy"><span class="catalog-name">${x.name}</span><span class="catalog-desc">${x.desc}</span><span class="catalog-tag">${x.category}</span></span><span class="catalog-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 17 17 7M7 7h10v10"/></svg></span></button>`}).join(""):'<div class="catalog-empty">No matches. Try a different search or category.</div>';
  }
  search.addEventListener("input",render);
  grid.addEventListener("click",e=>{const card=e.target.closest("[data-url]");if(card)launchBrowser(card.dataset.url)});
@@ -1350,14 +1265,15 @@ let docSettings={...settingDefaults};try{docSettings={...docSettings,...JSON.par
 function saveDocSettings(){try{localStorage.setItem(DOC_SETTINGS_KEY,JSON.stringify(docSettings))}catch{}}
 const themeOpts=[{value:"waterfront",label:"Waterfront (selected)"},{value:"midnight",label:"Midnight"},{value:"light",label:"Light"}],bgOpts=[{value:"slideshow",label:"Image Slideshow (selected)"},{value:"dots",label:"Dots"},{value:"none",label:"None"}],pageOpts=[{value:"20",label:"20 apps (selected)"},{value:"all",label:"All apps"},{value:"10",label:"10 apps"},{value:"15",label:"15 apps"}],scaleOpts=[{value:"100",label:"100% (selected)"},{value:"90",label:"90%"},{value:"110",label:"110%"},{value:"125",label:"125%"}],searchOpts=[{value:"ddg",label:"DuckDuckGo (selected)"},{value:"google",label:"Google"},{value:"brave",label:"Brave"},{value:"bing",label:"Bing"}];
 function settingSelect(id,options,key,apply){const val=options.some(o=>o.value===docSettings[key])?docSettings[key]:settingDefaults[key];return makeDocDropdown(document.getElementById(id),options,val,v=>{docSettings[key]=v;saveDocSettings();apply?.(v)},"settings")}
+window.docAppsPage=docSettings.appsPage||"20";function applyAppsPage(v){window.docAppsPage=v;["apps-filter","games-filter"].forEach(id=>document.getElementById(id)?.dispatchEvent(new Event("input")))}function applyCompactHeader(v){document.getElementById("view-apps").classList.toggle("compact-catalog",!!v);document.getElementById("view-games").classList.toggle("compact-catalog",!!v)}
 settingSelect("setting-theme",themeOpts,"theme",v=>document.documentElement.dataset.docTheme=v);
 settingSelect("setting-background",bgOpts,"background",v=>document.documentElement.dataset.backgroundDesign=v);
-settingSelect("setting-apps-page",pageOpts,"appsPage");
+settingSelect("setting-apps-page",pageOpts,"appsPage",applyAppsPage);
 settingSelect("setting-nav-scale",scaleOpts,"navScale",v=>document.documentElement.style.setProperty("--doc-nav-scale",Number(v)/100));
 settingSelect("setting-search-engine",searchOpts,"searchEngine",v=>{currentEngine=v;document.getElementById("engine-name").textContent=engines[v].name});
 function bindPref(id,key,type="checkbox"){const el=document.getElementById(id);if(!el)return;el[type==="checkbox"?"checked":"value"]=docSettings[key];el.addEventListener("change",()=>{docSettings[key]=type==="checkbox"?el.checked:el.value;saveDocSettings()})}
-["tabsBar","donation","compactHeader","aboutBlank","panicEnabled","confirmLeave"].forEach((key,i)=>bindPref(["setting-tabs-bar","setting-donation","setting-compact-header","setting-blank-start","setting-panic-enabled","setting-confirm-leave"][i],key));
-bindPref("setting-panic","panicKey","text");bindPref("setting-wisp","wisp","text");
+["tabsBar","donation","compactHeader","aboutBlank","panicEnabled","confirmLeave"].forEach((key,i)=>bindPref(["setting-tabs-bar","setting-donation","setting-compact-header","setting-blank-start","setting-panic-enabled","setting-confirm-leave"][i],key));document.getElementById("setting-tabs-bar").addEventListener("change",e=>{document.getElementById("browser-tabs").style.display=e.target.checked?"flex":"none"});document.getElementById("setting-compact-header").addEventListener("change",e=>applyCompactHeader(e.target.checked));
+bindPref("setting-panic","panicKey","text");const wispInput=document.getElementById("setting-wisp");wispInput.value=docSettings.wisp||settingDefaults.wisp;wispInput.addEventListener("change",()=>{const v=wispInput.value.trim();if(!/^wss?:\/\//i.test(v)){wispInput.setCustomValidity("Enter a valid ws:// or wss:// address.");wispInput.reportValidity();return}wispInput.setCustomValidity("");docSettings.wisp=v.replace(/\/$/,"");saveDocSettings();if(confirm("Wisp server saved. Reload Doc now to apply it?"))location.reload()});
 const blankStartToggle=document.getElementById("setting-blank-start"),autoCloakToggle=document.getElementById("setting-auto-cloak"),autoCloakRow=document.getElementById("auto-cloak-row");
 function syncAutoCloakAvailability(){const available=blankStartToggle.checked;autoCloakToggle.disabled=!available;if(!available){autoCloakToggle.checked=false;docSettings.autoCloak=false;saveDocSettings()}autoCloakRow.classList.toggle("is-disabled",!available)}
 autoCloakToggle.checked=!!docSettings.autoCloak&&!!docSettings.aboutBlank;
@@ -1367,8 +1283,8 @@ autoCloakToggle.addEventListener("change",()=>{docSettings.autoCloak=autoCloakTo
 
 document.getElementById("setting-panic").disabled=!docSettings.panicEnabled;document.getElementById("panic-shortcut-row").classList.toggle("is-disabled",!docSettings.panicEnabled);
 document.documentElement.dataset.docTheme=docSettings.theme;document.documentElement.dataset.backgroundDesign=docSettings.background;document.documentElement.style.setProperty("--doc-nav-scale",Number(docSettings.navScale||100)/100);
-document.getElementById("browser-tabs").style.display=docSettings.tabsBar?"flex":"none";currentEngine=docSettings.searchEngine||"ddg";document.getElementById("engine-name").textContent=engines[currentEngine].name;
-document.getElementById("setting-panic-enabled").addEventListener("change",e=>{document.getElementById("setting-panic").disabled=!e.target.checked;document.getElementById("panic-shortcut-row").classList.toggle("is-disabled",!e.target.checked)});
+document.getElementById("browser-tabs").style.display=docSettings.tabsBar?"flex":"none";applyCompactHeader(docSettings.compactHeader);applyAppsPage(docSettings.appsPage);currentEngine=docSettings.searchEngine||"ddg";document.getElementById("engine-name").textContent=engines[currentEngine].name;
+document.getElementById("setting-panic-enabled").addEventListener("change",e=>{document.getElementById("setting-panic").disabled=!e.target.checked;document.getElementById("panic-shortcut-row").classList.toggle("is-disabled",!e.target.checked)});window.addEventListener("keydown",e=>{if(!docSettings.panicEnabled||e.repeat||e.ctrlKey||e.altKey||e.metaKey)return;const key=String(docSettings.panicKey||"F1").trim().toLowerCase();if(key&&e.key.toLowerCase()===key){e.preventDefault();try{window.open("about:blank","_blank","noopener")}catch{location.href="about:blank"}}});
 window.addEventListener("beforeunload",e=>{if(docSettings.confirmLeave){e.preventDefault();e.returnValue=""}});
 document.querySelectorAll(".settings-nav-item").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll(".settings-nav-item").forEach(x=>x.classList.toggle("active",x===btn));document.querySelectorAll(".settings-page").forEach(p=>p.classList.toggle("active",p.dataset.settingsPage===btn.dataset.settingsTab));document.getElementById("settings-filter").value="";filterSettings("")}));
 function filterSettings(q){
