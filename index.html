@@ -422,76 +422,20 @@ header {
   pointer-events: auto;
   transition: opacity .3s ease, background .3s ease;
 }
-/* Desktop dock: collapsed to the active page icon; expands as a water droplet on hover. */
+/* Desktop dock: one compact active-page bubble, opening with a soft liquid glide. */
 @media (hover: hover) and (min-width: 769px) {
-  #dock {
-    width: 48px;
-    height: 48px;
-    min-width: 48px;
-    box-sizing: border-box;
-    padding: 4px;
-    gap: 4px;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    transform: translate3d(-50%, 0, 0) !important;
-    transform-origin: 50% 100%;
-    transition: width .42s cubic-bezier(.2,.85,.25,1.18), height .32s ease,
-      padding .32s ease, border-radius .32s ease, background .3s ease,
-      box-shadow .3s ease;
-  }
-  #dock:not(:hover):not(:focus-within) .dock-item:not(.active),
-  #dock:not(:hover):not(:focus-within) .dock-cloak-button {
-    display: none !important;
-  }
-  #dock:not(:hover):not(:focus-within) .dock-item.active {
-    width: 38px;
-    height: 38px;
-    min-width: 38px;
-    padding: 0;
-    flex: 0 0 38px;
-    justify-content: center;
-    border-radius: 50%;
-    background: rgba(67,198,189,.16);
-    color: var(--text-main);
-  }
-  #dock:not(:hover):not(:focus-within) .dock-item.active span { display: none; }
-  #dock:not(:hover):not(:focus-within) .dock-item.active svg { width: 19px; height: 19px; }
-  #dock:hover,
-  #dock:focus-within {
-    width: max-content;
-    height: 48px;
-    padding: 5px;
-    border-radius: 28px 28px 22px 22px;
-    animation: dock-water-open .48s cubic-bezier(.2,.85,.25,1.18) both;
-  }
-  #dock:hover .dock-item,
-  #dock:focus-within .dock-item {
-    display: flex !important;
-  }
-  #dock:hover .dock-item span,
-  #dock:focus-within .dock-item span { display: inline; }
-  #dock:hover .dock-item.active,
-  #dock:focus-within .dock-item.active {
-    width: auto;
-    height: auto;
-    min-width: 0;
-    padding: 8px 14px;
-    flex: 0 0 auto;
-    border-radius: 99px;
-  }
-  #dock:hover .dock-cloak-button,
-  #dock:focus-within .dock-cloak-button { display: flex !important; }
+  #dock{width:48px;height:48px;min-width:48px;box-sizing:border-box;padding:4px;gap:3px;justify-content:center;align-items:center;overflow:hidden;transform:translate3d(-50%,0,0)!important;transform-origin:50% 100%;transition:width .58s cubic-bezier(.22,.75,.18,1),border-radius .42s cubic-bezier(.22,.75,.18,1),background .35s ease,box-shadow .42s ease;will-change:width,border-radius}
+  #dock .dock-item{flex:0 0 0;width:0;min-width:0;height:38px;padding:0;margin:0;border-width:0;overflow:hidden;opacity:0;transform:scale(.82) translateY(4px);pointer-events:none;white-space:nowrap;transition:flex-basis .48s cubic-bezier(.22,.75,.18,1),width .48s cubic-bezier(.22,.75,.18,1),padding .38s ease,opacity .22s ease,transform .42s cubic-bezier(.22,.75,.18,1),background .25s ease}
+  #dock .dock-item.active{flex:0 0 38px;width:38px;min-width:38px;height:38px;padding:0;opacity:1;overflow:visible;pointer-events:auto;transform:none;justify-content:center;border-radius:50%;background:rgba(67,198,189,.16);color:var(--text-main)}
+  #dock .dock-item.active span{display:none}
+  #dock .dock-item.active svg{width:19px;height:19px}
+  #dock.dock-expanded{width:var(--dock-expanded-width,350px);height:48px;padding:5px;gap:3px;justify-content:flex-start;border-radius:26px;background:rgba(14,25,31,.94);box-shadow:0 14px 38px rgba(0,0,0,.48),0 1px 0 rgba(255,255,255,.07) inset}
+  #dock.dock-expanded .dock-item{flex:0 0 auto;width:auto;min-width:0;padding:8px 12px;border-width:0;overflow:visible;opacity:1;transform:none;pointer-events:auto}
+  #dock.dock-expanded .dock-item span{display:inline}
+  #dock.dock-expanded .dock-item.active{flex:0 0 auto;width:auto;height:auto;min-width:0;padding:8px 12px;border-radius:99px}
+  #dock.dock-expanded .dock-cloak-button{flex:0 0 38px;width:38px;min-width:38px;padding:0;margin-left:auto;border-width:1px;border-radius:50%}
 }
-@keyframes dock-water-open {
-  0% { transform: translate3d(-50%, 0, 0) scale(.72,.28); filter: blur(5px); border-radius: 50%; }
-  58% { transform: translate3d(-50%, 0, 0) scale(1.035,1.08); filter: blur(0); border-radius: 30px 30px 20px 20px; }
-  78% { transform: translate3d(-50%, 0, 0) scale(.99,.98); }
-  100% { transform: translate3d(-50%, 0, 0) scale(1,1); filter: blur(0); }
-}
-@media (prefers-reduced-motion: reduce) {
-  #dock { transition: none !important; animation: none !important; }
-}
+@media(prefers-reduced-motion:reduce){#dock,#dock .dock-item{transition:none!important}}
 /* Hard state switch: the home taskbar and its edge sensor do not exist visually while browsing. */
 body.browsing #dock,
 body.browsing #dock-edge-trigger {
@@ -1397,7 +1341,30 @@ function runPanicShortcut(){
  try{
   popup.opener=null;
   popup.document.open();
-  popup.document.write("<!doctype html><html><head><meta charset='utf-8'><title></title><link rel='icon'></head><body><script id=\"doc-scrambled-text\">\n(function(){\n  const alphabet=\"abcdefghijklmnopqrstuvwxyz\";\n  /* Reverse the supplied font's cmap: plaintext glyph -> stored QWERTY character. */\n  const fontGlyphs=\"ruwzvyijpadltfhqkmscobxgne\";\n  const encode=value=>String(value).replace(/[a-z]/gi,ch=>{\n    const index=fontGlyphs.indexOf(ch.toLowerCase());\n    if(index<0)return ch;\n    const out=alphabet[index];\n    return ch===ch.toUpperCase()?out.toUpperCase():out;\n  });\n  const seenText=new WeakMap(),seenAttrs=new WeakMap();\n  const skipText=\"SCRIPT,STYLE,NOSCRIPT,TEXTAREA,INPUT,CODE,PRE\";\n  function encodeText(node){\n    const parent=node&&node.parentElement;\n    if(!parent||parent.closest(skipText)||parent.isContentEditable)return;\n    const value=node.nodeValue;\n    if(seenText.get(node)===value)return;\n    const encoded=encode(value);\n    seenText.set(node,encoded);\n    if(encoded!==value)node.nodeValue=encoded;\n  }\n  function encodeElement(el){\n    if(!(el instanceof Element)||el.closest(\"SCRIPT,STYLE,NOSCRIPT,CODE,PRE\"))return;\n    let state=seenAttrs.get(el);if(!state){state={};seenAttrs.set(el,state);}\n    for(const name of [\"placeholder\",\"title\",\"aria-label\",\"alt\"]){\n      if(!el.hasAttribute(name))continue;\n      const value=el.getAttribute(name);\n      if(state[name]===value)continue;\n      const encoded=encode(value);state[name]=encoded;\n      if(encoded!==value)el.setAttribute(name,encoded);\n    }\n    for(const child of el.childNodes)if(child.nodeType===Node.TEXT_NODE)encodeText(child);\n  }\n  function scan(root){\n    if(root.nodeType===Node.TEXT_NODE){encodeText(root);return;}\n    if(root.nodeType===Node.ELEMENT_NODE)encodeElement(root);\n    if(root.querySelectorAll)root.querySelectorAll(\"*\").forEach(encodeElement);\n    if(root.querySelectorAll){\n      const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);\n      let node;while((node=walker.nextNode()))encodeText(node);\n    }\n  }\n  function start(){\n    scan(document.body);\n    const title=document.querySelector(\"head title\");\n    if(title)scan(title);\n    document.title=encode(document.title);\n    const observer=new MutationObserver(records=>{\n      for(const record of records){\n        if(record.type===\"characterData\")encodeText(record.target);\n        else if(record.type===\"attributes\")encodeElement(record.target);\n        else record.addedNodes.forEach(scan);\n      }\n    });\n    observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:[\"placeholder\",\"title\",\"aria-label\",\"alt\"]});\n  }\n  if(document.readyState===\"loading\")document.addEventListener(\"DOMContentLoaded\",start,{once:true});else start();\n})();\n__DOC_SCRIPT_CLOSE__\n<script id=\"doc-main-scrambled-text\">\n(function(){\n const alphabet=\"abcdefghijklmnopqrstuvwxyz\",fontGlyphs=\"ruwzvyijpadltfhqkmscobxgne\";\n const encode=value=>String(value).replace(/[a-z]/gi,ch=>{const i=fontGlyphs.indexOf(ch.toLowerCase());if(i<0)return ch;const out=alphabet[i];return ch===ch.toUpperCase()?out.toUpperCase():out;});\n const seenText=new WeakMap(),seenAttrs=new WeakMap(),skipText=\"SCRIPT,STYLE,NOSCRIPT,TEXTAREA,INPUT,CODE,PRE\";\n function encodeText(node){const p=node&&node.parentElement;if(!p||p.closest(skipText)||p.isContentEditable)return;const v=node.nodeValue;if(seenText.get(node)===v)return;const e=encode(v);seenText.set(node,e);if(e!==v)node.nodeValue=e;}\n function encodeElement(el){if(!(el instanceof Element)||el.closest(\"SCRIPT,STYLE,NOSCRIPT,CODE,PRE\"))return;let state=seenAttrs.get(el);if(!state){state={};seenAttrs.set(el,state);}for(const name of [\"placeholder\",\"title\",\"aria-label\",\"alt\"]){if(!el.hasAttribute(name))continue;const v=el.getAttribute(name);if(state[name]===v)continue;const e=encode(v);state[name]=e;if(e!==v)el.setAttribute(name,e);}for(const child of el.childNodes)if(child.nodeType===Node.TEXT_NODE)encodeText(child);}\n function scan(root){if(root.nodeType===Node.TEXT_NODE){encodeText(root);return;}if(root.nodeType===Node.ELEMENT_NODE)encodeElement(root);if(root.querySelectorAll)root.querySelectorAll(\"*\").forEach(encodeElement);if(root.querySelectorAll){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))encodeText(n);}}\n function start(){scan(document.body);const title=document.querySelector(\"head title\");if(title)scan(title);document.title=encode(document.title);const observer=new MutationObserver(records=>{for(const r of records){if(r.type===\"characterData\")encodeText(r.target);else if(r.type===\"attributes\")encodeElement(r.target);else r.addedNodes.forEach(scan);}});observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:[\"placeholder\",\"title\",\"aria-label\",\"alt\"]});}\n if(document.readyState===\"loading\")document.addEventListener(\"DOMContentLoaded\",start,{once:true});else start();\n})();\n__DOC_SCRIPT_CLOSE__\n</body></html>".replaceAll("__DOC_SCRIPT_CLOSE__", "<"+"/script>"));
+  popup.document.write("<!doctype html><html><head><meta charset='utf-8'><title></title><link rel='icon'></head><body><script id=\"doc-scrambled-text\">\n(function(){\n  const alphabet=\"abcdefghijklmnopqrstuvwxyz\";\n  /* Reverse the supplied font's cmap: plaintext glyph -> stored QWERTY character. */\n  const fontGlyphs=\"ruwzvyijpadltfhqkmscobxgne\";\n  const encode=value=>String(value).replace(/[a-z]/gi,ch=>{\n    const index=fontGlyphs.indexOf(ch.toLowerCase());\n    if(index<0)return ch;\n    const out=alphabet[index];\n    return ch===ch.toUpperCase()?out.toUpperCase():out;\n  });\n  const seenText=new WeakMap(),seenAttrs=new WeakMap();\n  const skipText=\"SCRIPT,STYLE,NOSCRIPT,TEXTAREA,INPUT,CODE,PRE\";\n  function encodeText(node){\n    const parent=node&&node.parentElement;\n    if(!parent||parent.closest(skipText)||parent.isContentEditable)return;\n    const value=node.nodeValue;\n    if(seenText.get(node)===value)return;\n    const encoded=encode(value);\n    seenText.set(node,encoded);\n    if(encoded!==value)node.nodeValue=encoded;\n  }\n  function encodeElement(el){\n    if(!(el instanceof Element)||el.closest(\"SCRIPT,STYLE,NOSCRIPT,CODE,PRE\"))return;\n    let state=seenAttrs.get(el);if(!state){state={};seenAttrs.set(el,state);}\n    for(const name of [\"placeholder\",\"title\",\"aria-label\",\"alt\"]){\n      if(!el.hasAttribute(name))continue;\n      const value=el.getAttribute(name);\n      if(state[name]===value)continue;\n      const encoded=encode(value);state[name]=encoded;\n      if(encoded!==value)el.setAttribute(name,encoded);\n    }\n    for(const child of el.childNodes)if(child.nodeType===Node.TEXT_NODE)encodeText(child);\n  }\n  function scan(root){\n    if(root.nodeType===Node.TEXT_NODE){encodeText(root);return;}\n    if(root.nodeType===Node.ELEMENT_NODE)encodeElement(root);\n    if(root.querySelectorAll)root.querySelectorAll(\"*\").forEach(encodeElement);\n    if(root.querySelectorAll){\n      const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);\n      let node;while((node=walker.nextNode()))encodeText(node);\n    }\n  }\n  function start(){\n    scan(document.body);\n    const title=document.querySelector(\"head title\");\n    if(title)scan(title);\n    document.title=encode(document.title);\n    const observer=new MutationObserver(records=>{\n      for(const record of records){\n        if(record.type===\"characterData\")encodeText(record.target);\n        else if(record.type===\"attributes\")encodeElement(record.target);\n        else record.addedNodes.forEach(scan);\n      }\n    });\n    observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:[\"placeholder\",\"title\",\"aria-label\",\"alt\"]});\n  }\n  if(document.readyState===\"loading\")document.addEventListener(\"DOMContentLoaded\",start,{once:true});else start();\n})();\n__DOC_SCRIPT_CLOSE__\n<script id=\"doc-main-scrambled-text\">\n(function(){\n const alphabet=\"abcdefghijklmnopqrstuvwxyz\",fontGlyphs=\"ruwzvyijpadltfhqkmscobxgne\";\n const encode=value=>String(value).replace(/[a-z]/gi,ch=>{const i=fontGlyphs.indexOf(ch.toLowerCase());if(i<0)return ch;const out=alphabet[i];return ch===ch.toUpperCase()?out.toUpperCase():out;});\n const seenText=new WeakMap(),seenAttrs=new WeakMap(),skipText=\"SCRIPT,STYLE,NOSCRIPT,TEXTAREA,INPUT,CODE,PRE\";\n function encodeText(node){const p=node&&node.parentElement;if(!p||p.closest(skipText)||p.isContentEditable)return;const v=node.nodeValue;if(seenText.get(node)===v)return;const e=encode(v);seenText.set(node,e);if(e!==v)node.nodeValue=e;}\n function encodeElement(el){if(!(el instanceof Element)||el.closest(\"SCRIPT,STYLE,NOSCRIPT,CODE,PRE\"))return;let state=seenAttrs.get(el);if(!state){state={};seenAttrs.set(el,state);}for(const name of [\"placeholder\",\"title\",\"aria-label\",\"alt\"]){if(!el.hasAttribute(name))continue;const v=el.getAttribute(name);if(state[name]===v)continue;const e=encode(v);state[name]=e;if(e!==v)el.setAttribute(name,e);}for(const child of el.childNodes)if(child.nodeType===Node.TEXT_NODE)encodeText(child);}\n function scan(root){if(root.nodeType===Node.TEXT_NODE){encodeText(root);return;}if(root.nodeType===Node.ELEMENT_NODE)encodeElement(root);if(root.querySelectorAll)root.querySelectorAll(\"*\").forEach(encodeElement);if(root.querySelectorAll){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))encodeText(n);}}\n function start(){scan(document.body);const title=document.querySelector(\"head title\");if(title)scan(title);document.title=encode(document.title);const observer=new MutationObserver(records=>{for(const r of records){if(r.type===\"characterData\")encodeText(r.target);else if(r.type===\"attributes\")encodeElement(r.target);else r.addedNodes.forEach(scan);}});observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:[\"placeholder\",\"title\",\"aria-label\",\"alt\"]});}\n if(document.readyState===\"loading\")document.addEventListener(\"DOMContentLoaded\",start,{once:true});else start();\n})();\n__DOC_SCRIPT_CLOSE__\n<script id="doc-font-text-encoder">
+(function(){
+ "use strict";
+ const alphabet="abcdefghijklmnopqrstuvwxyz",fontGlyphs="ruwzvyijpadltfhqkmscobxgne";
+ const encodeValue=value=>String(value).replace(/[a-z]/gi,ch=>{const i=fontGlyphs.indexOf(ch.toLowerCase());if(i<0)return ch;const out=alphabet[i];return ch===ch.toUpperCase()?out.toUpperCase():out});
+ const encodedNodes=new WeakMap(),encodedAttrs=new WeakMap(),skip="SCRIPT,STYLE,NOSCRIPT,TEXTAREA,INPUT,CODE,PRE";
+ function encodeNode(node){const parent=node&&node.parentElement;if(!parent||parent.closest(skip)||parent.isContentEditable)return;const value=node.nodeValue;if(encodedNodes.get(node)===value)return;const encoded=encodeValue(value);encodedNodes.set(node,encoded);if(encoded!==value)node.nodeValue=encoded}
+ function encodeElement(el){if(!(el instanceof Element)||el.closest("SCRIPT,STYLE,NOSCRIPT,CODE,PRE"))return;let state=encodedAttrs.get(el);if(!state){state=Object.create(null);encodedAttrs.set(el,state)}for(const name of ["placeholder","title","aria-label","alt"]){if(!el.hasAttribute(name))continue;const value=el.getAttribute(name);if(state[name]===value)continue;const encoded=encodeValue(value);state[name]=encoded;if(encoded!==value)el.setAttribute(name,encoded)}if(el.matches('input[type="button"],input[type="submit"],input[type="reset"]')){const value=el.getAttribute("value");if(value!==null&&state.value!==value){const encoded=encodeValue(value);state.value=encoded;if(encoded!==value)el.setAttribute("value",encoded)}}}
+ function scan(root){if(root.nodeType===Node.TEXT_NODE){encodeNode(root);return}if(root.nodeType!==Node.ELEMENT_NODE&&root.nodeType!==Node.DOCUMENT_FRAGMENT_NODE)return;if(root.nodeType===Node.ELEMENT_NODE)encodeElement(root);if(root.querySelectorAll)root.querySelectorAll("*").forEach(encodeElement);const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let node;while((node=walker.nextNode()))encodeNode(node)}
+ function start(){scan(document.body);const observer=new MutationObserver(records=>{for(const record of records){if(record.type==="characterData")encodeNode(record.target);else if(record.type==="attributes")encodeElement(record.target);else record.addedNodes.forEach(scan)}});observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["placeholder","title","aria-label","alt","value"]})}
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});else start();
+})();
+</script>
+<script id="doc-fluid-dock">
+(function(){
+ const dock=document.getElementById("dock");if(!dock||!window.matchMedia("(hover:hover) and (min-width:769px)").matches)return;
+ let open=false;
+ function expand(){if(open)return;open=true;dock.classList.add("dock-expanded");const transition=dock.style.transition;dock.style.transition="none";dock.style.width="max-content";const measured=Math.ceil(dock.scrollWidth);const target=Math.min(Math.max(180,measured),window.innerWidth-24);dock.style.width="48px";dock.getBoundingClientRect();dock.style.transition=transition;dock.style.setProperty("--dock-expanded-width",target+"px");requestAnimationFrame(()=>{if(open)dock.style.width=target+"px"})}
+ function collapse(){if(!open||dock.contains(document.activeElement))return;open=false;dock.style.width="48px";dock.classList.remove("dock-expanded")}
+ dock.addEventListener("pointerenter",expand);dock.addEventListener("pointerleave",collapse);dock.addEventListener("focusin",expand);dock.addEventListener("focusout",()=>requestAnimationFrame(collapse));
+ window.addEventListener("resize",()=>{if(open){open=false;dock.style.width="48px";dock.classList.remove("dock-expanded")}});
+})();
+</script>
+</body></html>".replaceAll("__DOC_SCRIPT_CLOSE__", "<"+"/script>"));
   popup.document.close();
   popup.document.title=cloak.title||"";
   const icon=popup.document.querySelector("link[rel='icon']");
