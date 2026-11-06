@@ -1712,64 +1712,82 @@ applyTabCloak("none");
 <script id="doc-font-text-encoder">
 (function(){
  "use strict";
- // cmap: source Unicode character -> glyph that the scrambled font visibly draws.
- // To display a normal letter, write the inverse character into the DOM.
- const normal="abcdefghijklmnopqrstuvwxyz";
- const drawn="ruwzvyijpadltfhqkmscobxgne";
+ // The supplied font maps: a→r, b→u, c→w, d→z, ... .
+ // Store the inverse character so the rendered glyph is the intended letter.
+ const alphabet="abcdefghijklmnopqrstuvwxyz";
+ const fontGlyphs="ruwzvyijpadltfhqkmscobxgne";
  const inverse=Object.create(null);
- for(let i=0;i<drawn.length;i++)inverse[drawn[i]]=normal[i];
+ for(let i=0;i<fontGlyphs.length;i++)inverse[fontGlyphs[i]]=alphabet[i];
  function encode(value){
-   return String(value).replace(/[a-z]/gi,ch=>{
-     const lower=ch.toLowerCase(),mapped=inverse[lower];
-     if(!mapped)return ch;
-     return ch===ch.toUpperCase()?mapped.toUpperCase():mapped;
+   return String(value).replace(/[a-z]/gi,function(ch){
+     const mapped=inverse[ch.toLowerCase()];
+     return mapped ? (ch===ch.toUpperCase()?mapped.toUpperCase():mapped) : ch;
    });
  }
- const textState=new WeakMap(),attrState=new WeakMap();
- const skip="SCRIPT,STYLE,NOSCRIPT,TEXTAREA,INPUT,CODE,PRE";
- function processText(node){
+ const textMemory=new WeakMap(),attrMemory=new WeakMap();
+ const ignored="SCRIPT,STYLE,NOSCRIPT,TEXTAREA,INPUT,CODE,PRE";
+ function encodeText(node){
    const parent=node.parentElement;
-   if(!parent||parent.closest(skip)||parent.isContentEditable)return;
-   const current=node.nodeValue,prior=textState.get(node);
-   const plain=prior&&prior.encoded===current?prior.plain:current;
+   if(!parent||parent.closest(ignored)||parent.isContentEditable)return;
+   const current=node.nodeValue,old=textMemory.get(node);
+   const plain=old&&old.encoded===current?old.plain:current;
    const encoded=encode(plain);
-   textState.set(node,{plain,encoded});
+   textMemory.set(node,{plain:plain,encoded:encoded});
    if(current!==encoded)node.nodeValue=encoded;
  }
- function processElement(el){
+ function encodeAttrs(el){
    if(!(el instanceof Element)||el.closest("SCRIPT,STYLE,NOSCRIPT,CODE,PRE"))return;
-   let state=attrState.get(el);
-   if(!state){state=Object.create(null);attrState.set(el,state);}
-   for(const name of ["placeholder","title","aria-label","alt"]){
-     if(!el.hasAttribute(name))continue;
-     const current=el.getAttribute(name),prior=state[name];
-     const plain=prior&&prior.encoded===current?prior.plain:current;
+   let state=attrMemory.get(el);
+   if(!state){state=Object.create(null);attrMemory.set(el,state);}
+   ["placeholder","title","aria-label","alt"].forEach(function(name){
+     if(!el.hasAttribute(name))return;
+     const current=el.getAttribute(name),old=state[name];
+     const plain=old&&old.encoded===current?old.plain:current;
      const encoded=encode(plain);
-     state[name]={plain,encoded};
+     state[name]={plain:plain,encoded:encoded};
      if(current!==encoded)el.setAttribute(name,encoded);
+   });
+   if(el.matches('input[type="button"],input[type="submit"],input[type="reset"]')){
+     const current=el.getAttribute("value");
+     if(current!==null){
+       const old=state.value,plain=old&&old.encoded===current?old.plain:current;
+       const encoded=encode(plain);state.value={plain:plain,encoded:encoded};
+       if(current!==encoded)el.setAttribute("value",encoded);
+     }
    }
  }
  function scan(root){
-   if(root.nodeType===Node.TEXT_NODE){processText(root);return;}
-   if(root.nodeType!==Node.ELEMENT_NODE&&root.nodeType!==Node.DOCUMENT_FRAGMENT_NODE)return;
-   if(root.nodeType===Node.ELEMENT_NODE)processElement(root);
-   if(root.querySelectorAll)root.querySelectorAll("*").forEach(processElement);
+   if(!root)return;
+   if(root.nodeType===Node.TEXT_NODE){encodeText(root);return;}
+   if(root.nodeType!==Node.ELEMENT_NODE&&root.nodeType!==Node.DOCUMENT_NODE&&root.nodeType!==Node.DOCUMENT_FRAGMENT_NODE)return;
+   if(root.nodeType===Node.ELEMENT_NODE)encodeAttrs(root);
+   if(root.querySelectorAll)root.querySelectorAll("*").forEach(encodeAttrs);
    const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
-   let node;while((node=walker.nextNode()))processText(node);
+   let node;while((node=walker.nextNode()))encodeText(node);
  }
- function boot(){
+ let observer;
+ function run(){
+   if(!document.body)return;
+   if(!observer){
+     observer=new MutationObserver(function(records){
+       records.forEach(function(record){
+         if(record.type==="characterData")encodeText(record.target);
+         else if(record.type==="attributes")encodeAttrs(record.target);
+         else record.addedNodes.forEach(scan);
+       });
+     });
+     observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["placeholder","title","aria-label","alt","value"]});
+   }
+   scan(document.head);
    scan(document.body);
-   const observer=new MutationObserver(records=>{
-     for(const record of records){
-       if(record.type==="characterData")processText(record.target);
-       else if(record.type==="attributes")processElement(record.target);
-       else for(const added of record.addedNodes)scan(added);
-     }
-   });
-   observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["placeholder","title","aria-label","alt"]});
+   // Re-scan after app rendering and after the custom font has become available.
+   requestAnimationFrame(function(){scan(document.body);});
+   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){scan(document.head);scan(document.body);});
  }
- if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",boot,{once:true});
- else boot();
+ if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run,{once:true});
+ run();
+ window.__docScramblerEncode=encode;
+ window.__docScramblerReady=true;
 })();
 </script>
 <script id="doc-fluid-dock">
