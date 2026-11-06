@@ -897,6 +897,9 @@ html[data-background-design="none"] #bg-overlay{background:none}
   #view-settings .settings-nav-item{padding:0 10px;font-size:12px}
 }
 
+
+/* Search results may span categories; reveal each matching settings page. */
+#view-settings .settings-page.search-visible{display:block!important}
 </style>
 </head>
 <body>
@@ -1368,8 +1371,31 @@ document.getElementById("browser-tabs").style.display=docSettings.tabsBar?"flex"
 document.getElementById("setting-panic-enabled").addEventListener("change",e=>{document.getElementById("setting-panic").disabled=!e.target.checked;document.getElementById("panic-shortcut-row").classList.toggle("is-disabled",!e.target.checked)});
 window.addEventListener("beforeunload",e=>{if(docSettings.confirmLeave){e.preventDefault();e.returnValue=""}});
 document.querySelectorAll(".settings-nav-item").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll(".settings-nav-item").forEach(x=>x.classList.toggle("active",x===btn));document.querySelectorAll(".settings-page").forEach(p=>p.classList.toggle("active",p.dataset.settingsPage===btn.dataset.settingsTab));document.getElementById("settings-filter").value="";filterSettings("")}));
-function filterSettings(q){q=q.trim().toLowerCase();let shown=0;document.querySelectorAll(".settings-page").forEach(p=>{let n=0;p.querySelectorAll(".settings-row").forEach(row=>{const ok=!q||(row.dataset.search+" "+row.innerText).toLowerCase().includes(q);row.hidden=!ok;if(ok)n++});p.hidden=!!q&&!n;if(!p.hidden)shown++});document.querySelector(".settings-no-results").hidden=shown>0}
-document.getElementById("settings-filter").addEventListener("input",e=>{if(e.target.value){document.querySelectorAll(".settings-nav-item").forEach(x=>x.classList.remove("active"));filterSettings(e.target.value)}else{document.querySelectorAll(".settings-nav-item").forEach((x,i)=>x.classList.toggle("active",i===0));filterSettings("")}});
+function filterSettings(q){
+ q=q.trim().toLowerCase();
+ let shown=0;
+ document.querySelectorAll(".settings-page").forEach(p=>{
+  let matches=0;
+  p.querySelectorAll(".settings-row").forEach(row=>{
+   const haystack=((row.dataset.search||"")+" "+(row.innerText||"")).toLowerCase();
+   const ok=!q||haystack.includes(q);
+   row.hidden=!ok;
+   if(ok)matches++;
+  });
+  const visible=!q||matches>0;
+  p.hidden=!visible;
+  p.classList.toggle("search-visible",!!q&&matches>0);
+  if(visible)shown++;
+ });
+ const empty=document.querySelector(".settings-no-results");
+ if(empty)empty.hidden=shown>0;
+}
+document.getElementById("settings-filter").addEventListener("input",e=>{
+ const q=e.target.value;
+ const searching=!!q.trim();
+ document.querySelectorAll(".settings-nav-item").forEach((x,i)=>x.classList.toggle("active",!searching&&x.dataset.settingsTab===(document.querySelector(".settings-nav-item[data-settings-tab].active")?.dataset.settingsTab||"privacy")));
+ filterSettings(q);
+});
 document.getElementById("settings-export").addEventListener("click",()=>{const u=URL.createObjectURL(new Blob([JSON.stringify(docSettings,null,2)],{type:"application/json"})),a=document.createElement("a");a.href=u;a.download="doc-settings.json";a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)});
 document.getElementById("settings-import").addEventListener("click",()=>document.getElementById("settings-import-file").click());
 document.getElementById("settings-import-file").addEventListener("change",async e=>{const f=e.target.files?.[0];if(!f)return;try{docSettings={...settingDefaults,...JSON.parse(await f.text())};saveDocSettings();location.reload()}catch{alert("That settings file could not be read.")}e.target.value=""});
