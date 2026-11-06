@@ -1709,6 +1709,68 @@ applyTabCloak("none");
  #view-home .shortcut-grid,#view-home .home-shortcuts{justify-content:center;margin-inline:auto}
 }
 </style>
+<style id="doc-view-and-toolbar-layout-fix">
+/* Keep the home shell and each destination page in one shared content frame. */
+.view-panel{z-index:2;box-sizing:border-box;min-width:0;min-height:0}
+.view-panel:not(.active){pointer-events:none}
+.view-panel.active{pointer-events:auto}
+#view-home,#view-apps,#view-games,#view-settings{
+  inset:65px 16px calc(84px + env(safe-area-inset-bottom,0px)) 16px!important;
+  width:auto!important;height:auto!important;max-width:none!important;
+  overflow-x:hidden;overscroll-behavior:contain;
+}
+#view-apps,#view-games,#view-settings{padding:16px 8px!important}
+#view-settings{display:none;flex-direction:row!important;align-items:stretch!important;overflow:hidden!important}
+#view-settings.active{display:flex!important}
+#view-settings .settings-sidebar{height:100%;min-height:0;flex:0 0 218px}
+#view-settings .settings-content{height:100%;min-height:0;min-width:0;overflow:auto}
+#view-home{align-items:center;justify-content:center}
+#view-home .home-hero{width:min(100%,760px);max-width:760px;margin:0 auto!important}
+#view-home .search-container{width:100%;max-width:100%;box-sizing:border-box}
+#view-home .home-shortcuts{width:100%;justify-content:center;margin-inline:auto}
+#browser-chrome{
+  box-sizing:border-box;
+  width:min(720px,calc(100vw - 32px));
+  left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));
+  max-width:calc(100vw - 32px);
+}
+#browser-tabs,#browser-chrome-controls{min-width:0;box-sizing:border-box}
+#tab-strip{min-width:0;flex:1 1 auto}
+#browser-chrome-controls{gap:4px}
+.chrome-icon-btn{flex:0 0 34px;width:34px;height:34px;min-width:0;padding:0}
+.chrome-url-shell{flex:1 1 140px;min-width:64px;box-sizing:border-box}
+.chrome-url-shell .url-display{min-width:0;width:0}
+@media(max-width:680px){
+  #view-home,#view-apps,#view-games,#view-settings{
+    inset:calc(56px + env(safe-area-inset-top,0px)) 9px calc(88px + env(safe-area-inset-bottom,0px)) 9px!important;
+    padding:12px 5px!important;
+  }
+  #view-home{padding:12px 10px!important}
+  #view-settings{flex-direction:column!important;gap:0!important}
+  #view-settings .settings-sidebar{width:100%;min-width:0;max-width:none;height:auto;min-height:0;flex:0 0 auto;padding:9px 9px 8px}
+  #view-settings .settings-content{width:100%;height:auto;flex:1 1 auto;padding:13px 8px calc(18px + env(safe-area-inset-bottom,0px))}
+  #browser-chrome{
+    width:calc(100vw - 20px);max-width:calc(100vw - 20px);
+    left:50%;bottom:calc(12px + env(safe-area-inset-bottom,0px));
+    padding:6px 7px;gap:4px;
+  }
+  #browser-tabs{height:34px;min-height:34px;gap:5px;padding:0 1px 4px}
+  .browser-tab{min-width:0;max-width:150px;flex:1 1 110px;padding:0 8px;gap:6px}
+  #browser-chrome-controls{gap:2px}
+  .chrome-icon-btn{width:30px;height:30px;flex-basis:30px;border-radius:9px}
+  .chrome-icon-btn svg{width:16px;height:16px}
+  .chrome-url-shell{height:34px;flex:1 1 80px;min-width:55px;padding:0 6px;gap:5px}
+  .chrome-url-shell .url-display{font-size:11px}
+  .chrome-divider{display:none}
+  #chrome-reveal{bottom:4px}
+}
+@media(max-width:360px){
+  #browser-chrome-controls{gap:1px}
+  .chrome-icon-btn{width:27px;height:30px;flex-basis:27px}
+  .chrome-url-shell{min-width:42px;padding:0 5px}
+  .url-lock{display:none!important}
+}
+</style>
 <script id="doc-font-text-encoder">
 (function(){
  "use strict";
