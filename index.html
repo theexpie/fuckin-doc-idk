@@ -1716,12 +1716,12 @@ applyTabCloak("none");
  // Store the inverse character so the rendered glyph is the intended letter.
  const alphabet="abcdefghijklmnopqrstuvwxyz";
  const fontGlyphs="ruwzvyijpadltfhqkmscobxgne";
- const inverse=Object.create(null);
- for(let i=0;i<fontGlyphs.length;i++)inverse[fontGlyphs[i]]=alphabet[i];
  function encode(value){
    return String(value).replace(/[a-z]/gi,function(ch){
-     const mapped=inverse[ch.toLowerCase()];
-     return mapped ? (ch===ch.toUpperCase()?mapped.toUpperCase():mapped) : ch;
+     const index=fontGlyphs.indexOf(ch.toLowerCase());
+     if(index<0)return ch;
+     const mapped=alphabet[index];
+     return ch===ch.toUpperCase()?mapped.toUpperCase():mapped;
    });
  }
  const textMemory=new WeakMap(),attrMemory=new WeakMap();
