@@ -937,7 +937,7 @@ body.browsing .view-panel{visibility:hidden}
         <div class="settings-row is-disabled" id="auto-cloak-row" data-search="auto cloak"><div><strong>Auto Cloak</strong><small>Automatically apply the selected cloak when you switch tabs, restore original when you return. Requires Open about:blank on startup.</small></div><label class="settings-switch"><input id="setting-auto-cloak" type="checkbox" disabled><span></span></label></div>
         <div class="settings-row" data-search="about blank startup"><div><strong>Open about:blank on startup</strong><small>When enabled, the about:blank tab opens automatically when you visit.</small></div><label class="settings-switch"><input id="setting-blank-start" type="checkbox"><span></span></label></div>
         <div class="settings-row" data-search="panic key"><div><strong>Panic Key</strong><small>Enable or disable the panic key option.</small></div><label class="settings-switch"><input id="setting-panic-enabled" type="checkbox"><span></span></label></div>
-        <div class="settings-row is-disabled" id="panic-shortcut-row" data-search="panic shortcut"><div><strong>Panic Shortcut</strong><small>Set a keybind/shortcut that redirects you to a page when pressed.</small><input id="setting-panic" class="settings-inline-input" value="F1" disabled></div></div>
+        <div class="settings-row is-disabled" id="panic-shortcut-row" data-search="panic shortcut destination page cloak"><div><strong>Panic Shortcut</strong><small>Choose the key and where it opens. Enter a full URL, or leave the destination as “Use selected cloak”.</small><input id="setting-panic" class="settings-inline-input" value="F1" disabled aria-label="Panic key"><input id="setting-panic-destination" class="settings-inline-input" value="cloak" placeholder="https://example.com or cloak" disabled aria-label="Panic destination"></div></div>
       </div></section>
       <section class="settings-page" data-settings-page="customize"><h2>Customize</h2><div class="settings-card">
         <div class="settings-row" data-search="site theme"><div><strong>Site Theme</strong><small>Customize the appearance of the website by selecting a theme.</small></div><div class="custom-select settings-control" id="setting-theme"></div></div>
@@ -1276,7 +1276,7 @@ try {
 applyTabCloak("none");
 
 /* Persisted Doc preferences. Waterfront + slideshow are the established defaults. */
-const DOC_SETTINGS_KEY="doc-preferences-v2",settingDefaults={theme:"waterfront",background:"slideshow",appsPage:"20",navScale:"100",searchEngine:"ddg",tabsBar:true,donation:true,compactHeader:false,aboutBlank:false,autoCloak:false,panicEnabled:false,panicKey:"F1",confirmLeave:true,wisp:"wss://wisp.mercurywork.shop"};
+const DOC_SETTINGS_KEY="doc-preferences-v2",settingDefaults={theme:"waterfront",background:"slideshow",appsPage:"20",navScale:"100",searchEngine:"ddg",tabsBar:true,donation:true,compactHeader:false,aboutBlank:false,autoCloak:false,panicEnabled:false,panicKey:"F1",panicDestination:"cloak",confirmLeave:true,wisp:"wss://wisp.mercurywork.shop"};
 let docSettings={...settingDefaults};try{docSettings={...docSettings,...JSON.parse(localStorage.getItem(DOC_SETTINGS_KEY)||"{}")}}catch{}
 function saveDocSettings(){try{localStorage.setItem(DOC_SETTINGS_KEY,JSON.stringify(docSettings))}catch{}}
 const themeOpts=[{value:"waterfront",label:"Waterfront (selected)"},{value:"midnight",label:"Midnight"},{value:"light",label:"Light"}],bgOpts=[{value:"slideshow",label:"Image Slideshow (selected)"},{value:"dots",label:"Dots"},{value:"none",label:"None"}],pageOpts=[{value:"20",label:"20 apps (selected)"},{value:"all",label:"All apps"},{value:"10",label:"10 apps"},{value:"15",label:"15 apps"}],scaleOpts=[{value:"100",label:"100% (selected)"},{value:"90",label:"90%"},{value:"110",label:"110%"},{value:"125",label:"125%"}],searchOpts=[{value:"ddg",label:"DuckDuckGo (selected)"},{value:"google",label:"Google"},{value:"brave",label:"Brave"},{value:"bing",label:"Bing"}];
@@ -1289,7 +1289,7 @@ settingSelect("setting-nav-scale",scaleOpts,"navScale",v=>document.documentEleme
 settingSelect("setting-search-engine",searchOpts,"searchEngine",v=>{currentEngine=v;document.getElementById("engine-name").textContent=engines[v].name});
 function bindPref(id,key,type="checkbox"){const el=document.getElementById(id);if(!el)return;el[type==="checkbox"?"checked":"value"]=docSettings[key];el.addEventListener("change",()=>{docSettings[key]=type==="checkbox"?el.checked:el.value;saveDocSettings()})}
 ["tabsBar","donation","compactHeader","aboutBlank","panicEnabled","confirmLeave"].forEach((key,i)=>bindPref(["setting-tabs-bar","setting-donation","setting-compact-header","setting-blank-start","setting-panic-enabled","setting-confirm-leave"][i],key));document.getElementById("setting-tabs-bar").addEventListener("change",e=>{document.getElementById("browser-tabs").style.display=e.target.checked?"flex":"none"});document.getElementById("setting-compact-header").addEventListener("change",e=>applyCompactHeader(e.target.checked));
-bindPref("setting-panic","panicKey","text");const wispInput=document.getElementById("setting-wisp");wispInput.value=docSettings.wisp||settingDefaults.wisp;wispInput.addEventListener("change",()=>{const v=wispInput.value.trim();if(!/^wss?:\/\//i.test(v)){wispInput.setCustomValidity("Enter a valid ws:// or wss:// address.");wispInput.reportValidity();return}wispInput.setCustomValidity("");docSettings.wisp=v.replace(/\/$/,"");saveDocSettings();if(confirm("Wisp server saved. Reload Doc now to apply it?"))location.reload()});
+bindPref("setting-panic","panicKey","text");bindPref("setting-panic-destination","panicDestination","text");const wispInput=document.getElementById("setting-wisp");wispInput.value=docSettings.wisp||settingDefaults.wisp;wispInput.addEventListener("change",()=>{const v=wispInput.value.trim();if(!/^wss?:\/\//i.test(v)){wispInput.setCustomValidity("Enter a valid ws:// or wss:// address.");wispInput.reportValidity();return}wispInput.setCustomValidity("");docSettings.wisp=v.replace(/\/$/,"");saveDocSettings();if(confirm("Wisp server saved. Reload Doc now to apply it?"))location.reload()});
 const blankStartToggle=document.getElementById("setting-blank-start"),autoCloakToggle=document.getElementById("setting-auto-cloak"),autoCloakRow=document.getElementById("auto-cloak-row");
 function syncAutoCloakAvailability(){const available=blankStartToggle.checked;autoCloakToggle.disabled=!available;if(!available){autoCloakToggle.checked=false;docSettings.autoCloak=false;saveDocSettings()}autoCloakRow.classList.toggle("is-disabled",!available)}
 autoCloakToggle.checked=!!docSettings.autoCloak&&!!docSettings.aboutBlank;
@@ -1300,10 +1300,32 @@ autoCloakToggle.addEventListener("change",()=>{docSettings.autoCloak=autoCloakTo
 let startupCloakPending=!!(docSettings.aboutBlank&&docSettings.autoCloak);
 if(startupCloakPending){document.addEventListener("click",function applyStartupCloak(){if(!startupCloakPending)return;startupCloakPending=false;applyTabCloak(cloakSelect.value);},{once:true,capture:true});}
 
-document.getElementById("setting-panic").disabled=!docSettings.panicEnabled;document.getElementById("panic-shortcut-row").classList.toggle("is-disabled",!docSettings.panicEnabled);
+document.getElementById("setting-panic").disabled=!docSettings.panicEnabled;document.getElementById("setting-panic-destination").disabled=!docSettings.panicEnabled;document.getElementById("panic-shortcut-row").classList.toggle("is-disabled",!docSettings.panicEnabled);
 document.documentElement.dataset.docTheme=docSettings.theme;document.documentElement.dataset.backgroundDesign=docSettings.background;document.documentElement.style.setProperty("--doc-nav-scale",Number(docSettings.navScale||100)/100);
 document.getElementById("browser-tabs").style.display=docSettings.tabsBar?"flex":"none";applyCompactHeader(docSettings.compactHeader);applyAppsPage(docSettings.appsPage);currentEngine=docSettings.searchEngine||"ddg";document.getElementById("engine-name").textContent=engines[currentEngine].name;
-document.getElementById("setting-panic-enabled").addEventListener("change",e=>{document.getElementById("setting-panic").disabled=!e.target.checked;document.getElementById("panic-shortcut-row").classList.toggle("is-disabled",!e.target.checked)});window.addEventListener("keydown",e=>{if(!docSettings.panicEnabled||e.repeat||e.ctrlKey||e.altKey||e.metaKey)return;const key=String(docSettings.panicKey||"F1").trim().toLowerCase();if(key&&e.key.toLowerCase()===key){e.preventDefault();try{window.open("about:blank","_blank","noopener")}catch{location.href="about:blank"}}});
+document.getElementById("setting-panic-enabled").addEventListener("change",e=>{document.getElementById("setting-panic").disabled=!e.target.checked;document.getElementById("setting-panic-destination").disabled=!e.target.checked;document.getElementById("panic-shortcut-row").classList.toggle("is-disabled",!e.target.checked)});
+function runPanicShortcut(){
+ const raw=String(docSettings.panicDestination||"cloak").trim();
+ if(raw.toLowerCase()!=="cloak"){
+  let target=raw;
+  if(!/^https?:\/\//i.test(target))target="https://"+target;
+  try{const parsed=new URL(target);if(!["http:","https:"].includes(parsed.protocol))return;window.open(parsed.href,"_blank","noopener,noreferrer")}catch(e){console.warn("[Doc] Invalid panic destination",e)}
+  return;
+ }
+ const cloak=TAB_CLOAKS[cloakSelect.value]||TAB_CLOAKS.none;
+ const popup=window.open("about:blank","_blank");
+ if(!popup)return;
+ try{
+  popup.opener=null;
+  popup.document.open();
+  popup.document.write("<!doctype html><html><head><meta charset='utf-8'><title></title><link rel='icon'></head><body></body></html>");
+  popup.document.close();
+  popup.document.title=cloak.title||"";
+  const icon=popup.document.querySelector("link[rel='icon']");
+  if(icon)icon.href=cloak.icon||"";
+ }catch(e){try{popup.location.replace("about:blank")}catch{}}
+}
+window.addEventListener("keydown",e=>{if(!docSettings.panicEnabled||e.repeat||e.ctrlKey||e.altKey||e.metaKey)return;const key=String(docSettings.panicKey||"F1").trim().toLowerCase();if(key&&e.key.toLowerCase()===key){e.preventDefault();runPanicShortcut()}});
 window.addEventListener("beforeunload",e=>{if(docSettings.confirmLeave){e.preventDefault();e.returnValue=""}});
 document.querySelectorAll(".settings-nav-item").forEach(btn=>btn.addEventListener("click",()=>{document.querySelectorAll(".settings-nav-item").forEach(x=>x.classList.toggle("active",x===btn));document.querySelectorAll(".settings-page").forEach(p=>p.classList.toggle("active",p.dataset.settingsPage===btn.dataset.settingsTab));document.getElementById("settings-filter").value="";filterSettings("")}));
 function filterSettings(q){
