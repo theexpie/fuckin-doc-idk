@@ -885,6 +885,7 @@ body.browsing .view-panel{visibility:hidden}
       </div></section><p class="settings-no-results" hidden>No settings match that filter.</p>
     </div>
   </div>
+</div>
 
 <!-- Browser workspace -->
 <div id="main-view">
@@ -1113,23 +1114,22 @@ function makeDocDropdown(root,options,initial,onChange,kind="catalog"){
   const selected=options.find(o=>o.value===value)||options[0];label.textContent=selected.label;
   menu.innerHTML=options.map(o=>`<button type="button" class="${optionClass}" role="option" data-value="${o.value}" aria-selected="${o.value===value}">${o.label}</button>`).join("");
  }
- function close(){root.classList.remove("open","drop-up");menu.style.maxHeight="";trigger.setAttribute("aria-expanded","false");menu.hidden=true}
+ function close(){root.classList.remove("open","drop-up");menu.style.maxHeight="";menu.style.position="";menu.style.left="";menu.style.top="";menu.style.width="";menu.style.zIndex="";trigger.setAttribute("aria-expanded","false");menu.hidden=true}
  function placeMenu(){
-  root.classList.remove("drop-up");menu.style.maxHeight="";
-  const rect=trigger.getBoundingClientRect(),panel=root.closest(".view-panel"),panelRect=panel?.getBoundingClientRect();
-  const bottomEdge=Math.min(window.innerHeight-14,panelRect?.bottom??window.innerHeight-14);
-  const topEdge=Math.max(14,panelRect?.top??14);
-  const below=Math.max(0,bottomEdge-rect.bottom-10),above=Math.max(0,rect.top-topEdge-10);
-  const desired=Math.min(240,menu.scrollHeight+10);
-  if(below<desired&&above>below)root.classList.add("drop-up");
-  const available=root.classList.contains("drop-up")?above:below;
-  menu.style.maxHeight=Math.max(90,Math.min(240,available-4))+"px";
+  const rect=trigger.getBoundingClientRect(),gap=7,edge=12;
+  const below=Math.max(0,window.innerHeight-rect.bottom-edge),above=Math.max(0,rect.top-edge);
+  const desired=Math.min(240,menu.scrollHeight+10),up=below<desired&&above>below;
+  const available=up?above:below,max=Math.max(70,Math.min(240,available-4));
+  menu.style.position="fixed";menu.style.left=Math.round(rect.left)+"px";menu.style.width=Math.round(rect.width)+"px";
+  menu.style.maxHeight=max+"px";menu.style.top=(up?Math.max(edge,rect.top-Math.min(desired,max)-gap):rect.bottom+gap)+"px";
+  menu.style.bottom="auto";menu.style.right="auto";menu.style.zIndex="2147483000";
  }
- trigger.addEventListener("click",()=>{const opening=!root.classList.contains("open");document.querySelectorAll(".catalog-dropdown.open,.custom-select.open").forEach(el=>{el.classList.remove("open","drop-up");const m=el.querySelector('[role="listbox"]');if(m){m.hidden=true;m.style.maxHeight=""}el.querySelector("button")?.setAttribute("aria-expanded","false")});if(opening){root.classList.add("open");trigger.setAttribute("aria-expanded","true");menu.hidden=false;placeMenu()}});
+ trigger.addEventListener("click",()=>{const opening=!root.classList.contains("open");document.querySelectorAll(".catalog-dropdown.open,.custom-select.open").forEach(el=>{el.classList.remove("open","drop-up");const m=el.querySelector('[role="listbox"]');if(m){m.hidden=true;m.style.maxHeight="";m.style.position="";m.style.left="";m.style.top="";m.style.width="";m.style.zIndex="";m.style.position="";m.style.left="";m.style.top="";m.style.width="";m.style.zIndex=""}el.querySelector("button")?.setAttribute("aria-expanded","false")});if(opening){root.classList.add("open");trigger.setAttribute("aria-expanded","true");menu.hidden=false;placeMenu()}});
  menu.addEventListener("click",e=>{const option=e.target.closest("[data-value]");if(!option)return;value=option.dataset.value;draw();close();onChange(value)});
  root._docSelect={get value(){return value},set value(v){if(options.some(o=>o.value===v)){value=v;draw();onChange(value)}}};
  draw();return root._docSelect;
 }
+window.addEventListener("resize",()=>document.querySelectorAll(".catalog-dropdown.open,.custom-select.open").forEach(el=>{const t=el.querySelector("button"),m=el.querySelector('[role="listbox"]');if(t&&m){const r=t.getBoundingClientRect();m.style.left=Math.round(r.left)+"px";m.style.top=(r.bottom+7)+"px"}}));
 document.addEventListener("click",e=>{if(!e.target.closest(".catalog-dropdown,.custom-select"))document.querySelectorAll(".catalog-dropdown.open,.custom-select.open").forEach(el=>{el.classList.remove("open","drop-up");el.querySelector("button")?.setAttribute("aria-expanded","false");const m=el.querySelector('[role="listbox"]');if(m){m.hidden=true;m.style.maxHeight=""}})});
 function populateGrid(containerId,list,filterId,categoryId,countId,kind){
  const grid=document.getElementById(containerId),search=document.getElementById(filterId),categoryRoot=document.getElementById(categoryId),count=document.getElementById(countId);
