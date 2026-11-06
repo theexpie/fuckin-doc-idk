@@ -828,6 +828,22 @@ body.browsing .view-panel{visibility:hidden}
 }
 @media(max-width:390px){.settings-nav-item{font-size:10px;gap:4px}.settings-row{align-items:flex-start}.settings-control{max-width:46%;width:46%}}
 .catalog-dropdown-menu,.custom-select-menu{display:block;visibility:hidden;opacity:0;pointer-events:none;transform:translateY(-7px) scale(.96,.9);transform-origin:top center;transition:opacity .18s ease,transform .28s var(--ease-water),visibility 0s linear .28s;will-change:opacity,transform}.catalog-dropdown-menu.doc-dropdown-menu-open,.custom-select-menu.doc-dropdown-menu-open{visibility:visible;opacity:1;pointer-events:auto;transform:translateY(0) scale(1);transition-delay:0s}.catalog-dropdown-menu[hidden],.custom-select-menu[hidden]{display:none!important}#view-apps.compact-catalog .catalog-hero,#view-games.compact-catalog .catalog-hero{padding-top:12px;padding-bottom:10px}#view-apps.compact-catalog .catalog-title-row,#view-games.compact-catalog .catalog-title-row{margin-bottom:8px}#view-apps.compact-catalog .catalog-heading,#view-games.compact-catalog .catalog-heading{font-size:22px}#view-apps.compact-catalog .catalog-card,#view-games.compact-catalog .catalog-card{min-height:58px;padding:8px 11px}#view-apps.compact-catalog .catalog-section-label,#view-games.compact-catalog .catalog-section-label{margin-bottom:7px}
+
+/* Water-drop separation: each menu grows out of the exact edge of its trigger. */
+@keyframes doc-droplet-detach{
+  0%{opacity:0;transform:translateY(-3px) scale(.12,.08);border-radius:50%;filter:blur(3px)}
+  48%{opacity:1;transform:translateY(0) scale(1.035,.94);border-radius:26px;filter:blur(.35px)}
+  72%{transform:translateY(0) scale(.985,1.015);border-radius:19px}
+  100%{opacity:1;transform:translateY(0) scale(1,1);border-radius:13px;filter:blur(0)}
+}
+.catalog-dropdown-menu.doc-dropdown-menu-open,.custom-select-menu.doc-dropdown-menu-open{
+  animation:doc-droplet-detach .46s cubic-bezier(.2,.82,.22,1) both;
+  transform-origin:var(--doc-drop-origin,center top);
+  will-change:transform,opacity,border-radius,filter;
+}
+@media(prefers-reduced-motion:reduce){
+ .catalog-dropdown-menu.doc-dropdown-menu-open,.custom-select-menu.doc-dropdown-menu-open{animation:none;opacity:1;transform:none;filter:none}
+}
 </style>
 </head>
 <body>
@@ -1165,7 +1181,7 @@ function makeDocDropdown(root,options,initial,onChange,kind="catalog"){
  root.innerHTML=`<button type="button" class="${triggerClass}" aria-haspopup="listbox" aria-expanded="false"><span></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>`;
  const trigger=root.querySelector("button"),label=trigger.querySelector("span"),menu=document.createElement("div");menu.className=menuClass;menu.setAttribute("role","listbox");menu.hidden=true;menu.dataset.docDropdownMenu="true";document.body.appendChild(menu);
  function draw(){const selected=options.find(o=>o.value===value)||options[0];label.textContent=selected?.label||"";menu.innerHTML=options.map(o=>`<button type="button" class="${optionClass}" role="option" data-value="${String(o.value).replace(/&/g,"&amp;").replace(/"/g,"&quot;")}" aria-selected="${o.value===value}">${o.label}</button>`).join("")}
- function placeMenu(){const r=trigger.getBoundingClientRect(),edge=12,gap=7,below=window.innerHeight-r.bottom-edge,above=r.top-edge,desired=Math.min(240,menu.scrollHeight+10),up=below<desired&&above>below,available=Math.max(70,(up?above:below)-4),height=Math.min(desired,available);root.classList.toggle("drop-up",up);menu.classList.add("doc-dropdown-menu-open");menu.style.position="fixed";menu.style.left=Math.max(edge,Math.min(r.left,window.innerWidth-r.width-edge))+"px";menu.style.width=Math.min(r.width,window.innerWidth-edge*2)+"px";menu.style.maxHeight=height+"px";menu.style.top=(up?Math.max(edge,r.top-height-gap):r.bottom+gap)+"px";menu.style.bottom="auto";menu.style.zIndex="2147483000"}
+ function placeMenu(){const r=trigger.getBoundingClientRect(),edge=12,gap=7,below=window.innerHeight-r.bottom-edge,above=r.top-edge,desired=Math.min(240,menu.scrollHeight+10),up=below<desired&&above>below,available=Math.max(70,(up?above:below)-4),height=Math.min(desired,available),left=Math.max(edge,Math.min(r.left,window.innerWidth-r.width-edge)),top=up?Math.max(edge,r.top-height-gap):r.bottom+gap;root.classList.toggle("drop-up",up);menu.style.position="fixed";menu.style.left=left+"px";menu.style.width=Math.min(r.width,window.innerWidth-edge*2)+"px";menu.style.maxHeight=height+"px";menu.style.top=top+"px";menu.style.bottom="auto";menu.style.zIndex="2147483000";menu.style.transformOrigin=(r.left+r.width/2-left)+"px "+(up?r.bottom-top:r.top-top)+"px";menu.classList.add("doc-dropdown-menu-open")}
  function close(){root.classList.remove("open","drop-up");menu.classList.remove("doc-dropdown-menu-open");menu.hidden=true;menu.style.cssText="";trigger.setAttribute("aria-expanded","false")}
  trigger.addEventListener("click",e=>{e.stopPropagation();const opening=!root.classList.contains("open");document.querySelectorAll(".catalog-dropdown.open,.custom-select.open").forEach(el=>{if(el!==root)el._docSelect?.close?.()});if(!opening){close();return}root.classList.add("open");menu.hidden=false;trigger.setAttribute("aria-expanded","true");placeMenu()});
  menu.addEventListener("click",e=>{const option=e.target.closest("[data-value]");if(!option)return;value=option.dataset.value;draw();close();onChange(value)});
