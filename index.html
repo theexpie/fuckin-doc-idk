@@ -1329,12 +1329,17 @@ function runPanicShortcut(){
   popup.document.open();
   popup.document.write("<!doctype html><html><head><meta charset='utf-8'><title></title><link rel='icon'></head><body><script id="doc-scrambled-text">
 (function(){
-  const plain="abcdefghijklmnopqrstuvwxyz", keyed="qwertyuiopasdfghjklzxcvbnm";
+  /* The supplied font's cmap maps typed letters to these visible glyphs.
+     Reverse that table so the browser stores scrambled text but paints normal text. */
+  const alphabet="abcdefghijklmnopqrstuvwxyz";
+  const fontGlyphs="ruwzvyijpadltfhqkmscobxgne";
   const encode=value=>String(value).replace(/[a-z]/gi,ch=>{
-    const i=plain.indexOf(ch.toLowerCase()), out=keyed[i]||ch;
-    return ch===ch.toUpperCase()?out.toUpperCase():out;
+    const lower=ch.toLowerCase(), index=fontGlyphs.indexOf(lower);
+    if(index<0)return ch;
+    const encoded=alphabet[index];
+    return ch===ch.toUpperCase()?encoded.toUpperCase():encoded;
   });
-  const seenText=new WeakMap(), seenAttrs=new WeakMap();
+  const seenText=new WeakMap(),seenAttrs=new WeakMap();
   const excluded="SCRIPT,STYLE,NOSCRIPT,TEXTAREA,INPUT,OPTION,CODE,PRE";
   function encodeText(node){
     const parent=node&&node.parentElement;
@@ -1361,7 +1366,10 @@ function runPanicShortcut(){
     if(root.nodeType===Node.TEXT_NODE){encodeText(root);return;}
     if(root.nodeType===Node.ELEMENT_NODE)encodeElement(root);
     if(root.querySelectorAll)root.querySelectorAll("*").forEach(encodeElement);
-    if(root.querySelectorAll){const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while((n=walker.nextNode()))encodeText(n);}
+    if(root.querySelectorAll){
+      const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+      let node;while((node=walker.nextNode()))encodeText(node);
+    }
   }
   function start(){
     scan(document.body);
