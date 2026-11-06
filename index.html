@@ -862,7 +862,7 @@ body.browsing .view-panel{visibility:hidden}
 <body>
 
 <div class="doc-loader" id="startup-loader" role="status" aria-live="polite">
-  <div class="doc-loader-card"><div class="doc-loader-mark">Kut</div><div class="doc-loader-spinner" aria-hidden="true"></div></div>
+  <div class="doc-loader-card"><div class="doc-loader-mark">Doc</div><div class="doc-loader-spinner" aria-hidden="true"></div></div>
 </div>
 <script>
 /* Independent failsafe: the workspace splash must never trap the app if a later script fails. */
@@ -893,13 +893,13 @@ body.browsing .view-panel{visibility:hidden}
 
 <div id="app">
   <header>
-    <div class="brand">Kut<span>.</span></div>
+    <div class="brand">Doc<span>.</span></div>
   </header>
 
   <!-- Home View -->
   <div class="view-panel active" id="view-home">
     <div class="home-hero">
-      <h1 class="home-title">Kut.</h1>
+      <h1 class="home-title">Doc.</h1>
       <div class="home-subtitle" id="home-splash">A little tide, a lot of tabs.</div>
       <div class="search-container">
         <div class="engine-select">
@@ -1329,56 +1329,60 @@ function runPanicShortcut(){
   popup.document.open();
   popup.document.write("<!doctype html><html><head><meta charset='utf-8'><title></title><link rel='icon'></head><body><script id="doc-scrambled-text">
 (function(){
-  /* Store inverse-mapped characters so the scrambled font paints ordinary text. */
   const alphabet="abcdefghijklmnopqrstuvwxyz";
-  const glyphs="ruwzvyijpadltfhqkmscobxgne";
-  const mapChar=ch=>{
-    const i=glyphs.indexOf(ch.toLowerCase());
-    if(i<0)return ch;
-    const out=alphabet[i];
+  /* Reverse the supplied font's cmap: plaintext glyph -> stored QWERTY character. */
+  const fontGlyphs="ruwzvyijpadltfhqkmscobxgne";
+  const encode=value=>String(value).replace(/[a-z]/gi,ch=>{
+    const index=fontGlyphs.indexOf(ch.toLowerCase());
+    if(index<0)return ch;
+    const out=alphabet[index];
     return ch===ch.toUpperCase()?out.toUpperCase():out;
-  };
-  const encode=value=>String(value).replace(/[a-z]/gi,mapChar);
-  const excluded="SCRIPT,STYLE,NOSCRIPT,TEXTAREA,INPUT,OPTION,CODE,PRE";
-  const textCache=new WeakMap(),attrCache=new WeakMap();
+  });
+  const seenText=new WeakMap(),seenAttrs=new WeakMap();
+  const skipText="SCRIPT,STYLE,NOSCRIPT,TEXTAREA,INPUT,CODE,PRE";
   function encodeText(node){
-    const parent=node.parentElement;
-    if(!parent||parent.closest(excluded)||parent.isContentEditable)return;
-    const raw=node.nodeValue;
-    if(textCache.get(node)===raw)return;
-    const encoded=encode(raw);
-    textCache.set(node,encoded);
-    if(encoded!==raw)node.nodeValue=encoded;
+    const parent=node&&node.parentElement;
+    if(!parent||parent.closest(skipText)||parent.isContentEditable)return;
+    const value=node.nodeValue;
+    if(seenText.get(node)===value)return;
+    const encoded=encode(value);
+    seenText.set(node,encoded);
+    if(encoded!==value)node.nodeValue=encoded;
   }
-  function encodeAttributes(el){
-    if(!(el instanceof Element)||el.closest(excluded))return;
-    let state=attrCache.get(el);if(!state){state={};attrCache.set(el,state);}
+  function encodeElement(el){
+    if(!(el instanceof Element)||el.closest("SCRIPT,STYLE,NOSCRIPT,CODE,PRE"))return;
+    let state=seenAttrs.get(el);if(!state){state={};seenAttrs.set(el,state);}
     for(const name of ["placeholder","title","aria-label","alt"]){
       if(!el.hasAttribute(name))continue;
-      const raw=el.getAttribute(name);
-      if(state[name]===raw)continue;
-      const encoded=encode(raw);state[name]=encoded;
-      if(encoded!==raw)el.setAttribute(name,encoded);
+      const value=el.getAttribute(name);
+      if(state[name]===value)continue;
+      const encoded=encode(value);state[name]=encoded;
+      if(encoded!==value)el.setAttribute(name,encoded);
     }
+    for(const child of el.childNodes)if(child.nodeType===Node.TEXT_NODE)encodeText(child);
   }
-  function scan(node){
-    if(node.nodeType===Node.TEXT_NODE){encodeText(node);return;}
-    if(node.nodeType!==Node.ELEMENT_NODE&&node!==document.body)return;
-    if(node.nodeType===Node.ELEMENT_NODE)encodeAttributes(node);
-    const walker=document.createTreeWalker(node,NodeFilter.SHOW_TEXT);
-    let textNode;while((textNode=walker.nextNode()))encodeText(textNode);
-    if(node.querySelectorAll)node.querySelectorAll("*").forEach(encodeAttributes);
+  function scan(root){
+    if(root.nodeType===Node.TEXT_NODE){encodeText(root);return;}
+    if(root.nodeType===Node.ELEMENT_NODE)encodeElement(root);
+    if(root.querySelectorAll)root.querySelectorAll("*").forEach(encodeElement);
+    if(root.querySelectorAll){
+      const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+      let node;while((node=walker.nextNode()))encodeText(node);
+    }
   }
   function start(){
     scan(document.body);
+    const title=document.querySelector("head title");
+    if(title)scan(title);
+    document.title=encode(document.title);
     const observer=new MutationObserver(records=>{
       for(const record of records){
         if(record.type==="characterData")encodeText(record.target);
-        else if(record.type==="attributes")encodeAttributes(record.target);
+        else if(record.type==="attributes")encodeElement(record.target);
         else record.addedNodes.forEach(scan);
       }
     });
-    observer.observe(document.body,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["placeholder","title","aria-label","alt"]});
+    observer.observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["placeholder","title","aria-label","alt"]});
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start,{once:true});else start();
 })();
