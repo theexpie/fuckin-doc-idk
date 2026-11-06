@@ -1273,7 +1273,7 @@ try {
   const savedCloak = localStorage.getItem("doc-tab-cloak");
   if (savedCloak && TAB_CLOAKS[savedCloak]) cloakSelect.value = savedCloak;
 } catch (e) {}
-applyTabCloak(cloakSelect.value);
+applyTabCloak("none");
 
 /* Persisted Doc preferences. Waterfront + slideshow are the established defaults. */
 const DOC_SETTINGS_KEY="doc-preferences-v2",settingDefaults={theme:"waterfront",background:"slideshow",appsPage:"20",navScale:"100",searchEngine:"ddg",tabsBar:true,donation:true,compactHeader:false,aboutBlank:false,autoCloak:false,panicEnabled:false,panicKey:"F1",confirmLeave:true,wisp:"wss://wisp.mercurywork.shop"};
@@ -1294,8 +1294,11 @@ const blankStartToggle=document.getElementById("setting-blank-start"),autoCloakT
 function syncAutoCloakAvailability(){const available=blankStartToggle.checked;autoCloakToggle.disabled=!available;if(!available){autoCloakToggle.checked=false;docSettings.autoCloak=false;saveDocSettings()}autoCloakRow.classList.toggle("is-disabled",!available)}
 autoCloakToggle.checked=!!docSettings.autoCloak&&!!docSettings.aboutBlank;
 syncAutoCloakAvailability();
-blankStartToggle.addEventListener("change",()=>{docSettings.aboutBlank=blankStartToggle.checked;syncAutoCloakAvailability();saveDocSettings();if(docSettings.aboutBlank&&docSettings.autoCloak)applyTabCloak(cloakSelect.value);else if(!docSettings.autoCloak)applyTabCloak("none");});
-autoCloakToggle.addEventListener("change",()=>{docSettings.autoCloak=autoCloakToggle.checked;saveDocSettings();if(docSettings.autoCloak)applyTabCloak(cloakSelect.value);});
+blankStartToggle.addEventListener("change",()=>{docSettings.aboutBlank=blankStartToggle.checked;syncAutoCloakAvailability();saveDocSettings();if(!docSettings.aboutBlank)applyTabCloak("none");});
+autoCloakToggle.addEventListener("change",()=>{docSettings.autoCloak=autoCloakToggle.checked;saveDocSettings();if(!docSettings.autoCloak)applyTabCloak("none");});
+/* Startup cloak waits for the first real user click. Never navigate the embedded frame to about:blank here: inside srcdoc Firefox can expose it as about:sourcedoc. */
+let startupCloakPending=!!(docSettings.aboutBlank&&docSettings.autoCloak);
+if(startupCloakPending){document.addEventListener("click",function applyStartupCloak(){if(!startupCloakPending)return;startupCloakPending=false;applyTabCloak(cloakSelect.value);},{once:true,capture:true});}
 
 document.getElementById("setting-panic").disabled=!docSettings.panicEnabled;document.getElementById("panic-shortcut-row").classList.toggle("is-disabled",!docSettings.panicEnabled);
 document.documentElement.dataset.docTheme=docSettings.theme;document.documentElement.dataset.backgroundDesign=docSettings.background;document.documentElement.style.setProperty("--doc-nav-scale",Number(docSettings.navScale||100)/100);
@@ -1604,9 +1607,9 @@ function makePanelMovable(panel){
 }
 Object.values(panels).forEach(makePanelMovable);
 renderBookmarks();renderHistory();
-/* Startup cloak is applied after preferences and the saved cloak choice are restored. */
+/* Keep the startup frame on its normal in-app blank state. Cloaking is deferred until the first user click above. */
 const startupTab=createBrowserTab();
-if(docSettings.aboutBlank){browserFrame.src="about:blank";urlDisplay.value="";startupTab.url="";startupTab.title="New tab";renderBrowserTabs();if(docSettings.autoCloak)applyTabCloak(cloakSelect.value);else applyTabCloak("none");}else applyTabCloak("none");
+if(!docSettings.aboutBlank||!docSettings.autoCloak)applyTabCloak("none");
 
 /* Dock visibility is synchronized to the actual browser-view state above. */
 </script>
