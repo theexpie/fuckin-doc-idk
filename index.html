@@ -1770,6 +1770,65 @@ applyTabCloak("none");
   .chrome-url-shell{min-width:42px;padding:0 5px}
   .url-lock{display:none!important}
 }
+
+/* Center the animated browser dock against the viewport and keep every control visible. */
+#browser-chrome{
+  position:fixed!important;left:50%!important;right:auto!important;
+  width:min(720px,calc(100vw - 24px))!important;
+  max-width:calc(100vw - 24px)!important;
+  margin:0!important;box-sizing:border-box!important;
+  transform:translate3d(-50%,0,0);
+}
+#browser-chrome.collapsed{transform:translate3d(-50%,145%,0)}
+#browser-chrome-controls{
+  display:flex!important;align-items:center!important;
+  width:100%!important;min-width:0!important;gap:clamp(1px,0.55vw,5px)!important;
+  flex-wrap:nowrap!important;overflow:visible!important;
+}
+#browser-chrome-controls>.chrome-icon-btn{
+  flex:0 0 34px!important;width:34px!important;min-width:34px!important;
+  height:34px!important;box-sizing:border-box!important;
+}
+#browser-chrome-controls>.chrome-divider{flex:0 0 1px!important}
+#browser-chrome-controls>.chrome-url-shell{
+  flex:1 1 0!important;width:auto!important;min-width:0!important;
+  max-width:none!important;box-sizing:border-box!important;
+}
+#browser-chrome-controls .chrome-url-shell .url-display{
+  flex:1 1 0!important;width:0!important;min-width:0!important;
+}
+#browser-tabs{min-width:0!important;width:100%!important;box-sizing:border-box!important}
+#tab-strip{flex:1 1 0!important;width:0!important;min-width:0!important}
+#new-tab{flex:0 0 34px!important}
+#chrome-reveal{position:fixed!important;left:50%!important}
+@media(max-width:680px){
+  #browser-chrome{
+    width:calc(100vw - 20px)!important;max-width:calc(100vw - 20px)!important;
+    bottom:calc(12px + env(safe-area-inset-bottom,0px))!important;
+    padding:6px!important;
+  }
+  #browser-chrome-controls{gap:2px!important}
+  #browser-chrome-controls>.chrome-icon-btn{
+    flex-basis:30px!important;width:30px!important;min-width:30px!important;
+    height:30px!important;
+  }
+  #browser-chrome-controls>.chrome-url-shell{
+    flex:1 1 0!important;min-width:0!important;padding-inline:5px!important;gap:4px!important;
+  }
+  #browser-chrome-controls .url-lock{display:none!important}
+  #browser-chrome-controls>.chrome-divider{display:none!important}
+  #new-tab{flex-basis:30px!important}
+}
+@media(max-width:380px){
+  #browser-chrome{width:calc(100vw - 16px)!important;max-width:calc(100vw - 16px)!important;padding:5px!important}
+  #browser-chrome-controls{gap:1px!important}
+  #browser-chrome-controls>.chrome-icon-btn{
+    flex-basis:27px!important;width:27px!important;min-width:27px!important;height:29px!important;
+  }
+  #browser-chrome-controls>.chrome-url-shell{padding-inline:3px!important}
+  #new-tab{flex-basis:27px!important}
+}
+
 </style>
 <script id="doc-font-text-encoder">
 (function(){
